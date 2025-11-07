@@ -132,7 +132,9 @@ exports.createDungeon = async (req, res) => {
     res.status(500).json({ 
       message: 'Error creating dungeon', 
       error: error.message 
+      
     });
+    console.error(error);
   }
 };
 
