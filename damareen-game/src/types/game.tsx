@@ -1,5 +1,6 @@
-// World Card Types
-export interface WorldCardData {
+// src/types/game.ts
+export interface WorldCard {
+  _id: string
   name: string
   damage: number
   health: number
@@ -7,63 +8,38 @@ export interface WorldCardData {
   isLeader?: boolean
   originalCard?: string
   boostType?: 'damage' | 'health'
-}
-
-export interface WorldCard extends WorldCardData {
-  _id: string
   createdBy: string
   createdAt: string
   updatedAt: string
 }
 
-export interface WorldCardsResponse {
-  cards: WorldCard[]
+export interface WorldCardData {
+  name: string
+  damage: number
+  health: number
+  type: 'föld' | 'levegő' | 'víz' | 'tűz'
 }
 
-// Leader Card Types
 export interface LeaderCardData {
   originalCardId: string
   newName: string
   boostType: 'damage' | 'health'
 }
 
-export interface LeaderCardResponse {
-  message: string
-  card: WorldCard
-}
-
-// Dungeon Types
-export interface DungeonData {
-  name: string
-  type: 'Egyszerű találkozás' | 'Kis kazamata' | 'Nagy kazamata'
-  cardIds: string[]
-}
-
 export interface Dungeon {
   _id: string
   name: string
-  type: string
+  type: 'Egyszerű találkozás' | 'Kis kazamata' | 'Nagy kazamata'
   cards: WorldCard[]
   createdBy: string
   createdAt: string
   updatedAt: string
 }
 
-export interface DungeonsResponse {
-  dungeons: Dungeon[]
-}
-
-export interface DungeonResponse {
-  message: string
-  dungeon: Dungeon
-}
-
-// Game Environment Types
-export interface GameEnvironmentData {
+export interface DungeonData {
   name: string
-  worldCardIds: string[]
-  dungeonIds: string[]
-  starterCollectionIds: string[]
+  type: 'Egyszerű találkozás' | 'Kis kazamata' | 'Nagy kazamata'
+  cardIds: string[]
 }
 
 export interface GameEnvironment {
@@ -78,11 +54,27 @@ export interface GameEnvironment {
   updatedAt: string
 }
 
+export interface GameEnvironmentData {
+  name: string
+  worldCardIds: string[]
+  dungeonIds: string[]
+  starterCollectionIds: string[]
+}
+
+// Response types
+export interface WorldCardsResponse {
+  cards: WorldCard[]
+}
+
+export interface DungeonsResponse {
+  dungeons: Dungeon[]
+}
+
 export interface GameEnvironmentsResponse {
   environments: GameEnvironment[]
 }
 
-export interface GameEnvironmentResponse {
+export interface ApiResponse<T> {
   message: string
-  gameEnvironment: GameEnvironment
+  data?: T
 }

@@ -208,6 +208,7 @@ exports.createGameEnvironment = async (req, res) => {
       message: 'Error creating game environment', 
       error: error.message 
     });
+    console.error(error);
   }
 };
 
