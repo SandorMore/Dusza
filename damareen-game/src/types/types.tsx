@@ -1,12 +1,12 @@
-export type CardType = "tűz" | "víz" | "föld" | "levegő"
-export type DungeonType = "egyszerű" | "kis" | "nagy"
+export type CardType = 'tűz' | 'víz' | 'föld' | 'levegő';
+export type DungeonType = 'egyszerű' | 'kis' | 'nagy';
 
-export interface BaseCard{
-    id: string,
-    name: string,
-    damage: number,
-    health: number,
-    type: CardType
+export interface BaseCard {
+  id: string;
+  name: string;
+  damage: number;
+  health: number;
+  type: CardType;
 }
 
 export interface LeaderCard extends BaseCard {
@@ -29,22 +29,21 @@ export interface Dungeon {
   };
 }
 
-export interface Deck{
-    id: string,
-    name: string,
-    cards: BaseCard[]
+export interface PlayerCollection {
+  id: string;
+  name: string;
+  cards: BaseCard[];
 }
 
-export interface PlayerCollection{
-    id: string,
-    name: string,
-    cards: BaseCard[]
+export interface Deck {
+  id: string;
+  name: string;
+  cards: BaseCard[];
 }
 
 export interface BattleResult {
   winner: 'player' | 'dungeon';
   rounds: BattleRound[];
-  rewardApplied?: boolean;
 }
 
 export interface BattleRound {
