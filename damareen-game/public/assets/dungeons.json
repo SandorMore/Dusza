@@ -1,0 +1,109 @@
+[
+    {
+        "id": "1",
+        "name": "A mélység királynője",
+        "difficulty": 3,
+        "cards": [
+            {
+                "id": "1",
+                "name": "Aragorn",
+                "damage": 2,
+                "health": 5,
+                "type": "tűz"
+            },
+            {
+                "id": "2",
+                "name": "ObiWan",
+                "damage": 2,
+                "health": 2,
+                "type": "föld"
+            },
+            {
+                "id": "3",
+                "name": "Eowyn",
+                "damage": 2,
+                "health": 5,
+                "type": "víz"
+            },
+            {
+                "id": "4",
+                "name": "Kira",
+                "damage": 2,
+                "health": 7,
+                "type": "levegő"
+            },
+            {
+                "id": "5",
+                "name": "TulArak",
+                "damage": 2,
+                "health": 4,
+                "type": "föld"
+            },
+            {
+                "id": "11",
+                "name": "Darth ObiWan",
+                "damage": 4,
+                "health": 2,
+                "type": "föld",
+                "baseCardId": "2",
+                "isLeader": true,
+                "doubleDamage": true,
+                "doubleHealth": false
+            }
+        ],
+        "reward": {
+            "type": "damage",
+            "value": 3
+        }
+    },
+    {
+        "id": "2",
+        "name": "Tűz szörnyetege",
+        "difficulty": 1,
+        "cards": [
+            {
+                "id": "1",
+                "name": "Aragorn",
+                "damage": 2,
+                "health": 5,
+                "type": "tűz"
+            }
+        ],
+        "reward": {
+            "type": "damage",
+            "value": 1
+        }
+    },
+    {
+        "id": "3",
+        "name": "Vízi csapda",
+        "difficulty": 2,
+        "cards": [
+            {
+                "id": "5",
+                "name": "TulArak",
+                "damage": 2,
+                "health": 4,
+                "type": "föld"
+            },
+            {
+                "id": "6",
+                "name": "Sadan",
+                "damage": 2,
+                "health": 4,
+                "type": "levegő"
+            },
+            {
+                "id": "7",
+                "name": "Corky",
+                "damage": 2,
+                "health": 4,
+                "type": "föld"
+            }
+        ],
+        "reward": {
+            "type": "health",
+            "value": 2
+        }
+    }
+]

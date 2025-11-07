@@ -1,5 +1,4 @@
 export type CardType = 'tűz' | 'víz' | 'föld' | 'levegő';
-export type DungeonType = 'egyszerű' | 'kis' | 'nagy';
 
 export interface BaseCard {
   id: string;
@@ -18,10 +17,10 @@ export interface LeaderCard extends BaseCard {
 
 export type Card = BaseCard | LeaderCard;
 
-export interface Dungeon {
+export type DungeonType = {
   id: string;
   name: string;
-  type: DungeonType;
+  difficulty: number;
   cards: Card[];
   reward: {
     type: 'damage' | 'health';
@@ -57,6 +56,6 @@ export interface GameWorld {
   id: string;
   name: string;
   cards: Card[];
-  dungeons: Dungeon[];
+  dungeons: DungeonType[];
   playerCollections: PlayerCollection[];
 }

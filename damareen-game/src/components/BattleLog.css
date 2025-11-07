@@ -1,0 +1,68 @@
+.battle-log {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 20px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.battle-log h4 {
+  margin: 0 0 10px 0;
+  color: #e94560;
+  border-bottom: 1px solid #333;
+  padding-bottom: 5px;
+}
+
+.log-entry {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 8px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  transition: all 0.3s ease;
+}
+
+.log-entry.current {
+  background: rgba(233, 69, 96, 0.2);
+  border-left: 3px solid #e94560;
+}
+
+.log-entry.player-win {
+  background: rgba(78, 205, 196, 0.1);
+}
+
+.log-entry.dungeon-win {
+  background: rgba(255, 107, 107, 0.1);
+}
+
+.round-number {
+  font-weight: bold;
+  color: #ccc;
+  min-width: 50px;
+}
+
+.battle-info {
+  flex: 1;
+  color: #ddd;
+}
+
+.result {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.result.player {
+  color: #4ecdc4;
+}
+
+.result.dungeon {
+  color: #ff6b6b;
+}
+
+.reason {
+  font-size: 0.8rem;
+  color: #888;
+  font-style: italic;
+}
