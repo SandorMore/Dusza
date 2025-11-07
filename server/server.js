@@ -27,7 +27,14 @@ app.use((error, req, res, next) => {
   console.error(error.stack);
   res.status(500).json({ message: 'Something went wrong!' });
 });
+// server.js
 
+
+// Enable CORS for React app
+app.use(cors({
+  origin: 'http://localhost:3000', // React default port
+  credentials: true
+}));
 // 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });

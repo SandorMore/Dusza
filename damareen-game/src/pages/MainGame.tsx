@@ -1,7 +1,7 @@
 import React from 'react'
 import axios from "axios";
 import {useState, useEffect} from "react"
-import { DungeonType } from '../types/types';
+import type { DungeonType } from '../types/types';
 
 const MainGame = () => {
   const [dungeons, setDungeons] = useState<DungeonType[]>([])
