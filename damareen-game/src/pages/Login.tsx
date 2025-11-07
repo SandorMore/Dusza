@@ -1,4 +1,5 @@
-import React, { useState} from 'react'
+// src/pages/Login.tsx
+import React, { useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import type { LoginFormData } from '../types/auth'
@@ -20,8 +21,20 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    await login(formData)
-    // Redirect happens automatically through the hook
+    const success = await login(formData)
+    
+    if (success) {
+      // Get the updated user from localStorage
+      const userStr = localStorage.getItem('user')
+      const user = userStr ? JSON.parse(userStr) : null
+      
+      // Redirect based on role
+      if (user?.role === 'gameMaster') {
+        window.location.href = '/game-master'
+      } else {
+        window.location.href = '/player' // or whatever your player dashboard route is
+      }
+    }
   }
 
   return (

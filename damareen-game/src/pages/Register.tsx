@@ -22,16 +22,27 @@ const Register: React.FC = () => {
   }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setSuccessMessage('')
+  e.preventDefault()
+  setSuccessMessage('')
 
-    const success = await register(formData)
+  const success = await register(formData)
+  
+  if (success) {
+    setSuccessMessage('Sikeres regisztráció! Átirányítás...')
     
-    if (success) {
-      setSuccessMessage('Sikeres regisztráció! Átirányítás...')
-      // Redirect will happen automatically through the hook
-    }
+    // Wait a moment then redirect
+    setTimeout(() => {
+      const userStr = localStorage.getItem('user')
+      const user = userStr ? JSON.parse(userStr) : null
+      
+      if (user?.role === 'gameMaster') {
+        window.location.href = '/game-master'
+      } else {
+        window.location.href = '/player'
+      }
+    }, 1500)
   }
+}
 
   return (
     <div className='w-full h-screen flex justify-center items-center'>
