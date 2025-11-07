@@ -1,17 +1,18 @@
-import React, { useState} from 'react'
+// src/pages/Register.tsx - Javított verzió
+import React, { useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
-import { useAuth } from '../hooks/useAuth'
-import type { RegisterFormData } from '../types/auth'
+import { apiService } from '../services/api'
+import type { RegisterFormData, AuthResponse } from '../types/auth'
 
 const Register: React.FC = () => {
-  const { register, loading, error } = useAuth()
   const [formData, setFormData] = useState<RegisterFormData>({
     username: '',
     email: '',
     password: '',
     role: 'player'
   })
-  const [successMessage, setSuccessMessage] = useState<string>('')
+  const [loading, setLoading] = useState<boolean>(false)
+  const [message, setMessage] = useState<string>('')
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target
@@ -22,27 +23,47 @@ const Register: React.FC = () => {
   }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-  e.preventDefault()
-  setSuccessMessage('')
+    e.preventDefault()
+    setLoading(true)
+    setMessage('')
 
-  const success = await register(formData)
-  
-  if (success) {
-    setSuccessMessage('Sikeres regisztráció! Átirányítás...')
-    
-    // Wait a moment then redirect
-    setTimeout(() => {
-      const userStr = localStorage.getItem('user')
-      const user = userStr ? JSON.parse(userStr) : null
+    try {
+      console.log('Sending registration request...')
+      const response: AuthResponse = await apiService.register(formData)
+      console.log('Full API response:', response)
       
-      if (user?.role === 'gameMaster') {
-        window.location.href = '/game-master'
+      // MEGVÁLTOZOTT: tokens.accessToken használata
+      if (response.tokens?.accessToken) {
+        localStorage.setItem('token', response.tokens.accessToken)
+        console.log('AccessToken saved:', response.tokens.accessToken)
       } else {
-        window.location.href = '/player'
+        console.log('No accessToken in response!')
       }
-    }, 1500)
+      
+      if (response.user) {
+        localStorage.setItem('user', JSON.stringify(response.user))
+        console.log('User saved:', response.user)
+      } else {
+        console.log('No user in response!')
+      }
+      
+      if (response.tokens?.accessToken && response.user) {
+        setMessage('Sikeres regisztráció! Átirányítás...')
+        setTimeout(() => {
+          const redirectTo = response.user?.role === 'gameMaster' ? '/game-master' : '/player'
+          console.log('Redirecting to:', redirectTo)
+          window.location.href = redirectTo
+        }, 1500)
+      } else {
+        setMessage('Registration completed but missing tokens or user')
+      }
+    } catch (error: unknown) {
+      console.error('Registration error:', error)
+      setMessage('Registration failed')
+    } finally {
+      setLoading(false)
+    }
   }
-}
 
   return (
     <div className='w-full h-screen flex justify-center items-center'>
@@ -50,15 +71,13 @@ const Register: React.FC = () => {
         <form onSubmit={handleSubmit} className='flex flex-col w-full'>
           <h1 className='text-[3rem] mb-4'>Regisztráció</h1>
 
-          {successMessage && (
-            <div className='p-3 mb-4 rounded bg-green-100 text-green-800'>
-              {successMessage}
-            </div>
-          )}
-
-          {error && (
-            <div className='p-3 mb-4 rounded bg-red-100 text-red-800'>
-              {error}
+          {message && (
+            <div className={`p-3 mb-4 rounded ${
+              message.includes('Sikeres') 
+                ? 'bg-green-100 text-green-800' 
+                : 'bg-red-100 text-red-800'
+            }`}>
+              {message}
             </div>
           )}
 

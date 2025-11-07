@@ -1,4 +1,4 @@
-// src/services/api.ts
+// src/services/api.ts - Teljesen típusbiztos verzió
 import axios from 'axios'
 import type { AxiosInstance, AxiosResponse } from 'axios'
 import type { 
@@ -7,17 +7,38 @@ import type {
   LoginFormData 
 } from '../types/auth'
 import type {
-  WorldCard,
   WorldCardData,
+  WorldCard,
   WorldCardsResponse,
   LeaderCardData,
-  Dungeon,
   DungeonData,
+  Dungeon,
   DungeonsResponse,
-  GameEnvironment,
   GameEnvironmentData,
+  GameEnvironment,
   GameEnvironmentsResponse
 } from '../types/game'
+
+// Response típusok
+interface CreateWorldCardResponse {
+  message: string
+  card: WorldCard
+}
+
+interface CreateLeaderCardResponse {
+  message: string
+  card: WorldCard
+}
+
+interface CreateDungeonResponse {
+  message: string
+  dungeon: Dungeon
+}
+
+interface CreateGameEnvironmentResponse {
+  message: string
+  gameEnvironment: GameEnvironment
+}
 
 class ApiService {
   private api: AxiosInstance
@@ -58,11 +79,18 @@ class ApiService {
   // Auth methods
   async register(userData: RegisterFormData): Promise<AuthResponse> {
     const response: AxiosResponse<AuthResponse> = await this.api.post('/auth/register', userData)
+    console.log('🔍 Register API válasz:', response.data)
     return response.data
   }
 
   async login(credentials: LoginFormData): Promise<AuthResponse> {
     const response: AxiosResponse<AuthResponse> = await this.api.post('/auth/login', credentials)
+    console.log('🔍 Login API válasz:', response.data)
+    return response.data
+  }
+
+  async refreshToken(refreshToken: string): Promise<{ accessToken: string }> {
+    const response: AxiosResponse<{ accessToken: string }> = await this.api.post('/auth/refresh-token', { refreshToken })
     return response.data
   }
 
@@ -72,18 +100,18 @@ class ApiService {
     return response.data
   }
 
-  async createWorldCard(cardData: WorldCardData): Promise<{ message: string; card: WorldCard }> {
-    const response: AxiosResponse<{ message: string; card: WorldCard }> = await this.api.post('/game-master/world-cards', cardData)
+  async createWorldCard(cardData: WorldCardData): Promise<CreateWorldCardResponse> {
+    const response: AxiosResponse<CreateWorldCardResponse> = await this.api.post('/game-master/world-cards', cardData)
     return response.data
   }
 
-  async createLeaderCard(leaderData: LeaderCardData): Promise<{ message: string; card: WorldCard }> {
-    const response: AxiosResponse<{ message: string; card: WorldCard }> = await this.api.post('/game-master/world-cards/leader', leaderData)
+  async createLeaderCard(leaderData: LeaderCardData): Promise<CreateLeaderCardResponse> {
+    const response: AxiosResponse<CreateLeaderCardResponse> = await this.api.post('/game-master/world-cards/leader', leaderData)
     return response.data
   }
 
-  async createDungeon(dungeonData: DungeonData): Promise<{ message: string; dungeon: Dungeon }> {
-    const response: AxiosResponse<{ message: string; dungeon: Dungeon }> = await this.api.post('/game-master/dungeons', dungeonData)
+  async createDungeon(dungeonData: DungeonData): Promise<CreateDungeonResponse> {
+    const response: AxiosResponse<CreateDungeonResponse> = await this.api.post('/game-master/dungeons', dungeonData)
     return response.data
   }
 
@@ -92,8 +120,8 @@ class ApiService {
     return response.data
   }
 
-  async createGameEnvironment(environmentData: GameEnvironmentData): Promise<{ message: string; gameEnvironment: GameEnvironment }> {
-    const response: AxiosResponse<{ message: string; gameEnvironment: GameEnvironment }> = await this.api.post('/game-master/game-environments', environmentData)
+  async createGameEnvironment(environmentData: GameEnvironmentData): Promise<CreateGameEnvironmentResponse> {
+    const response: AxiosResponse<CreateGameEnvironmentResponse> = await this.api.post('/game-master/game-environments', environmentData)
     return response.data
   }
 

@@ -1,16 +1,7 @@
+// src/hooks/useAuth.tsx
 import { useState, useCallback } from 'react'
 import { apiService } from '../services/api'
 import type { RegisterFormData, LoginFormData, User, AuthResponse } from '../types/auth'
-
-// Add proper error types
-interface ApiError {
-  response?: {
-    data?: {
-      message: string
-    }
-  }
-  message: string
-}
 
 interface UseAuthReturn {
   user: User | null
@@ -33,24 +24,35 @@ export const useAuth = (): UseAuthReturn => {
   const register = useCallback(async (data: RegisterFormData): Promise<boolean> => {
     setLoading(true)
     setError(null)
+    console.log('Starting registration with:', data)
     
     try {
       const response: AuthResponse = await apiService.register(data)
+      console.log('Registration response:', response)
       
-      if (response.token && response.user) {
-        localStorage.setItem('token', response.token)
-        localStorage.setItem('user', JSON.stringify(response.user))
-        setUser(response.user)
-        return true
+      // MEGVÁLTOZOTT: tokens.accessToken használata
+      if (response.message && response.message.includes('successfully')) {
+        if (response.tokens?.accessToken && response.user) {
+          localStorage.setItem('token', response.tokens.accessToken)
+          localStorage.setItem('user', JSON.stringify(response.user))
+          setUser(response.user)
+          console.log('Registration successful, user saved to localStorage')
+          return true
+        }
+      }
+      
+      // If we get here but have a message, it might still be successful
+      if (response.message) {
+        console.log('Registration has message but no tokens:', response.message)
+        setError(response.message)
+      } else {
+        console.log('Registration failed - unexpected response format')
+        setError('Registration failed - unexpected response')
       }
       return false
     } catch (err: unknown) {
-      // Proper error handling with type guards
-      if (typeof err === 'object' && err !== null && 'response' in err) {
-        const apiError = err as ApiError
-        const errorMessage = apiError.response?.data?.message || 'Registration failed'
-        setError(errorMessage)
-      } else if (err instanceof Error) {
+      console.error('Registration error:', err)
+      if (err instanceof Error) {
         setError(err.message)
       } else {
         setError('Registration failed')
@@ -64,24 +66,34 @@ export const useAuth = (): UseAuthReturn => {
   const login = useCallback(async (data: LoginFormData): Promise<boolean> => {
     setLoading(true)
     setError(null)
+    console.log('Starting login with:', data)
     
     try {
       const response: AuthResponse = await apiService.login(data)
+      console.log('Login response:', response)
       
-      if (response.token && response.user) {
-        localStorage.setItem('token', response.token)
-        localStorage.setItem('user', JSON.stringify(response.user))
-        setUser(response.user)
-        return true
+      // MEGVÁLTOZOTT: tokens.accessToken használata
+      if (response.message && response.message.includes('successfully')) {
+        if (response.tokens?.accessToken && response.user) {
+          localStorage.setItem('token', response.tokens.accessToken)
+          localStorage.setItem('user', JSON.stringify(response.user))
+          setUser(response.user)
+          console.log('Login successful, user saved to localStorage')
+          return true
+        }
+      }
+      
+      if (response.message) {
+        console.log('Login has message but no tokens:', response.message)
+        setError(response.message)
+      } else {
+        console.log('Login failed - unexpected response format')
+        setError('Login failed - unexpected response')
       }
       return false
     } catch (err: unknown) {
-      // Proper error handling with type guards
-      if (typeof err === 'object' && err !== null && 'response' in err) {
-        const apiError = err as ApiError
-        const errorMessage = apiError.response?.data?.message || 'Login failed'
-        setError(errorMessage)
-      } else if (err instanceof Error) {
+      console.error('Login error:', err)
+      if (err instanceof Error) {
         setError(err.message)
       } else {
         setError('Login failed')
@@ -95,6 +107,7 @@ export const useAuth = (): UseAuthReturn => {
   const logout = useCallback(() => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
+    localStorage.removeItem('refreshToken') // MEGVÁLTOZOTT: refreshToken is törlése
     setUser(null)
     window.location.href = '/login'
   }, [])

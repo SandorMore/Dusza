@@ -1,15 +1,16 @@
-// src/pages/Login.tsx
+// src/pages/Login.tsx - Javított verzió
 import React, { useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
-import { useAuth } from '../hooks/useAuth'
-import type { LoginFormData } from '../types/auth'
+import { apiService } from '../services/api'
+import type { LoginFormData, AuthResponse } from '../types/auth'
 
 const Login: React.FC = () => {
-  const { login, loading, error } = useAuth()
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: ''
   })
+  const [loading, setLoading] = useState<boolean>(false)
+  const [message, setMessage] = useState<string>('')
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
@@ -21,19 +22,54 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const success = await login(formData)
-    
-    if (success) {
-      // Get the updated user from localStorage
-      const userStr = localStorage.getItem('user')
-      const user = userStr ? JSON.parse(userStr) : null
+    setLoading(true)
+    setMessage('')
+
+    try {
+      console.log('🔍 Login küldés...', formData)
+      const response: AuthResponse = await apiService.login(formData)
+      console.log('✅ Backend válasz:', response)
       
-      // Redirect based on role
-      if (user?.role === 'gameMaster') {
-        window.location.href = '/game-master'
+      // MEGVÁLTOZOTT: tokens.accessToken használata
+      if (response.tokens?.accessToken) {
+        localStorage.setItem('token', response.tokens.accessToken)
+        console.log('💾 AccessToken elmentve:', response.tokens.accessToken)
+        
+        // Refresh token is elmenthető
+        if (response.tokens.refreshToken) {
+          localStorage.setItem('refreshToken', response.tokens.refreshToken)
+        }
       } else {
-        window.location.href = '/player' // or whatever your player dashboard route is
+        console.log('❌ Nincs accessToken a válaszban!')
       }
+      
+      if (response.user) {
+        localStorage.setItem('user', JSON.stringify(response.user))
+        console.log('💾 User elmentve:', response.user)
+      } else {
+        console.log('❌ Nincs user a válaszban!')
+      }
+      
+      // Ellenőrizzük, tényleg elmentődött-e
+      const savedToken = localStorage.getItem('token')
+      const savedUser = localStorage.getItem('user')
+      console.log('🔍 Ellenőrzés - Mentett token:', savedToken)
+      console.log('🔍 Ellenőrzés - Mentett user:', savedUser)
+      
+      if (response.tokens?.accessToken && response.user) {
+        setMessage('Sikeres bejelentkezés! Átirányítás...')
+        setTimeout(() => {
+          console.log('🚀 Átirányítás a /game-master-re...')
+          window.location.href = '/game-master'
+        }, 1000)
+      } else {
+        setMessage('Bejelentkezés sikeres, de hiányzó adatok')
+      }
+    } catch (error: unknown) {
+      console.error('❌ Login hiba:', error)
+      setMessage('Bejelentkezés sikertelen')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -43,9 +79,13 @@ const Login: React.FC = () => {
         <form onSubmit={handleSubmit} className='flex flex-col w-full'>
           <h1 className='text-[3rem] mb-4'>Bejelentkezés</h1>
 
-          {error && (
-            <div className='p-3 mb-4 rounded bg-red-100 text-red-800'>
-              {error}
+          {message && (
+            <div className={`p-3 mb-4 rounded ${
+              message.includes('Sikeres') 
+                ? 'bg-green-100 text-green-800' 
+                : 'bg-red-100 text-red-800'
+            }`}>
+              {message}
             </div>
           )}
 

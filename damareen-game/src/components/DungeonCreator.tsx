@@ -23,13 +23,44 @@ const DungeonCreator: React.FC<Props> = ({ worldCards, onDungeonCreated }) => {
     setMessage('')
 
     try {
-      await apiService.createDungeon(formData)
+      console.log('🔄 Starting dungeon creation...')
+      console.log('Original card order:', formData.cardIds)
+      
+      // Ensure leader is last before submitting
+      const selectedCards = getSelectedCardsInOrder()
+      const leaderIndex = selectedCards.findIndex(card => card.isLeader)
+      
+      let finalCardIds = formData.cardIds
+      
+      console.log('Selected cards:', selectedCards.map(c => ({ name: c.name, isLeader: c.isLeader })))
+      console.log('Leader index:', leaderIndex)
+      
+      if (leaderIndex !== -1 && leaderIndex !== selectedCards.length - 1) {
+        // Reorder the cardIds to put leader last
+        const leaderCardId = formData.cardIds[leaderIndex]
+        const nonLeaderCards = formData.cardIds.filter(id => id !== leaderCardId)
+        finalCardIds = [...nonLeaderCards, leaderCardId]
+        console.log('Reordered cards - leader moved to end')
+      }
+      
+      console.log('Final card order for submission:', finalCardIds)
+      
+      const submissionData = {
+        ...formData,
+        cardIds: finalCardIds
+      }
+      
+      console.log('Submitting dungeon data:', submissionData)
+      
+      await apiService.createDungeon(submissionData)
+      
       setMessage('Dungeon created successfully!')
       setFormData({ name: '', type: 'Egyszerű találkozás', cardIds: [] })
       onDungeonCreated()
     } catch (error: unknown) {
+      console.error('❌ Dungeon creation error:', error)
       if (error instanceof Error) {
-        setMessage(error.message)
+        setMessage(`Error: ${error.message}`)
       } else {
         setMessage('Error creating dungeon')
       }
@@ -66,7 +97,51 @@ const DungeonCreator: React.FC<Props> = ({ worldCards, onDungeonCreated }) => {
     })
   }
 
-  const selectedCards = worldCards.filter(card => formData.cardIds.includes(card._id))
+  // Get selected cards with their full data, in the current order
+  const getSelectedCardsInOrder = (): WorldCard[] => {
+    return formData.cardIds
+      .map(id => worldCards.find(card => card._id === id))
+      .filter((card): card is WorldCard => card !== undefined)
+  }
+
+  // Move card to new position
+  const moveCard = (currentIndex: number, newIndex: number) => {
+    if (currentIndex === newIndex || currentIndex < 0 || newIndex < 0 || 
+        currentIndex >= formData.cardIds.length || newIndex >= formData.cardIds.length) {
+      return
+    }
+
+    setFormData(prev => {
+      const newCardIds = [...prev.cardIds]
+      const [movedCard] = newCardIds.splice(currentIndex, 1)
+      newCardIds.splice(newIndex, 0, movedCard)
+      return { ...prev, cardIds: newCardIds }
+    })
+  }
+
+  // Move card up
+  const moveCardUp = (index: number) => {
+    moveCard(index, index - 1)
+  }
+
+  // Move card down
+  const moveCardDown = (index: number) => {
+    moveCard(index, index + 1)
+  }
+
+  // Auto-fix: move leader to last position
+  const moveLeaderToLast = () => {
+    const selectedCards = getSelectedCardsInOrder()
+    const leaderIndex = selectedCards.findIndex(card => card.isLeader)
+    
+    if (leaderIndex !== -1 && leaderIndex !== selectedCards.length - 1) {
+      moveCard(leaderIndex, selectedCards.length - 1)
+    }
+  }
+
+  const selectedCards = getSelectedCardsInOrder()
+  const hasLeader = selectedCards.some(card => card.isLeader)
+  const isLeaderLast = selectedCards.length > 0 && selectedCards[selectedCards.length - 1]?.isLeader
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
@@ -131,19 +206,78 @@ const DungeonCreator: React.FC<Props> = ({ worldCards, onDungeonCreated }) => {
 
         {selectedCards.length > 0 && (
           <div className="bg-blue-50 p-3 rounded-md">
-            <p className="text-sm font-medium text-blue-800 mb-2">Selected Cards:</p>
-            <div className="space-y-1">
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-sm font-medium text-blue-800">Selected Cards:</p>
+              {hasLeader && !isLeaderLast && (
+                <button
+                  type="button"
+                  onClick={moveLeaderToLast}
+                  className="text-xs bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 transition-colors"
+                >
+                  Move Leader to End
+                </button>
+              )}
+            </div>
+            <div className="space-y-2">
               {selectedCards.map((card, index) => (
-                <div key={card._id} className="flex justify-between text-sm">
-                  <span>{index + 1}. {card.name}</span>
-                  <span className={`px-2 py-1 rounded text-xs ${
-                    card.isLeader ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'
-                  }`}>
-                    {card.isLeader ? 'Leader' : 'Regular'}
-                  </span>
+                <div 
+                  key={card._id} 
+                  className="flex items-center justify-between p-2 bg-white rounded border shadow-sm"
+                >
+                  <div className="flex items-center space-x-3 flex-1">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-medium text-gray-500 w-4 text-center">{index + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => moveCardUp(index)}
+                        disabled={index === 0}
+                        className="p-1 text-gray-400 hover:text-violet-600 disabled:text-gray-200 disabled:cursor-not-allowed"
+                        title="Move up"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveCardDown(index)}
+                        disabled={index === selectedCards.length - 1}
+                        className="p-1 text-gray-400 hover:text-violet-600 disabled:text-gray-200 disabled:cursor-not-allowed"
+                        title="Move down"
+                      >
+                        ↓
+                      </button>
+                    </div>
+                    <span className="font-medium">{card.name}</span>
+                    <span className={`px-2 py-1 rounded text-xs ${
+                      card.isLeader ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {card.isLeader ? 'Leader' : 'Regular'}
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    DMG: {card.damage} | HP: {card.health}
+                  </div>
                 </div>
               ))}
             </div>
+            
+            {/* Validation warnings */}
+            {hasLeader && !isLeaderLast && (
+              <div className="mt-3 p-2 bg-yellow-100 border border-yellow-300 text-yellow-800 rounded text-sm">
+                ⚠️ <strong>Leader must be last!</strong> The leader card should be the final card in the dungeon. Use the "Move Leader to End" button or move the leader card to the bottom position.
+              </div>
+            )}
+            
+            {formData.type === 'Kis kazamata' && selectedCards.length === 4 && (!hasLeader || !isLeaderLast) && (
+              <div className="mt-2 p-2 bg-red-100 border border-red-300 text-red-800 rounded text-sm">
+                ❌ <strong>Invalid composition for Small Dungeon:</strong> Must have 3 regular cards + 1 leader card, with leader as the last card.
+              </div>
+            )}
+            
+            {formData.type === 'Nagy kazamata' && selectedCards.length === 6 && (!hasLeader || !isLeaderLast) && (
+              <div className="mt-2 p-2 bg-red-100 border border-red-300 text-red-800 rounded text-sm">
+                ❌ <strong>Invalid composition for Large Dungeon:</strong> Must have 5 regular cards + 1 leader card, with leader as the last card.
+              </div>
+            )}
           </div>
         )}
 

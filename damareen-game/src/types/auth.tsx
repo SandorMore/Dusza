@@ -1,3 +1,4 @@
+// src/types/auth.ts - Frissítsd a típusdefiníciót
 export interface User {
   id: string
   username: string
@@ -5,9 +6,16 @@ export interface User {
   role: 'player' | 'gameMaster'
 }
 
+export interface Tokens {
+  accessToken: string
+  refreshToken: string
+  accessTokenExpires: string
+  refreshTokenExpires: string
+}
+
 export interface AuthResponse {
   message: string
-  token?: string
+  tokens?: Tokens  // MEGVÁLTOZOTT: tokens objektum
   user?: User
   error?: string
 }
@@ -22,10 +30,4 @@ export interface RegisterFormData {
 export interface LoginFormData {
   email: string
   password: string
-}
-
-// types/api.ts
-export interface ApiError {
-  message: string
-  error?: string
 }
