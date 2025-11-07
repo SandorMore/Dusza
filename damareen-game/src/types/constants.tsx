@@ -1,11 +1,11 @@
 import type { Card, CardType } from "./types";
 
-export const CARD_CONSTANTS = {
+export const CARD_CONSTRAINTS = {
     NAME_MAX_LENGTH: 16,
-    MIN_DAMAGE: 2,
-    MAX_DAMAGE: 100,
-    MIN_HEALTH: 1,
-    MAX_HEALTH: 100,
+    DAMAGE_MIN: 2,
+    DAMAGE_MAX: 100,
+    HEALTH_MIN: 1,
+    HEALTH_MAX: 100,
 } as const;
 
 export const DUNGEON_CARD_COUNTS = {
