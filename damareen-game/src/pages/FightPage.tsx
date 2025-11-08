@@ -1,4 +1,4 @@
-// src/pages/FightPage.tsx - COMPLETE UPDATED VERSION WITH DEBUGGING
+// src/pages/FightPage.tsx - MEDIEVAL STYLE WITH ALL CARDS
 import React, { useState, useEffect } from 'react'
 import { apiService } from '../services/api'
 import type { 
@@ -106,26 +106,26 @@ const FightPage: React.FC = () => {
         name: newDeckName,
         cardIds: selectedCardsForDeck
       })
-      setMessage('🎉 Deck created successfully!')
+      setMessage('🎉 Deck forged successfully!')
       setNewDeckName('')
       setSelectedCardsForDeck([])
       await loadData()
       setIsCreatingDeck(false)
       setActiveTab('battle')
     } catch (error: any) {
-      setMessage('❌ Error creating deck: ' + (error.response?.data?.message || error.message))
+      setMessage('❌ Error forging deck: ' + (error.response?.data?.message || error.message))
       setIsCreatingDeck(false)
     }
   }
 
   const startBattle = async (): Promise<void> => {
     if (!selectedDeck || !selectedDungeon) {
-      setMessage('Please select both a deck and a dungeon')
+      setMessage('Please select both a war formation and a dungeon')
       return
     }
 
     if (selectedDeck.cards.length !== selectedDungeon.cards.length) {
-      setMessage(`❌ Deck must have exactly ${selectedDungeon.cards.length} cards for this dungeon`)
+      setMessage(`❌ War formation must have exactly ${selectedDungeon.cards.length} warriors for this dungeon`)
       return
     }
 
@@ -136,7 +136,7 @@ const FightPage: React.FC = () => {
       setMessage(battleRes.message)
       setActiveTab('battle')
     } catch (error: any) {
-      setMessage('❌ Error starting battle: ' + (error.response?.data?.message || error.message))
+      setMessage('❌ Error commencing battle: ' + (error.response?.data?.message || error.message))
     } finally {
       setLoading(false)
     }
@@ -158,7 +158,7 @@ const FightPage: React.FC = () => {
       );
       
       console.log('✅ Reward API response:', result);
-      setMessage('🎁 ' + result.message);
+      setMessage('⚜️ ' + result.message);
       
       // Force reload the data to see updates
       console.log('🔄 Reloading data after reward...');
@@ -169,7 +169,7 @@ const FightPage: React.FC = () => {
       
     } catch (error: any) {
       console.error('❌ Error applying reward:', error);
-      setMessage('❌ Error applying reward: ' + (error.response?.data?.message || error.message));
+      setMessage('❌ Error bestowing reward: ' + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }
@@ -185,11 +185,11 @@ const FightPage: React.FC = () => {
 
   const getTypeColor = (type: string): string => {
     switch (type) {
-      case 'tűz': return 'bg-red-100 text-red-800 border-red-300'
-      case 'víz': return 'bg-blue-100 text-blue-800 border-blue-300'
-      case 'föld': return 'bg-green-100 text-green-800 border-green-300'
-      case 'levegő': return 'bg-gray-100 text-gray-800 border-gray-300'
-      default: return 'bg-gray-100 text-gray-800 border-gray-300'
+      case 'tűz': return 'bg-red-800 text-amber-100 border-red-600'
+      case 'víz': return 'bg-blue-800 text-amber-100 border-blue-600'
+      case 'föld': return 'bg-green-800 text-amber-100 border-green-600'
+      case 'levegő': return 'bg-gray-700 text-amber-100 border-gray-500'
+      default: return 'bg-gray-700 text-amber-100 border-gray-500'
     }
   }
 
@@ -199,46 +199,54 @@ const FightPage: React.FC = () => {
       case 'víz': return '💧'
       case 'föld': return '🌍'
       case 'levegő': return '💨'
-      default: return '❓'
+      default: return '⚔️'
     }
   }
 
   const getDungeonColor = (type: string): string => {
     switch (type) {
-      case 'Egyszerű találkozás': return 'bg-green-50 border-green-200'
-      case 'Kis kazamata': return 'bg-yellow-50 border-yellow-200'
-      case 'Nagy kazamata': return 'bg-red-50 border-red-200'
-      default: return 'bg-gray-50 border-gray-200'
+      case 'Egyszerű találkozás': return 'bg-green-800 text-amber-100 border-green-600'
+      case 'Kis kazamata': return 'bg-yellow-800 text-amber-100 border-yellow-600'
+      case 'Nagy kazamata': return 'bg-red-800 text-amber-100 border-red-600'
+      default: return 'bg-gray-700 text-amber-100 border-gray-500'
     }
+  }
+
+  const getCardRarityColor = (card: WorldCard): string => {
+    if (card.isLeader) return 'bg-gradient-to-br from-yellow-600 to-amber-700'
+    if (card.boostType) return 'bg-gradient-to-br from-purple-700 to-purple-800'
+    return 'bg-gradient-to-br from-gray-700 to-gray-800'
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-amber-100">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-600 mx-auto mb-4"></div>
+          <p className="text-amber-800 font-serif text-lg">Preparing the battlefield...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-amber-100">
+      {/* Medieval Header */}
+      <header className="bg-gradient-to-r from-amber-800 to-amber-900 shadow-2xl border-b-4 border-amber-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">⚔️ Fight Arena</h1>
-              <p className="text-gray-600">Welcome, {user.username}! | Game Cards: {allGameCards.length} | Dungeons: {allGameDungeons.length}</p>
+          <div className="flex justify-between items-center py-6">
+            <div className="text-center">
+              <h1 className="text-3xl font-bold text-amber-100 font-serif tracking-wider">⚔️ Grand Battle Arena</h1>
+              <p className="text-amber-200 font-medium mt-2">
+                Hail, {user.username}! Warriors: {allGameCards.length} | Dungeons: {allGameDungeons.length}
+              </p>
             </div>
-            <div className="flex space-x-2">
+            <div className="flex space-x-3">
               <button
                 onClick={() => window.location.href = '/player'}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
+                className="bg-blue-700 hover:bg-blue-800 text-amber-100 px-6 py-3 rounded-xl transition-all border-2 border-blue-600 font-bold shadow-lg"
               >
-                ← Dashboard
+                🏰 Return to Keep
               </button>
               {collections.length === 0 && (
                 <button
@@ -248,12 +256,12 @@ const FightPage: React.FC = () => {
                       setMessage(result.message);
                       await loadData();
                     } catch (error: any) {
-                      setMessage('❌ Error: ' + (error.response?.data?.message || error.message));
+                      setMessage('❌ Royal Decree Error: ' + (error.response?.data?.message || error.message));
                     }
                   }}
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors"
+                  className="bg-orange-700 hover:bg-orange-800 text-amber-100 px-6 py-3 rounded-xl transition-all border-2 border-orange-600 font-bold shadow-lg"
                 >
-                  🎁 Get Starter Cards
+                  ⚜️ Summon Starter Warriors
                 </button>
               )}
             </div>
@@ -261,27 +269,29 @@ const FightPage: React.FC = () => {
         </div>
       </header>
 
-      {/* Navigation Tabs */}
-      <div className="bg-white border-b">
+      {/* Medieval Navigation Tabs */}
+      <div className="bg-gradient-to-r from-amber-700 to-amber-800 border-b-4 border-amber-600">
         <div className="max-w-7xl mx-auto">
           <nav className="flex space-x-8">
             {[
-              { id: 'decks' as const, label: `🃏 My Decks (${playerDecks.length})`, icon: '🃏' },
-              { id: 'battle' as const, label: '⚔️ Battle', icon: '⚔️' },
-              { id: 'collection' as const, label: `📚 Collection (${availableCards.length})`, icon: '📚' },
-              { id: 'allcards' as const, label: `🏰 All Game Cards (${allGameCards.length})`, icon: '🏰' }
+              { id: 'decks' as const, label: `🛡️ War Formations (${playerDecks.length})`, icon: '🛡️' },
+              { id: 'battle' as const, label: '⚔️ Battlefield', icon: '⚔️' },
+              { id: 'collection' as const, label: `📜 Royal Archives (${availableCards.length})`, icon: '📜' },
+              { id: 'allcards' as const, label: `🏰 Kingdom Lore (${allGameCards.length})`, icon: '🏰' }
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
+                className={`py-5 px-3 border-b-4 font-bold text-lg font-serif transition-all ${
                   activeTab === tab.id
-                    ? 'border-violet-500 text-violet-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-amber-300 text-amber-100 bg-amber-900/50'
+                    : 'border-transparent text-amber-200 hover:text-amber-100 hover:border-amber-400'
                 }`}
               >
-                <span>{tab.icon}</span>
-                <span>{tab.label}</span>
+                <span className="flex items-center space-x-3">
+                  <span className="text-xl">{tab.icon}</span>
+                  <span>{tab.label}</span>
+                </span>
               </button>
             ))}
           </nav>
@@ -289,14 +299,14 @@ const FightPage: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
         {message && (
-          <div className={`mb-4 p-4 rounded-lg ${
+          <div className={`mb-6 p-4 rounded-xl border-2 font-bold text-center ${
             message.includes('❌') 
-              ? 'bg-red-100 text-red-800 border border-red-300'
-              : message.includes('🎉') || message.includes('🎁')
-              ? 'bg-green-100 text-green-800 border border-green-300'
-              : 'bg-blue-100 text-blue-800 border border-blue-300'
+              ? 'bg-red-800 text-amber-100 border-red-600' 
+              : message.includes('🎉') || message.includes('⚜️')
+              ? 'bg-green-800 text-amber-100 border-green-600'
+              : 'bg-blue-800 text-amber-100 border-blue-600'
           }`}>
             {message}
           </div>
@@ -304,72 +314,73 @@ const FightPage: React.FC = () => {
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-500"></div>
-            <span className="ml-4 text-gray-600">Loading...</span>
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-600"></div>
+            <span className="ml-4 text-amber-800 font-serif text-lg">Consulting the war council...</span>
           </div>
         ) : (
           <>
-            {/* Decks Tab */}
+            {/* War Formations Tab */}
             {activeTab === 'decks' && (
-              <div className="space-y-6">
-                {/* Create New Deck Section */}
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h2 className="text-xl font-semibold mb-4">🃏 Create New Deck</h2>
-                  <div className="space-y-4">
+              <div className="space-y-8">
+                {/* Forge New War Formation */}
+                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
+                  <h2 className="text-2xl font-bold text-amber-100 font-serif mb-6 text-center">🛡️ Forge New War Formation</h2>
+                  <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Deck Name</label>
+                      <label className="block text-lg font-medium text-amber-200 mb-3 font-serif">Formation Name</label>
                       <input
                         type="text"
                         value={newDeckName}
                         onChange={(e) => setNewDeckName(e.target.value)}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
-                        placeholder="Enter deck name..."
+                        className="w-full bg-gray-700 border-2 border-amber-500 rounded-xl px-4 py-3 text-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 font-serif"
+                        placeholder="Enter formation name..."
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Select Cards ({selectedCardsForDeck.length} selected)
+                      <label className="block text-lg font-medium text-amber-200 mb-3 font-serif">
+                        Select Warriors ({selectedCardsForDeck.length} chosen)
                         {availableCards.length === 0 && (
-                          <span className="text-orange-600 text-sm ml-2">
-                            No cards available. Click "Get Starter Cards" above!
+                          <span className="text-orange-300 text-sm ml-3 font-normal">
+                            No warriors available. Summon starter warriors above!
                           </span>
                         )}
                       </label>
-                      <div className="border border-gray-300 rounded-md p-4 max-h-96 overflow-y-auto bg-gray-50">
+                      <div className="border-2 border-amber-500 rounded-xl p-6 max-h-96 overflow-y-auto bg-gray-700/50">
                         {availableCards.length === 0 ? (
-                          <div className="text-center py-8 text-gray-500">
-                            <p>No cards available in your collection.</p>
+                          <div className="text-center py-12 text-amber-300">
+                            <p className="text-xl mb-4">No warriors in your ranks</p>
+                            <p className="text-lg">Summon your first warriors to begin your conquest!</p>
                           </div>
                         ) : (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {availableCards.map((card: WorldCard) => (
                               <div
                                 key={card._id}
-                                className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                                className={`p-4 border-2 rounded-xl cursor-pointer transition-all transform hover:scale-105 ${
                                   selectedCardsForDeck.includes(card._id)
-                                    ? 'border-violet-500 bg-violet-50'
-                                    : 'border-gray-200 bg-white hover:border-gray-300'
+                                    ? 'border-amber-400 bg-amber-900/30 shadow-lg'
+                                    : `${getCardRarityColor(card)} border-amber-600 hover:border-amber-400`
                                 }`}
                                 onClick={() => toggleCardForDeck(card._id)}
                               >
                                 <div className="flex justify-between items-start">
                                   <div>
-                                    <h3 className="font-semibold text-gray-900">{card.name}</h3>
-                                    <div className="flex items-center space-x-2 mt-1">
-                                      <span className={`px-2 py-1 rounded text-xs ${getTypeColor(card.type)}`}>
+                                    <h3 className="font-bold text-amber-100 text-lg">{card.name}</h3>
+                                    <div className="flex items-center space-x-2 mt-2">
+                                      <span className={`px-3 py-1 rounded-lg text-sm font-bold ${getTypeColor(card.type)}`}>
                                         {getTypeEmoji(card.type)} {card.type}
                                       </span>
                                       {card.isLeader && (
-                                        <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
-                                          👑 Leader
+                                        <span className="bg-yellow-700 text-amber-100 text-xs px-2 py-1 rounded-lg font-bold">
+                                          👑 Commander
                                         </span>
                                       )}
                                     </div>
                                   </div>
                                   <div className="text-right text-sm">
-                                    <div className="text-red-600">💥 {card.damage}</div>
-                                    <div className="text-green-600">❤️ {card.health}</div>
+                                    <div className="text-red-300 font-bold">⚔️ {card.damage}</div>
+                                    <div className="text-green-300 font-bold">❤️ {card.health}</div>
                                   </div>
                                 </div>
                               </div>
@@ -382,65 +393,65 @@ const FightPage: React.FC = () => {
                     <button
                       onClick={createDeck}
                       disabled={!newDeckName.trim() || selectedCardsForDeck.length === 0 || isCreatingDeck}
-                      className="w-full bg-violet-500 text-white py-3 px-4 rounded-md hover:bg-violet-600 disabled:bg-gray-400 transition-colors font-medium"
+                      className="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-amber-100 py-4 px-6 rounded-xl disabled:bg-gray-600 transition-all border-2 border-amber-500 font-bold text-lg shadow-lg"
                     >
-                      {isCreatingDeck ? 'Creating Deck...' : '🎯 Create Deck'}
+                      {isCreatingDeck ? '⚒️ Forging Formation...' : '⚒️ Forge War Formation'}
                     </button>
                   </div>
                 </div>
 
-                {/* Existing Decks Section */}
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold">My Decks</h2>
-                    <span className="text-sm text-gray-500">
-                      {playerDecks.length} deck{playerDecks.length !== 1 ? 's' : ''}
+                {/* Existing War Formations */}
+                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-amber-100 font-serif">My War Formations</h2>
+                    <span className="text-amber-200 font-bold">
+                      {playerDecks.length} formation{playerDecks.length !== 1 ? 's' : ''}
                     </span>
                   </div>
                   
                   {playerDecks.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      <p className="text-lg mb-2">No decks created yet</p>
-                      <p className="text-sm">Create your first deck above to start battling!</p>
+                    <div className="text-center py-12 text-amber-300">
+                      <p className="text-xl mb-4">No formations forged yet</p>
+                      <p className="text-lg">Forge your first war formation above to commence battle!</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {playerDecks.map((deck: PlayerDeck) => (
                         <div 
                           key={deck._id}
-                          className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                          className={`border-4 rounded-2xl p-6 cursor-pointer transition-all transform hover:scale-105 ${
                             selectedDeck?._id === deck._id 
-                              ? 'border-violet-500 bg-violet-50 shadow-md' 
-                              : 'border-gray-200 bg-white hover:border-violet-300 hover:shadow-sm'
+                              ? 'border-amber-400 bg-amber-900/30 shadow-2xl' 
+                              : 'border-amber-600 bg-gray-700/50 hover:border-amber-400 hover:shadow-lg'
                           }`}
                           onClick={() => setSelectedDeck(deck)}
                         >
-                          <div className="flex justify-between items-start mb-3">
-                            <h3 className="font-semibold text-lg text-gray-900">{deck.name}</h3>
-                            <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-                              {deck.cards.length} cards
+                          <div className="flex justify-between items-start mb-4">
+                            <h3 className="font-bold text-amber-100 text-xl">{deck.name}</h3>
+                            <span className="bg-blue-700 text-amber-100 text-sm px-3 py-1 rounded-lg font-bold">
+                              {deck.cards.length} warriors
                             </span>
                           </div>
                           
-                          <div className="space-y-2 max-h-32 overflow-y-auto">
+                          <div className="space-y-3 max-h-40 overflow-y-auto">
                             {deck.cards.map((card: WorldCard, index: number) => (
-                              <div key={card._id} className="flex justify-between items-center text-sm p-2 bg-gray-50 rounded">
-                                <div className="flex items-center space-x-2">
-                                  <span className="text-gray-500 w-4">{index + 1}.</span>
-                                  <span className="font-medium">{card.name}</span>
+                              <div key={card._id} className="flex justify-between items-center p-3 bg-gray-600 rounded-lg">
+                                <div className="flex items-center space-x-3">
+                                  <span className="text-amber-300 w-6 text-sm">{index + 1}.</span>
+                                  <span className="font-bold text-amber-100">{card.name}</span>
                                 </div>
-                                <div className="text-xs text-gray-500">
-                                  <span className="text-red-500">💥{card.damage}</span>
-                                  <span className="mx-1">|</span>
-                                  <span className="text-green-500">❤️{card.health}</span>
+                                <div className="text-xs text-amber-300">
+                                  <span className="text-red-300">⚔️{card.damage}</span>
+                                  <span className="mx-2">|</span>
+                                  <span className="text-green-300">❤️{card.health}</span>
                                 </div>
                               </div>
                             ))}
                           </div>
                           
                           {selectedDeck?._id === deck._id && (
-                            <div className="mt-3 pt-3 border-t border-gray-200">
-                              <span className="text-xs text-violet-600 font-medium">✓ Selected for battle</span>
+                            <div className="mt-4 pt-4 border-t border-amber-500">
+                              <span className="text-amber-300 font-bold text-sm">✓ Chosen for battle</span>
                             </div>
                           )}
                         </div>
@@ -451,47 +462,47 @@ const FightPage: React.FC = () => {
               </div>
             )}
 
-            {/* Battle Tab */}
+            {/* Battlefield Tab */}
             {activeTab === 'battle' && (
-              <div className="space-y-6">
-                {/* Battle Setup */}
+              <div className="space-y-8">
+                {/* Battle Preparation */}
                 {!battleResult && (
-                  <div className="bg-white rounded-lg shadow-md p-6">
-                    <h2 className="text-xl font-semibold mb-6">⚔️ Prepare for Battle</h2>
+                  <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
+                    <h2 className="text-2xl font-bold text-amber-100 font-serif mb-8 text-center">⚔️ Prepare for Battle</h2>
                     
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      {/* Deck Selection */}
-                      <div className="space-y-4">
-                        <h3 className="font-semibold text-lg text-gray-900">🎯 Select Your Deck</h3>
+                      {/* War Formation Selection */}
+                      <div className="space-y-6">
+                        <h3 className="font-bold text-xl text-amber-200 font-serif">🛡️ Choose Your War Formation</h3>
                         {playerDecks.length === 0 ? (
-                          <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg text-center">
-                            <p className="text-gray-500 mb-3">No decks available</p>
+                          <div className="p-8 border-4 border-dashed border-amber-500 rounded-2xl text-center bg-gray-700/30">
+                            <p className="text-amber-300 mb-4 text-lg">No formations available</p>
                             <button
                               onClick={() => setActiveTab('decks')}
-                              className="bg-violet-500 text-white px-4 py-2 rounded-md hover:bg-violet-600 transition-colors"
+                              className="bg-amber-600 hover:bg-amber-700 text-amber-100 px-6 py-3 rounded-xl transition-all border-2 border-amber-500 font-bold"
                             >
-                              Create Your First Deck
+                              Forge Your First Formation
                             </button>
                           </div>
                         ) : (
-                          <div className="space-y-3 max-h-96 overflow-y-auto">
+                          <div className="space-y-4 max-h-96 overflow-y-auto">
                             {playerDecks.map((deck: PlayerDeck) => (
                               <div
                                 key={deck._id}
-                                className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                className={`p-5 border-4 rounded-2xl cursor-pointer transition-all ${
                                   selectedDeck?._id === deck._id 
-                                    ? 'border-violet-500 bg-violet-50 shadow-md' 
-                                    : 'border-gray-200 bg-white hover:border-gray-300'
+                                    ? 'border-amber-400 bg-amber-900/30 shadow-2xl' 
+                                    : 'border-amber-600 bg-gray-700/50 hover:border-amber-400'
                                 }`}
                                 onClick={() => setSelectedDeck(deck)}
                               >
                                 <div className="flex justify-between items-center">
                                   <div>
-                                    <h4 className="font-semibold">{deck.name}</h4>
-                                    <p className="text-sm text-gray-600">{deck.cards.length} cards</p>
+                                    <h4 className="font-bold text-amber-100 text-lg">{deck.name}</h4>
+                                    <p className="text-amber-300">{deck.cards.length} warriors</p>
                                   </div>
                                   {selectedDeck?._id === deck._id && (
-                                    <span className="bg-violet-500 text-white text-xs px-2 py-1 rounded">Selected</span>
+                                    <span className="bg-amber-600 text-amber-100 text-sm px-3 py-1 rounded-lg font-bold">Chosen</span>
                                   )}
                                 </div>
                               </div>
@@ -501,32 +512,32 @@ const FightPage: React.FC = () => {
                       </div>
 
                       {/* Dungeon Selection */}
-                      <div className="space-y-4">
-                        <h3 className="font-semibold text-lg text-gray-900">🏰 Select Dungeon</h3>
+                      <div className="space-y-6">
+                        <h3 className="font-bold text-xl text-amber-200 font-serif">🏰 Choose Your Conquest</h3>
                         {dungeons.length === 0 ? (
-                          <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg text-center">
-                            <p className="text-gray-500">No dungeons available</p>
+                          <div className="p-8 border-4 border-dashed border-amber-500 rounded-2xl text-center bg-gray-700/30">
+                            <p className="text-amber-300">No dungeons available for conquest</p>
                           </div>
                         ) : (
-                          <div className="space-y-3 max-h-96 overflow-y-auto">
+                          <div className="space-y-4 max-h-96 overflow-y-auto">
                             {dungeons.map((dungeon: Dungeon) => (
                               <div
                                 key={dungeon._id}
-                                className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                className={`p-5 border-4 rounded-2xl cursor-pointer transition-all ${
                                   selectedDungeon?._id === dungeon._id 
-                                    ? 'border-violet-500 bg-violet-50 shadow-md' 
-                                    : 'border-gray-200 bg-white hover:border-gray-300'
+                                    ? 'border-amber-400 bg-amber-900/30 shadow-2xl' 
+                                    : 'border-amber-600 bg-gray-700/50 hover:border-amber-400'
                                 } ${getDungeonColor(dungeon.type)}`}
                                 onClick={() => setSelectedDungeon(dungeon)}
                               >
                                 <div className="flex justify-between items-start">
                                   <div>
-                                    <h4 className="font-semibold">{dungeon.name}</h4>
-                                    <p className="text-sm text-gray-600 capitalize">{dungeon.type}</p>
-                                    <p className="text-xs text-gray-500">{dungeon.cards.length} cards</p>
+                                    <h4 className="font-bold text-amber-100 text-lg">{dungeon.name}</h4>
+                                    <p className="text-amber-300 capitalize">{dungeon.type}</p>
+                                    <p className="text-amber-400 text-sm">{dungeon.cards.length} guardians</p>
                                   </div>
                                   {selectedDungeon?._id === dungeon._id && (
-                                    <span className="bg-violet-500 text-white text-xs px-2 py-1 rounded">Selected</span>
+                                    <span className="bg-amber-600 text-amber-100 text-sm px-3 py-1 rounded-lg font-bold">Chosen</span>
                                   )}
                                 </div>
                               </div>
@@ -538,46 +549,46 @@ const FightPage: React.FC = () => {
 
                     {/* Battle Preview */}
                     {selectedDeck && selectedDungeon && (
-                      <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-                        <h3 className="font-semibold text-lg mb-4 text-center">🎮 Battle Preview</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="mt-8 p-8 bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-2xl border-4 border-blue-600">
+                        <h3 className="font-bold text-2xl text-amber-100 font-serif mb-6 text-center">🎯 Battle Preview</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                           <div>
-                            <h4 className="font-medium text-blue-800 mb-3">🎯 Your Deck</h4>
-                            <div className="space-y-2">
+                            <h4 className="font-bold text-blue-300 text-xl mb-4 font-serif">🛡️ Your Formation</h4>
+                            <div className="space-y-3">
                               {selectedDeck.cards.map((card: WorldCard, index: number) => (
-                                <div key={card._id} className="flex justify-between items-center p-2 bg-white rounded border">
-                                  <div className="flex items-center space-x-2">
-                                    <span className="text-sm text-gray-500 w-4">{index + 1}.</span>
-                                    <span className="font-medium text-sm">{card.name}</span>
+                                <div key={card._id} className="flex justify-between items-center p-4 bg-gray-700 rounded-xl border-2 border-blue-500">
+                                  <div className="flex items-center space-x-3">
+                                    <span className="text-amber-300 w-6">{index + 1}.</span>
+                                    <span className="font-bold text-amber-100">{card.name}</span>
                                   </div>
-                                  <div className="text-xs text-gray-500">
-                                    <span className={`px-1 rounded ${getTypeColor(card.type)}`}>
+                                  <div className="text-sm text-amber-300">
+                                    <span className={`px-2 py-1 rounded-lg ${getTypeColor(card.type)}`}>
                                       {getTypeEmoji(card.type)}
                                     </span>
-                                    <span className="mx-1 text-red-500">💥{card.damage}</span>
-                                    <span className="text-green-500">❤️{card.health}</span>
+                                    <span className="mx-2 text-red-300">⚔️{card.damage}</span>
+                                    <span className="text-green-300">❤️{card.health}</span>
                                   </div>
                                 </div>
                               ))}
                             </div>
                           </div>
                           <div>
-                            <h4 className="font-medium text-red-800 mb-3">🏰 Dungeon</h4>
-                            <div className="space-y-2">
+                            <h4 className="font-bold text-red-300 text-xl mb-4 font-serif">🏰 Dungeon Guardians</h4>
+                            <div className="space-y-3">
                               {selectedDungeon.cards.map((card: WorldCard, index: number) => (
-                                <div key={card._id} className="flex justify-between items-center p-2 bg-white rounded border">
-                                  <div className="flex items-center space-x-2">
-                                    <span className="text-sm text-gray-500 w-4">{index + 1}.</span>
-                                    <span className="font-medium text-sm">{card.name}</span>
+                                <div key={card._id} className="flex justify-between items-center p-4 bg-gray-700 rounded-xl border-2 border-red-500">
+                                  <div className="flex items-center space-x-3">
+                                    <span className="text-amber-300 w-6">{index + 1}.</span>
+                                    <span className="font-bold text-amber-100">{card.name}</span>
                                   </div>
-                                  <div className="text-xs text-gray-500">
-                                    <span className={`px-1 rounded ${getTypeColor(card.type)}`}>
+                                  <div className="text-sm text-amber-300">
+                                    <span className={`px-2 py-1 rounded-lg ${getTypeColor(card.type)}`}>
                                       {getTypeEmoji(card.type)}
                                     </span>
-                                    <span className="mx-1 text-red-500">💥{card.damage}</span>
-                                    <span className="text-green-500">❤️{card.health}</span>
+                                    <span className="mx-2 text-red-300">⚔️{card.damage}</span>
+                                    <span className="text-green-300">❤️{card.health}</span>
                                     {card.isLeader && (
-                                      <span className="ml-1 bg-yellow-100 text-yellow-800 text-xs px-1 rounded">👑</span>
+                                      <span className="ml-2 bg-yellow-700 text-amber-100 text-xs px-2 py-1 rounded-lg">👑</span>
                                     )}
                                   </div>
                                 </div>
@@ -586,16 +597,16 @@ const FightPage: React.FC = () => {
                           </div>
                         </div>
                         
-                        <div className="mt-4 text-center">
-                          <div className="text-sm text-gray-600 mb-3">
-                            {selectedDeck.cards.length} vs {selectedDungeon.cards.length} cards
+                        <div className="mt-6 text-center">
+                          <div className="text-amber-300 text-lg mb-4 font-bold">
+                            {selectedDeck.cards.length} vs {selectedDungeon.cards.length} warriors
                           </div>
                           <button
                             onClick={startBattle}
                             disabled={!selectedDeck || !selectedDungeon || selectedDeck.cards.length !== selectedDungeon.cards.length}
-                            className="bg-red-500 hover:bg-red-600 text-white py-3 px-8 rounded-lg disabled:bg-gray-400 transition-colors text-lg font-bold shadow-lg"
+                            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-amber-100 py-4 px-12 rounded-2xl disabled:bg-gray-600 transition-all text-xl font-bold border-2 border-red-500 shadow-2xl"
                           >
-                            ⚔️ START BATTLE! ⚔️
+                            ⚔️ COMMENCE BATTLE! ⚔️
                           </button>
                         </div>
                       </div>
@@ -605,39 +616,39 @@ const FightPage: React.FC = () => {
 
                 {/* Battle Results */}
                 {battleResult && (
-                  <div className="bg-white rounded-lg shadow-md p-6">
-                    <h2 className="text-xl font-semibold mb-6">🏆 Battle Results</h2>
+                  <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
+                    <h2 className="text-2xl font-bold text-amber-100 font-serif mb-8 text-center">🏆 Battle Results</h2>
                     
                     {/* Overall Result */}
-                    <div className={`p-6 rounded-lg mb-8 text-center ${
+                    <div className={`p-8 rounded-2xl mb-8 text-center border-4 ${
                       battleResult.playerWins 
-                        ? 'bg-gradient-to-r from-green-50 to-emerald-100 border-2 border-green-200' 
-                        : 'bg-gradient-to-r from-red-50 to-pink-100 border-2 border-red-200'
+                        ? 'bg-gradient-to-r from-green-800 to-emerald-900 border-green-600' 
+                        : 'bg-gradient-to-r from-red-800 to-pink-900 border-red-600'
                     }`}>
-                      <div className="text-2xl font-bold mb-2">
-                        {battleResult.playerWins ? '🎉 VICTORY! 🎉' : '💀 DEFEAT! 💀'}
+                      <div className="text-3xl font-bold mb-4">
+                        {battleResult.playerWins ? '🎉 GLORIOUS VICTORY! 🎉' : '💀 VALIANT DEFEAT! 💀'}
                       </div>
-                      <div className="text-lg">
-                        You won {battleResult.rounds.filter(r => r.playerWins).length} out of {battleResult.rounds.length} rounds
+                      <div className="text-xl text-amber-100">
+                        You claimed {battleResult.rounds.filter(r => r.playerWins).length} out of {battleResult.rounds.length} engagements
                       </div>
                     </div>
 
-                    {/* Round Details */}
-                    <div className="space-y-4 mb-8">
-                      <h3 className="font-semibold text-lg">📊 Battle Rounds</h3>
+                    {/* Engagement Details */}
+                    <div className="space-y-6 mb-8">
+                      <h3 className="font-bold text-2xl text-amber-200 font-serif text-center">📜 Battle Engagements</h3>
                       {battleResult.rounds.map((round: BattleRound, index: number) => (
-                        <div key={index} className="border rounded-lg p-4 bg-gray-50">
-                          <div className="text-sm font-medium mb-3 text-center bg-white py-1 rounded">
-                            Round {index + 1}
+                        <div key={index} className="border-2 border-amber-500 rounded-2xl p-6 bg-gray-700/50">
+                          <div className="text-lg font-bold mb-4 text-center bg-amber-900/30 py-3 rounded-xl text-amber-100">
+                            Engagement {index + 1}
                           </div>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                            {/* Player Card */}
-                            <div className="text-center p-3 bg-white rounded border">
-                              <div className="font-semibold text-blue-600">{round.playerCard.name}</div>
-                              <div className="mt-2 space-y-1">
-                                <div>💥 Damage: {round.playerCard.damage}</div>
-                                <div>❤️ Health: {round.playerCard.health}</div>
-                                <div className={`px-2 py-1 rounded text-xs inline-block ${getTypeColor(round.playerCard.type)}`}>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                            {/* Your Warrior */}
+                            <div className="text-center p-4 bg-gray-600 rounded-xl border-2 border-blue-500">
+                              <div className="font-bold text-blue-300 text-lg">{round.playerCard.name}</div>
+                              <div className="mt-3 space-y-2">
+                                <div>⚔️ Might: {round.playerCard.damage}</div>
+                                <div>❤️ Resilience: {round.playerCard.health}</div>
+                                <div className={`px-3 py-1 rounded-lg font-bold inline-block ${getTypeColor(round.playerCard.type)}`}>
                                   {getTypeEmoji(round.playerCard.type)} {round.playerCard.type}
                                 </div>
                               </div>
@@ -645,60 +656,60 @@ const FightPage: React.FC = () => {
                             
                             {/* Result */}
                             <div className="text-center flex items-center justify-center">
-                              <div className={`px-4 py-2 rounded-full font-bold ${
+                              <div className={`px-6 py-3 rounded-full font-bold text-lg border-2 ${
                                 round.playerWins 
-                                  ? 'bg-green-100 text-green-800 border border-green-300' 
-                                  : 'bg-red-100 text-red-800 border border-red-300'
+                                  ? 'bg-green-800 text-amber-100 border-green-600' 
+                                  : 'bg-red-800 text-amber-100 border-red-600'
                               }`}>
-                                {round.playerWins ? '✅ WIN' : '❌ LOSE'}
+                                {round.playerWins ? '✅ VICTORY' : '❌ DEFEAT'}
                               </div>
                             </div>
                             
-                            {/* Dungeon Card */}
-                            <div className="text-center p-3 bg-white rounded border">
-                              <div className="font-semibold text-red-600">{round.dungeonCard.name}</div>
-                              <div className="mt-2 space-y-1">
-                                <div>💥 Damage: {round.dungeonCard.damage}</div>
-                                <div>❤️ Health: {round.dungeonCard.health}</div>
-                                <div className={`px-2 py-1 rounded text-xs inline-block ${getTypeColor(round.dungeonCard.type)}`}>
+                            {/* Dungeon Guardian */}
+                            <div className="text-center p-4 bg-gray-600 rounded-xl border-2 border-red-500">
+                              <div className="font-bold text-red-300 text-lg">{round.dungeonCard.name}</div>
+                              <div className="mt-3 space-y-2">
+                                <div>⚔️ Might: {round.dungeonCard.damage}</div>
+                                <div>❤️ Resilience: {round.dungeonCard.health}</div>
+                                <div className={`px-3 py-1 rounded-lg font-bold inline-block ${getTypeColor(round.dungeonCard.type)}`}>
                                   {getTypeEmoji(round.dungeonCard.type)} {round.dungeonCard.type}
                                 </div>
                                 {round.dungeonCard.isLeader && (
-                                  <div className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded mt-1">
-                                    👑 Leader
+                                  <div className="bg-yellow-700 text-amber-100 text-sm px-2 py-1 rounded-lg mt-2 font-bold">
+                                    👑 Guardian Commander
                                   </div>
                                 )}
                               </div>
                             </div>
                           </div>
-                          <div className="text-xs text-gray-600 mt-3 text-center bg-white p-2 rounded">
+                          <div className="text-amber-300 mt-4 text-center bg-amber-900/30 p-3 rounded-xl">
                             🎯 {round.reason}
                           </div>
                         </div>
                       ))}
                     </div>
 
-                    {/* Reward Section */}
+                    {/* Victory Rewards */}
                     {battleResult.playerWins && battleResult.playerReward && (
-                      <div className="mt-6 p-6 bg-gradient-to-r from-yellow-50 to-orange-100 rounded-lg border border-yellow-200">
-                        <h3 className="font-semibold text-lg mb-4 text-center">🎁 Victory Reward!</h3>
-                        <p className="text-center mb-4">
-                          You earned <span className="font-bold">+{battleResult.playerReward.bonusAmount} {battleResult.playerReward.bonusType}</span>!
-                          Choose a card to apply the reward to:
+                      <div className="mt-8 p-8 bg-gradient-to-r from-yellow-800 to-orange-900 rounded-2xl border-4 border-yellow-600">
+                        <h3 className="font-bold text-2xl text-amber-100 font-serif mb-6 text-center">⚜️ Victory Spoils!</h3>
+                        <p className="text-center mb-6 text-amber-200 text-lg">
+                          You earned <span className="font-bold text-yellow-300">+{battleResult.playerReward.bonusAmount} {battleResult.playerReward.bonusType}</span>!
+                          Bestow this boon upon one of your warriors:
                         </p>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-80 overflow-y-auto">
                           {availableCards.map((card: WorldCard) => (
                             <button
                               key={card._id}
                               onClick={() => applyReward(card._id)}
-                              className="p-3 border border-gray-300 rounded-lg text-left bg-white hover:bg-yellow-50 transition-colors"
+                              className="p-4 border-2 border-yellow-500 rounded-xl text-left bg-gray-700 hover:bg-yellow-900/30 transition-all"
                             >
-                              <div className="font-medium">{card.name}</div>
-                              <div className="text-xs text-gray-600 mt-1">
-                                Current: 💥{card.damage} ❤️{card.health}
+                              <div className="font-bold text-amber-100 text-lg">{card.name}</div>
+                              <div className="text-amber-300 text-sm mt-2">
+                                Current: ⚔️{card.damage} ❤️{card.health}
                               </div>
-                              <div className="text-xs text-green-600 font-medium mt-1">
-                                After: 💥{card.damage + (battleResult.playerReward?.bonusType === 'damage' ? battleResult.playerReward.bonusAmount : 0)} ❤️{card.health + (battleResult.playerReward?.bonusType === 'health' ? battleResult.playerReward.bonusAmount : 0)}
+                              <div className="text-green-300 font-bold text-sm mt-2">
+                                After: ⚔️{card.damage + (battleResult.playerReward?.bonusType === 'damage' ? battleResult.playerReward.bonusAmount : 0)} ❤️{card.health + (battleResult.playerReward?.bonusType === 'health' ? battleResult.playerReward.bonusAmount : 0)}
                               </div>
                             </button>
                           ))}
@@ -706,22 +717,22 @@ const FightPage: React.FC = () => {
                       </div>
                     )}
 
-                    <div className="mt-8 flex justify-center space-x-4">
+                    <div className="mt-8 flex justify-center space-x-6">
                       <button
                         onClick={() => {
                           setBattleResult(null);
                           setSelectedDeck(null);
                           setSelectedDungeon(null);
                         }}
-                        className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition-colors"
+                        className="bg-gray-600 hover:bg-gray-700 text-amber-100 px-8 py-4 rounded-xl transition-all border-2 border-gray-500 font-bold text-lg"
                       >
                         🔄 Battle Again
                       </button>
                       <button
                         onClick={() => setActiveTab('decks')}
-                        className="bg-violet-500 hover:bg-violet-600 text-white px-6 py-3 rounded-lg transition-colors"
+                        className="bg-amber-600 hover:bg-amber-700 text-amber-100 px-8 py-4 rounded-xl transition-all border-2 border-amber-500 font-bold text-lg"
                       >
-                        🃏 Build New Deck
+                        🛡️ Forge New Formation
                       </button>
                     </div>
                   </div>
@@ -729,28 +740,28 @@ const FightPage: React.FC = () => {
               </div>
             )}
 
-            {/* Collection Tab */}
+            {/* Royal Archives Tab */}
             {activeTab === 'collection' && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-semibold">📚 My Collection</h2>
-                  <div className="flex space-x-2">
+              <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
+                <div className="flex justify-between items-center mb-8">
+                  <h2 className="text-2xl font-bold text-amber-100 font-serif">📜 Royal Archives</h2>
+                  <div className="flex space-x-4">
                     <button
                       onClick={loadData}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                      className="bg-blue-700 hover:bg-blue-800 text-amber-100 px-6 py-3 rounded-xl transition-all border-2 border-blue-600 font-bold"
                     >
-                      🔄 Refresh Data
+                      🔄 Update Archives
                     </button>
-                    <span className="text-sm text-gray-500">
-                      {availableCards.length} card{availableCards.length !== 1 ? 's' : ''}
+                    <span className="text-amber-200 font-bold text-lg">
+                      {availableCards.length} warrior{availableCards.length !== 1 ? 's' : ''}
                     </span>
                   </div>
                 </div>
                 
                 {availableCards.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="text-4xl mb-4">🃏</div>
-                    <p className="text-lg text-gray-600 mb-4">Your collection is empty</p>
+                  <div className="text-center py-16">
+                    <div className="text-6xl mb-6">🛡️</div>
+                    <p className="text-xl text-amber-300 mb-6">Your archives are empty</p>
                     <button
                       onClick={async () => {
                         try {
@@ -758,47 +769,47 @@ const FightPage: React.FC = () => {
                           setMessage(result.message);
                           await loadData();
                         } catch (error: any) {
-                          setMessage('❌ Error: ' + (error.response?.data?.message || error.message));
+                          setMessage('❌ Royal Decree Error: ' + (error.response?.data?.message || error.message));
                         }
                       }}
-                      className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg transition-colors"
+                      className="bg-orange-700 hover:bg-orange-800 text-amber-100 px-8 py-4 rounded-xl transition-all border-2 border-orange-600 font-bold text-lg"
                     >
-                      🎁 Get Starter Cards
+                      ⚜️ Summon Starter Warriors
                     </button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {availableCards.map((card: WorldCard) => (
-                      <div key={card._id} className="border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
-                        <div className="flex justify-between items-start mb-3">
-                          <h3 className="font-semibold text-gray-900">{card.name}</h3>
-                          <span className={`px-2 py-1 rounded text-xs ${getTypeColor(card.type)}`}>
+                      <div key={card._id} className={`border-2 rounded-2xl p-5 transition-all transform hover:scale-105 ${getCardRarityColor(card)} border-amber-500 hover:shadow-2xl`}>
+                        <div className="flex justify-between items-start mb-4">
+                          <h3 className="font-bold text-amber-100 text-lg">{card.name}</h3>
+                          <span className={`px-3 py-1 rounded-lg text-sm font-bold ${getTypeColor(card.type)}`}>
                             {getTypeEmoji(card.type)} {card.type}
                           </span>
                         </div>
                         
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           <div className="flex justify-between text-sm">
-                            <span className="text-red-600 font-medium">💥 Damage</span>
-                            <span className="font-bold">{card.damage}</span>
+                            <span className="text-red-300 font-bold">⚔️ Might</span>
+                            <span className="font-bold text-amber-100">{card.damage}</span>
                           </div>
                           <div className="flex justify-between text-sm">
-                            <span className="text-green-600 font-medium">❤️ Health</span>
-                            <span className="font-bold">{card.health}</span>
+                            <span className="text-green-300 font-bold">❤️ Resilience</span>
+                            <span className="font-bold text-amber-100">{card.health}</span>
                           </div>
                           
                           {card.boostType && (
-                            <div className="bg-blue-50 border border-blue-200 rounded p-2 mt-2">
-                              <div className="text-xs text-blue-800 font-medium">
-                                ⚡ {card.boostType === 'damage' ? '2× Damage' : '2× Health'}
+                            <div className="bg-purple-700 border border-purple-500 rounded-xl p-3 mt-3">
+                              <div className="text-xs text-purple-200 font-bold">
+                                ⚡ {card.boostType === 'damage' ? '2× Might' : '2× Resilience'}
                               </div>
                             </div>
                           )}
                           
                           {card.isLeader && (
-                            <div className="bg-yellow-50 border border-yellow-200 rounded p-2 mt-2">
-                              <div className="text-xs text-yellow-800 font-medium flex items-center">
-                                👑 Leader Card
+                            <div className="bg-yellow-700 border border-yellow-500 rounded-xl p-3 mt-3">
+                              <div className="text-xs text-yellow-200 font-bold flex items-center">
+                                👑 Formation Commander
                               </div>
                             </div>
                           )}
@@ -810,49 +821,49 @@ const FightPage: React.FC = () => {
               </div>
             )}
 
-            {/* All Game Cards Tab */}
+            {/* Kingdom Lore Tab */}
             {activeTab === 'allcards' && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl font-semibold">🏰 All Game Cards ({allGameCards.length})</h2>
-                  <div className="text-sm text-gray-500">
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2">
-                      Leaders: {allGameCards.filter(c => c.isLeader).length}
+              <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
+                <div className="flex justify-between items-center mb-8">
+                  <h2 className="text-2xl font-bold text-amber-100 font-serif">🏰 Kingdom Lore ({allGameCards.length})</h2>
+                  <div className="text-amber-200 font-bold">
+                    <span className="bg-yellow-700 text-amber-100 px-3 py-2 rounded-xl mr-3">
+                      👑 Commanders: {allGameCards.filter(c => c.isLeader).length}
                     </span>
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
-                      Dungeons: {allGameDungeons.length}
+                    <span className="bg-green-700 text-amber-100 px-3 py-2 rounded-xl">
+                      🏰 Dungeons: {allGameDungeons.length}
                     </span>
                   </div>
                 </div>
 
                 {/* Dungeons Section */}
-                <div className="mb-8">
-                  <h3 className="text-lg font-semibold mb-4">🏰 Game Dungeons</h3>
+                <div className="mb-12">
+                  <h3 className="text-2xl font-bold text-amber-200 font-serif mb-6 text-center">🏰 Kingdom Dungeons</h3>
                   {allGameDungeons.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      <p>No dungeons available in the game yet.</p>
+                    <div className="text-center py-12 text-amber-300">
+                      <p className="text-xl">No dungeons discovered in the kingdom yet.</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {allGameDungeons.map((dungeon: Dungeon) => (
-                        <div key={dungeon._id} className="border border-gray-200 rounded-lg p-4 bg-gradient-to-br from-purple-50 to-pink-50">
-                          <div className="flex justify-between items-start mb-3">
-                            <h4 className="font-semibold text-gray-900">{dungeon.name}</h4>
-                            <span className={`px-2 py-1 rounded text-xs ${getDungeonColor(dungeon.type)}`}>
+                        <div key={dungeon._id} className="border-2 border-purple-500 rounded-2xl p-6 bg-gradient-to-br from-purple-800 to-purple-900 hover:shadow-2xl transition-all">
+                          <div className="flex justify-between items-start mb-4">
+                            <h4 className="font-bold text-amber-100 text-xl">{dungeon.name}</h4>
+                            <span className={`px-3 py-1 rounded-lg text-sm font-bold ${getDungeonColor(dungeon.type)}`}>
                               {dungeon.type}
                             </span>
                           </div>
-                          <div className="text-xs text-gray-500">
-                            <div className="flex justify-between mb-2">
-                              <span>Cards: {dungeon.cards.length}</span>
-                              <span>Leaders: {dungeon.cards.filter(c => c.isLeader).length}</span>
+                          <div className="text-amber-300 text-sm">
+                            <div className="flex justify-between mb-3 font-bold">
+                              <span>Guardians: {dungeon.cards.length}</span>
+                              <span>Commanders: {dungeon.cards.filter(c => c.isLeader).length}</span>
                             </div>
-                            <div className="space-y-1 max-h-32 overflow-y-auto">
+                            <div className="space-y-2 max-h-40 overflow-y-auto">
                               {dungeon.cards.map((card: WorldCard, index: number) => (
-                                <div key={card._id} className="flex justify-between items-center p-1 bg-white rounded text-xs">
-                                  <span className="font-medium">{card.name}</span>
-                                  <span className="text-gray-500">
-                                    💥{card.damage} ❤️{card.health}
+                                <div key={card._id} className="flex justify-between items-center p-2 bg-purple-700 rounded-lg text-xs">
+                                  <span className="font-bold text-amber-100">{card.name}</span>
+                                  <span className="text-amber-300">
+                                    ⚔️{card.damage} ❤️{card.health}
                                   </span>
                                 </div>
                               ))}
@@ -864,47 +875,49 @@ const FightPage: React.FC = () => {
                   )}
                 </div>
 
-                {/* All Cards Section */}
+                {/* All Warriors Section */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-4">🃏 All Game Cards</h3>
+                  <h3 className="text-2xl font-bold text-amber-200 font-serif mb-6 text-center">🛡️ Kingdom Warriors</h3>
                   {allGameCards.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      <p>No cards available in the game yet.</p>
+                    <div className="text-center py-12 text-amber-300">
+                      <p className="text-xl">No warriors recorded in the kingdom annals yet.</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                       {allGameCards.map((card: WorldCard) => (
-                        <div key={card._id} className={`border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow ${
-                          card.isLeader ? 'bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200' : ''
-                        }`}>
-                          <div className="flex justify-between items-start mb-3">
-                            <h4 className="font-semibold text-gray-900">{card.name}</h4>
-                            <div className="flex flex-col items-end space-y-1">
-                              <span className={`px-2 py-1 rounded text-xs ${getTypeColor(card.type)}`}>
+                        <div key={card._id} className={`border-2 rounded-2xl p-5 transition-all transform hover:scale-105 ${
+                          card.isLeader 
+                            ? 'bg-gradient-to-br from-yellow-600 to-amber-700 border-yellow-500' 
+                            : 'bg-gradient-to-br from-gray-700 to-gray-800 border-amber-500'
+                        } hover:shadow-2xl`}>
+                          <div className="flex justify-between items-start mb-4">
+                            <h4 className="font-bold text-amber-100 text-lg">{card.name}</h4>
+                            <div className="flex flex-col items-end space-y-2">
+                              <span className={`px-3 py-1 rounded-lg text-sm font-bold ${getTypeColor(card.type)}`}>
                                 {getTypeEmoji(card.type)} {card.type}
                               </span>
                               {card.isLeader && (
-                                <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
-                                    👑 Leader
+                                <span className="bg-yellow-700 text-amber-100 text-xs px-2 py-1 rounded-lg font-bold">
+                                  👑 Commander
                                 </span>
                               )}
                             </div>
                           </div>
                           
-                          <div className="space-y-2">
+                          <div className="space-y-3">
                             <div className="flex justify-between text-sm">
-                              <span className="text-red-600 font-medium">💥 Damage</span>
-                              <span className="font-bold">{card.damage}</span>
+                              <span className="text-red-300 font-bold">⚔️ Might</span>
+                              <span className="font-bold text-amber-100">{card.damage}</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                              <span className="text-green-600 font-medium">❤️ Health</span>
-                              <span className="font-bold">{card.health}</span>
+                              <span className="text-green-300 font-bold">❤️ Resilience</span>
+                              <span className="font-bold text-amber-100">{card.health}</span>
                             </div>
                             
                             {card.boostType && (
-                              <div className="bg-blue-50 border border-blue-200 rounded p-2 mt-2">
-                                <div className="text-xs text-blue-800 font-medium">
-                                  ⚡ {card.boostType === 'damage' ? '2× Damage' : '2× Health'}
+                              <div className="bg-blue-700 border border-blue-500 rounded-xl p-3 mt-3">
+                                <div className="text-xs text-blue-200 font-bold">
+                                  ⚡ {card.boostType === 'damage' ? '2× Might' : '2× Resilience'}
                                 </div>
                               </div>
                             )}
@@ -919,6 +932,16 @@ const FightPage: React.FC = () => {
           </>
         )}
       </main>
+
+      {/* Medieval Footer */}
+      <footer className="bg-gradient-to-r from-amber-900 to-amber-800 border-t-4 border-amber-700 mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center text-amber-200">
+            <p className="font-serif text-lg">© 2024 Royal Card Battle Arena - All rights reserved by royal decree</p>
+            <p className="text-amber-300 mt-2 font-bold">May your sword stay sharp and your formations stay mighty!</p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
