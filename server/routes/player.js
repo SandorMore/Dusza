@@ -22,7 +22,52 @@ router.get('/test', auth, (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+router.get('/all-cards', auth, async (req, res) => {
+  try {
+    console.log('🔍 Player fetching ALL world cards');
+    const cards = await WorldCard.find().sort({ createdAt: -1 });
+    res.json({ 
+      cards: cards || [],
+      total: cards.length
+    });
+  } catch (error) {
+    console.error('Error fetching all world cards:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
 
+router.get('/all-dungeons', auth, async (req, res) => {
+  try {
+    console.log('🔍 Player fetching ALL dungeons');
+    const dungeons = await Dungeon.find().populate('cards').sort({ createdAt: -1 });
+    res.json({ 
+      dungeons: dungeons || [],
+      total: dungeons.length
+    });
+  } catch (error) {
+    console.error('Error fetching all dungeons:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.get('/all-game-environments', auth, async (req, res) => {
+  try {
+    console.log('🔍 Player fetching ALL game environments');
+    const environments = await GameEnvironment.find()
+      .populate('worldCards')
+      .populate('dungeons')
+      .populate('starterCollection')
+      .sort({ createdAt: -1 });
+    
+    res.json({ 
+      environments: environments || [],
+      total: environments.length
+    });
+  } catch (error) {
+    console.error('Error fetching all game environments:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
 // Initialize starter data
 router.post('/initialize-starter', auth, async (req, res) => {
   try {
@@ -200,19 +245,42 @@ router.put('/collections/:collectionId/cards/:cardId', auth, async (req, res) =>
       return res.status(404).json({ message: 'Collection not found' });
     }
     
-    const card = collection.cards.id(cardId);
-    if (!card) {
+    const cardIndex = collection.cards.findIndex(c => c._id.toString() === cardId);
+    if (cardIndex === -1) {
       return res.status(404).json({ message: 'Card not found in collection' });
     }
     
+    console.log('🔍 Card before update:', 
+      collection.cards[cardIndex].name, 
+      'DMG:', collection.cards[cardIndex].damage, 
+      'HP:', collection.cards[cardIndex].health
+    );
+    
     if (bonusType === 'damage') {
-      card.damage += bonusAmount;
+      collection.cards[cardIndex].damage += bonusAmount;
     } else if (bonusType === 'health') {
-      card.health += bonusAmount;
+      collection.cards[cardIndex].health += bonusAmount;
     }
     
+    console.log('🔍 Card after update:', 
+      collection.cards[cardIndex].name, 
+      'DMG:', collection.cards[cardIndex].damage, 
+      'HP:', collection.cards[cardIndex].health
+    );
+    
+    collection.markModified('cards');
     await collection.save();
-    res.json({ message: 'Card updated successfully' });
+    
+    res.json({ 
+      message: 'Card updated successfully',
+      card: {
+        _id: collection.cards[cardIndex]._id,
+        name: collection.cards[cardIndex].name,
+        damage: collection.cards[cardIndex].damage,
+        health: collection.cards[cardIndex].health,
+        type: collection.cards[cardIndex].type
+      }
+    });
   } catch (error) {
     console.error('Error updating collection card:', error);
     res.status(500).json({ message: error.message });

@@ -130,7 +130,20 @@ class ApiService {
     const response: AxiosResponse<CreateLeaderCardResponse> = await this.api.post('/game-master/world-cards/leader', leaderData)
     return response.data
   }
+  async getAllCards(): Promise<WorldCardsResponse> {
+    const response: AxiosResponse<WorldCardsResponse> = await this.api.get('/player/all-cards');
+    return response.data;
+  }
 
+  async getAllDungeons(): Promise<DungeonsResponse> {
+    const response: AxiosResponse<DungeonsResponse> = await this.api.get('/player/all-dungeons');
+    return response.data;
+  }
+
+  async getAllGameEnvironments(): Promise<GameEnvironmentsResponse> {
+    const response: AxiosResponse<GameEnvironmentsResponse> = await this.api.get('/player/all-game-environments');
+    return response.data;
+  }
   async createDungeon(dungeonData: DungeonData): Promise<CreateDungeonResponse> {
     const response: AxiosResponse<CreateDungeonResponse> = await this.api.post('/game-master/dungeons', dungeonData)
     return response.data

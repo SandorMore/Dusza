@@ -1,4 +1,4 @@
-// src/pages/FightPage.tsx - COMPLETE VERSION WITH FULL UI
+// src/pages/FightPage.tsx - COMPLETE UPDATED VERSION WITH DEBUGGING
 import React, { useState, useEffect } from 'react'
 import { apiService } from '../services/api'
 import type { 
@@ -12,7 +12,7 @@ import type {
 import type { User } from '../types/auth'
 
 const FightPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'decks' | 'battle' | 'collection'>('decks')
+  const [activeTab, setActiveTab] = useState<'decks' | 'battle' | 'collection' | 'allcards'>('decks')
   const [playerDecks, setPlayerDecks] = useState<PlayerDeck[]>([])
   const [dungeons, setDungeons] = useState<Dungeon[]>([])
   const [collections, setCollections] = useState<PlayerCollection[]>([])
@@ -26,6 +26,8 @@ const FightPage: React.FC = () => {
   const [selectedCardsForDeck, setSelectedCardsForDeck] = useState<string[]>([])
   const [availableCards, setAvailableCards] = useState<WorldCard[]>([])
   const [isCreatingDeck, setIsCreatingDeck] = useState<boolean>(false)
+  const [allGameCards, setAllGameCards] = useState<WorldCard[]>([])
+  const [allGameDungeons, setAllGameDungeons] = useState<Dungeon[]>([])
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -54,24 +56,34 @@ const FightPage: React.FC = () => {
     try {
       console.log('🔄 Loading fight page data...')
       
-      const [decksRes, collectionsRes, dungeonsRes] = await Promise.all([
+      const [decksRes, collectionsRes, dungeonsRes, allCardsRes, allDungeonsRes] = await Promise.all([
         apiService.getPlayerDecks(),
         apiService.getPlayerCollections(),
         apiService.getPlayerDungeons(),
+        apiService.getAllCards(),
+        apiService.getAllDungeons()
       ])
       
       setPlayerDecks(decksRes.decks || [])
       setDungeons(dungeonsRes.dungeons || [])
       setCollections(collectionsRes.collections || [])
+      setAllGameCards(allCardsRes.cards || [])
+      setAllGameDungeons(allDungeonsRes.dungeons || [])
       
-      const allCards: WorldCard[] = collectionsRes.collections?.flatMap(col => col.cards) || []
-      setAvailableCards(allCards)
+      // Make sure we're properly extracting cards from collections
+      const playerCards: WorldCard[] = collectionsRes.collections?.flatMap(col => col.cards) || []
+      console.log('🃏 Player cards loaded:', playerCards.length);
+      console.log('🃏 Sample cards after load:', playerCards.slice(0, 3).map(c => ({name: c.name, damage: c.damage, health: c.health})));
+      
+      setAvailableCards(playerCards)
       
       console.log('✅ Loaded:', {
         decks: decksRes.decks?.length || 0,
         dungeons: dungeonsRes.dungeons?.length || 0,
         collections: collectionsRes.collections?.length || 0,
-        availableCards: allCards.length
+        availableCards: playerCards.length,
+        allGameCards: allCardsRes.cards?.length || 0,
+        allGameDungeons: allDungeonsRes.dungeons?.length || 0
       })
       
     } catch (error: any) {
@@ -130,33 +142,38 @@ const FightPage: React.FC = () => {
     }
   }
 
-  // Replace the applyReward function in FightPage.tsx
-const applyReward = async (cardId: string): Promise<void> => {
-  if (!battleResult?.playerWins || !battleResult.playerReward) return
+  const applyReward = async (cardId: string): Promise<void> => {
+    if (!battleResult?.playerWins || !battleResult.playerReward) return
 
-  try {
-    setLoading(true);
-    
-    // Use the new reward endpoint
-    const result = await apiService.applyReward(
-      cardId,
-      battleResult.playerReward.bonusType,
-      battleResult.playerReward.bonusAmount
-    );
-    
-    setMessage('🎁 ' + result.message);
-    console.log('✅ Reward applied:', result.card);
-    
-    // Reload data to show updated cards
-    await loadData();
-    
-  } catch (error: any) {
-    console.error('❌ Error applying reward:', error);
-    setMessage('❌ Error applying reward: ' + (error.response?.data?.message || error.message));
-  } finally {
-    setLoading(false);
+    try {
+      setLoading(true);
+      console.log('🔄 Applying reward to card:', cardId);
+      console.log('🎁 Reward details:', battleResult.playerReward);
+      console.log('📊 Available cards BEFORE reward:', availableCards.map(c => ({name: c.name, damage: c.damage, health: c.health})));
+      
+      const result = await apiService.applyReward(
+        cardId,
+        battleResult.playerReward.bonusType,
+        battleResult.playerReward.bonusAmount
+      );
+      
+      console.log('✅ Reward API response:', result);
+      setMessage('🎁 ' + result.message);
+      
+      // Force reload the data to see updates
+      console.log('🔄 Reloading data after reward...');
+      await loadData();
+      
+      // Also log the current available cards to see if they updated
+      console.log('📊 Available cards AFTER reward:', availableCards.map(c => ({name: c.name, damage: c.damage, health: c.health})));
+      
+    } catch (error: any) {
+      console.error('❌ Error applying reward:', error);
+      setMessage('❌ Error applying reward: ' + (error.response?.data?.message || error.message));
+    } finally {
+      setLoading(false);
+    }
   }
-}
 
   const toggleCardForDeck = (cardId: string): void => {
     setSelectedCardsForDeck(prev => 
@@ -214,7 +231,7 @@ const applyReward = async (cardId: string): Promise<void> => {
           <div className="flex justify-between items-center py-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">⚔️ Fight Arena</h1>
-              <p className="text-gray-600">Welcome, {user.username}!</p>
+              <p className="text-gray-600">Welcome, {user.username}! | Game Cards: {allGameCards.length} | Dungeons: {allGameDungeons.length}</p>
             </div>
             <div className="flex space-x-2">
               <button
@@ -251,7 +268,8 @@ const applyReward = async (cardId: string): Promise<void> => {
             {[
               { id: 'decks' as const, label: `🃏 My Decks (${playerDecks.length})`, icon: '🃏' },
               { id: 'battle' as const, label: '⚔️ Battle', icon: '⚔️' },
-              { id: 'collection' as const, label: `📚 Collection (${availableCards.length})`, icon: '📚' }
+              { id: 'collection' as const, label: `📚 Collection (${availableCards.length})`, icon: '📚' },
+              { id: 'allcards' as const, label: `🏰 All Game Cards (${allGameCards.length})`, icon: '🏰' }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -716,9 +734,17 @@ const applyReward = async (cardId: string): Promise<void> => {
               <div className="bg-white rounded-lg shadow-md p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-semibold">📚 My Collection</h2>
-                  <span className="text-sm text-gray-500">
-                    {availableCards.length} card{availableCards.length !== 1 ? 's' : ''}
-                  </span>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={loadData}
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                    >
+                      🔄 Refresh Data
+                    </button>
+                    <span className="text-sm text-gray-500">
+                      {availableCards.length} card{availableCards.length !== 1 ? 's' : ''}
+                    </span>
+                  </div>
                 </div>
                 
                 {availableCards.length === 0 ? (
@@ -781,6 +807,113 @@ const applyReward = async (cardId: string): Promise<void> => {
                     ))}
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* All Game Cards Tab */}
+            {activeTab === 'allcards' && (
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-semibold">🏰 All Game Cards ({allGameCards.length})</h2>
+                  <div className="text-sm text-gray-500">
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded mr-2">
+                      Leaders: {allGameCards.filter(c => c.isLeader).length}
+                    </span>
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
+                      Dungeons: {allGameDungeons.length}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Dungeons Section */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold mb-4">🏰 Game Dungeons</h3>
+                  {allGameDungeons.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <p>No dungeons available in the game yet.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {allGameDungeons.map((dungeon: Dungeon) => (
+                        <div key={dungeon._id} className="border border-gray-200 rounded-lg p-4 bg-gradient-to-br from-purple-50 to-pink-50">
+                          <div className="flex justify-between items-start mb-3">
+                            <h4 className="font-semibold text-gray-900">{dungeon.name}</h4>
+                            <span className={`px-2 py-1 rounded text-xs ${getDungeonColor(dungeon.type)}`}>
+                              {dungeon.type}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            <div className="flex justify-between mb-2">
+                              <span>Cards: {dungeon.cards.length}</span>
+                              <span>Leaders: {dungeon.cards.filter(c => c.isLeader).length}</span>
+                            </div>
+                            <div className="space-y-1 max-h-32 overflow-y-auto">
+                              {dungeon.cards.map((card: WorldCard, index: number) => (
+                                <div key={card._id} className="flex justify-between items-center p-1 bg-white rounded text-xs">
+                                  <span className="font-medium">{card.name}</span>
+                                  <span className="text-gray-500">
+                                    💥{card.damage} ❤️{card.health}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* All Cards Section */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">🃏 All Game Cards</h3>
+                  {allGameCards.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <p>No cards available in the game yet.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                      {allGameCards.map((card: WorldCard) => (
+                        <div key={card._id} className={`border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow ${
+                          card.isLeader ? 'bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200' : ''
+                        }`}>
+                          <div className="flex justify-between items-start mb-3">
+                            <h4 className="font-semibold text-gray-900">{card.name}</h4>
+                            <div className="flex flex-col items-end space-y-1">
+                              <span className={`px-2 py-1 rounded text-xs ${getTypeColor(card.type)}`}>
+                                {getTypeEmoji(card.type)} {card.type}
+                              </span>
+                              {card.isLeader && (
+                                <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
+                                    👑 Leader
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-red-600 font-medium">💥 Damage</span>
+                              <span className="font-bold">{card.damage}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-green-600 font-medium">❤️ Health</span>
+                              <span className="font-bold">{card.health}</span>
+                            </div>
+                            
+                            {card.boostType && (
+                              <div className="bg-blue-50 border border-blue-200 rounded p-2 mt-2">
+                                <div className="text-xs text-blue-800 font-medium">
+                                  ⚡ {card.boostType === 'damage' ? '2× Damage' : '2× Health'}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </>
