@@ -1,0 +1,321 @@
+// routes/player.js - COMPLETE UPDATED VERSION
+const express = require('express')
+const router = express.Router()
+const PlayerDeck = require('../models/PlayerDeck')
+const PlayerCollection = require('../models/PlayerCollection')
+const Dungeon = require('../models/Dungeon')
+const WorldCard = require('../models/WorldCard')
+
+// FIX: Import 'auth' directly instead of renaming
+const { auth } = require('../middleware/auth')
+
+// Test route
+router.get('/test', auth, (req, res) => {
+  console.log('✅ Player route test - User:', req.user.username);
+  res.json({ 
+    message: 'Player routes are working!',
+    user: {
+      id: req.user._id,
+      username: req.user.username,
+      role: req.user.role
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Initialize starter data
+router.post('/initialize-starter', auth, async (req, res) => {
+  try {
+    console.log('🔄 Initializing starter data for user:', req.user.username);
+    
+    // Check if player already has a collection
+    const existingCollection = await PlayerCollection.findOne({ createdBy: req.user._id });
+    
+    if (existingCollection) {
+      return res.json({ 
+        message: 'Collection already exists',
+        collection: existingCollection 
+      });
+    }
+    
+    // Get some basic world cards to use as starter cards
+    const starterCards = await WorldCard.find().limit(6);
+    
+    if (starterCards.length === 0) {
+      return res.status(400).json({ 
+        message: 'No world cards found. Please create some cards first as Game Master.' 
+      });
+    }
+    
+    // Create starter collection
+    const collection = new PlayerCollection({
+      name: 'Starter Collection',
+      cards: starterCards.map(card => card._id),
+      createdBy: req.user._id
+    });
+    
+    await collection.save();
+    await collection.populate('cards');
+    
+    console.log('✅ Starter collection created with', starterCards.length, 'cards');
+    
+    res.json({
+      message: 'Starter collection created successfully!',
+      collection: collection,
+      cardsCount: starterCards.length
+    });
+    
+  } catch (error) {
+    console.error('❌ Error initializing starter data:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get player dungeons (NEW)
+router.get('/dungeons', auth, async (req, res) => {
+  try {
+    console.log('🔍 Player fetching dungeons for:', req.user.username);
+    const dungeons = await Dungeon.find().populate('cards');
+    res.json({ dungeons: dungeons || [] });
+  } catch (error) {
+    console.error('Error fetching dungeons for player:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get player world cards (NEW)
+router.get('/world-cards', auth, async (req, res) => {
+  try {
+    console.log('🔍 Player fetching world cards for:', req.user.username);
+    const cards = await WorldCard.find();
+    res.json({ cards: cards || [] });
+  } catch (error) {
+    console.error('Error fetching world cards for player:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Test dungeons route (NEW)
+router.get('/test-dungeons', auth, async (req, res) => {
+  try {
+    console.log('🔍 Player test dungeons for:', req.user.username);
+    const dungeons = await Dungeon.find().limit(3).populate('cards');
+    res.json({ 
+      message: 'Test dungeons for player',
+      dungeons: dungeons || [] 
+    });
+  } catch (error) {
+    console.error('Error in test dungeons:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get player decks
+router.get('/decks', auth, async (req, res) => {
+  try {
+    console.log('🔍 GET /decks - User:', req.user.username);
+    const decks = await PlayerDeck.find({ createdBy: req.user._id }).populate('cards');
+    res.json({ decks: decks || [] });
+  } catch (error) {
+    console.error('Error fetching decks:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Create player deck
+router.post('/decks', auth, async (req, res) => {
+  try {
+    console.log('🔍 POST /decks - User:', req.user.username);
+    const { name, cardIds } = req.body;
+    
+    const cards = await WorldCard.find({ _id: { $in: cardIds } });
+    
+    const deck = new PlayerDeck({
+      name,
+      cards,
+      cardIds,
+      createdBy: req.user._id
+    });
+    
+    await deck.save();
+    await deck.populate('cards');
+    res.json({ message: 'Deck created successfully', deck });
+  } catch (error) {
+    console.error('Error creating deck:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Start battle
+router.post('/battle', auth, async (req, res) => {
+  try {
+    console.log('🔍 POST /battle - User:', req.user.username);
+    const { deckId, dungeonId } = req.body;
+    
+    const deck = await PlayerDeck.findById(deckId).populate('cards');
+    const dungeon = await Dungeon.findById(dungeonId).populate('cards');
+    
+    if (!deck || !dungeon) {
+      return res.status(404).json({ message: 'Deck or dungeon not found' });
+    }
+    
+    if (deck.cards.length !== dungeon.cards.length) {
+      return res.status(400).json({ message: 'Deck size must match dungeon size' });
+    }
+    
+    const battleResult = simulateBattle(deck.cards, dungeon.cards, dungeon.type);
+    
+    res.json({ message: 'Battle completed', result: battleResult });
+  } catch (error) {
+    console.error('Error starting battle:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get player collections
+router.get('/collections', auth, async (req, res) => {
+  try {
+    console.log('🔍 GET /collections - User:', req.user.username);
+    const collections = await PlayerCollection.find({ createdBy: req.user._id }).populate('cards');
+    res.json({ collections: collections || [] });
+  } catch (error) {
+    console.error('Error fetching collections:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Update collection card (apply rewards)
+router.put('/collections/:collectionId/cards/:cardId', auth, async (req, res) => {
+  try {
+    console.log('🔍 PUT /collections - User:', req.user.username);
+    const { collectionId, cardId } = req.params;
+    const { bonusType, bonusAmount } = req.body;
+    
+    const collection = await PlayerCollection.findOne({ 
+      _id: collectionId, 
+      createdBy: req.user._id
+    });
+    
+    if (!collection) {
+      return res.status(404).json({ message: 'Collection not found' });
+    }
+    
+    const card = collection.cards.id(cardId);
+    if (!card) {
+      return res.status(404).json({ message: 'Card not found in collection' });
+    }
+    
+    if (bonusType === 'damage') {
+      card.damage += bonusAmount;
+    } else if (bonusType === 'health') {
+      card.health += bonusAmount;
+    }
+    
+    await collection.save();
+    res.json({ message: 'Card updated successfully' });
+  } catch (error) {
+    console.error('Error updating collection card:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Battle simulation function
+function simulateBattle(playerCards, dungeonCards, dungeonType) {
+  const rounds = [];
+  let playerWinsCount = 0;
+  
+  for (let i = 0; i < playerCards.length; i++) {
+    const playerCard = playerCards[i];
+    const dungeonCard = dungeonCards[i];
+    const roundResult = simulateRound(playerCard, dungeonCard);
+    rounds.push(roundResult);
+    
+    if (roundResult.playerWins) {
+      playerWinsCount++;
+    }
+  }
+  
+  const playerWins = playerWinsCount >= Math.ceil(playerCards.length / 2);
+  
+  // Determine reward based on dungeon type
+  let playerReward = null;
+  if (playerWins) {
+    if (dungeonType === 'Egyszerű találkozás') {
+      playerReward = {
+        cardId: null, // To be chosen by player
+        bonusType: 'damage',
+        bonusAmount: 1
+      };
+    } else if (dungeonType === 'Kis kazamata') {
+      playerReward = {
+        cardId: null,
+        bonusType: 'health',
+        bonusAmount: 2
+      };
+    } else if (dungeonType === 'Nagy kazamata') {
+      playerReward = {
+        cardId: null,
+        bonusType: 'damage',
+        bonusAmount: 3
+      };
+    }
+  }
+  
+  return {
+    playerWins,
+    rounds,
+    playerReward
+  };
+}
+
+function simulateRound(playerCard, dungeonCard) {
+  let playerWins = false;
+  let reason = '';
+  
+  // Rule 1: Damage comparison
+  if (playerCard.damage > dungeonCard.health) {
+    playerWins = true;
+    reason = `Player damage (${playerCard.damage}) > Dungeon health (${dungeonCard.health})`;
+  } else if (dungeonCard.damage > playerCard.health) {
+    playerWins = false;
+    reason = `Dungeon damage (${dungeonCard.damage}) > Player health (${playerCard.health})`;
+  } else {
+    // Rule 2: Type advantages
+    const advantage = getTypeAdvantage(playerCard.type, dungeonCard.type);
+    if (advantage > 0) {
+      playerWins = true;
+      reason = `Type advantage: ${playerCard.type} beats ${dungeonCard.type}`;
+    } else if (advantage < 0) {
+      playerWins = false;
+      reason = `Type disadvantage: ${dungeonCard.type} beats ${playerCard.type}`;
+    } else {
+      // Rule 3: Default to dungeon wins
+      playerWins = false;
+      reason = 'No clear winner - dungeon card wins by default';
+    }
+  }
+  
+  return {
+    playerCard,
+    dungeonCard,
+    playerWins,
+    reason,
+    playerCardDamage: playerCard.damage,
+    dungeonCardDamage: dungeonCard.damage
+  };
+}
+
+function getTypeAdvantage(type1, type2) {
+  const advantages = {
+    'tűz': ['föld'],
+    'föld': ['víz'],
+    'víz': ['levegő'],
+    'levegő': ['tűz']
+  };
+  
+  if (advantages[type1]?.includes(type2)) return 1;
+  if (advantages[type2]?.includes(type1)) return -1;
+  return 0;
+}
+
+module.exports = router;

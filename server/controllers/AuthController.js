@@ -195,3 +195,4 @@ exports.logoutAll = async (req, res) => {
     });
   }
 };
+

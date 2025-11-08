@@ -1,4 +1,4 @@
-// src/services/api.ts - Teljesen típusbiztos verzió
+// src/services/api.ts - UPDATED VERSION
 import axios from 'axios'
 import type { AxiosInstance, AxiosResponse } from 'axios'
 import type { 
@@ -16,7 +16,12 @@ import type {
   DungeonsResponse,
   GameEnvironmentData,
   GameEnvironment,
-  GameEnvironmentsResponse
+  GameEnvironmentsResponse,
+  PlayerCollectionsResponse,
+  PlayerDeckData,
+  CreatePlayerDeckResponse,
+  PlayerDecksResponse,
+  BattleResponse
 } from '../types/game'
 
 // Response típusok
@@ -55,6 +60,7 @@ class ApiService {
     this.api.interceptors.request.use(
       (config) => {
         const token = localStorage.getItem('token')
+        console.log('🔍 API Request - URL:', config.url, 'Token:', !!token)
         if (token) {
           config.headers.Authorization = `Bearer ${token}`
         }
@@ -66,6 +72,7 @@ class ApiService {
     this.api.interceptors.response.use(
       (response) => response,
       (error) => {
+        console.error('❌ API Error:', error.response?.status, error.response?.data)
         if (error.response?.status === 401) {
           localStorage.removeItem('token')
           localStorage.removeItem('user')
@@ -101,8 +108,15 @@ class ApiService {
   }
 
   async createWorldCard(cardData: WorldCardData): Promise<CreateWorldCardResponse> {
-    const response: AxiosResponse<CreateWorldCardResponse> = await this.api.post('/game-master/world-cards', cardData)
-    return response.data
+    try {
+      console.log('🔍 Sending card data:', cardData);
+      const response: AxiosResponse<CreateWorldCardResponse> = await this.api.post('/game-master/world-cards', cardData);
+      console.log('✅ Card created successfully:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Error creating world card:', error.response?.data || error.message);
+      throw error;
+    }
   }
 
   async createLeaderCard(leaderData: LeaderCardData): Promise<CreateLeaderCardResponse> {
@@ -127,6 +141,61 @@ class ApiService {
 
   async getGameEnvironments(): Promise<GameEnvironmentsResponse> {
     const response: AxiosResponse<GameEnvironmentsResponse> = await this.api.get('/game-master/game-environments')
+    return response.data
+  }
+
+  // Player methods
+  async createPlayerDeck(deckData: PlayerDeckData): Promise<CreatePlayerDeckResponse> {
+    const response: AxiosResponse<CreatePlayerDeckResponse> = await this.api.post('/player/decks', deckData)
+    return response.data
+  }
+
+  async getPlayerDecks(): Promise<PlayerDecksResponse> {
+    const response: AxiosResponse<PlayerDecksResponse> = await this.api.get('/player/decks')
+    return response.data
+  }
+
+  async startBattle(deckId: string, dungeonId: string): Promise<BattleResponse> {
+    const response: AxiosResponse<BattleResponse> = await this.api.post('/player/battle', { deckId, dungeonId })
+    return response.data
+  }
+
+  async getPlayerCollections(): Promise<PlayerCollectionsResponse> {
+    const response: AxiosResponse<PlayerCollectionsResponse> = await this.api.get('/player/collections')
+    return response.data
+  }
+
+  async updateCollectionCard(collectionId: string, cardId: string, bonusType: 'damage' | 'health', bonusAmount: number): Promise<{message: string}> {
+    const response: AxiosResponse<{message: string}> = await this.api.put(`/player/collections/${collectionId}/cards/${cardId}`, {
+      bonusType,
+      bonusAmount
+    })
+    return response.data
+  }
+
+  // NEW: Player methods for accessing game data
+  async getPlayerDungeons(): Promise<DungeonsResponse> {
+    const response: AxiosResponse<DungeonsResponse> = await this.api.get('/player/dungeons')
+    return response.data
+  }
+
+  async getPlayerWorldCards(): Promise<WorldCardsResponse> {
+    const response: AxiosResponse<WorldCardsResponse> = await this.api.get('/player/world-cards')
+    return response.data
+  }
+
+  async initializeStarterData(): Promise<{message: string, collection: any}> {
+    const response: AxiosResponse<{message: string, collection: any}> = await this.api.post('/player/initialize-starter')
+    return response.data
+  }
+
+  async testPlayerRoute(): Promise<{message: string, user: any}> {
+    const response: AxiosResponse<{message: string, user: any}> = await this.api.get('/player/test')
+    return response.data
+  }
+
+  async getTestDungeons(): Promise<DungeonsResponse> {
+    const response: AxiosResponse<DungeonsResponse> = await this.api.get('/player/test-dungeons')
     return response.data
   }
 }
