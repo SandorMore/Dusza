@@ -390,7 +390,6 @@ function getTypeAdvantage(type1, type2) {
 router.post('/apply-reward', auth, async (req, res) => {
   try {
     console.log('🔍 POST /apply-reward - User:', req.user.username);
-    console.log('🔍 Request body:', JSON.stringify(req.body, null, 2));
     const { cardId, bonusType, bonusAmount } = req.body;
     
     if (!cardId || !bonusType || !bonusAmount) {
@@ -399,119 +398,47 @@ router.post('/apply-reward', auth, async (req, res) => {
     
     // Find all collections for this user
     const collections = await PlayerCollection.find({ createdBy: req.user._id }).populate('cards');
-    console.log('🔍 Found collections:', collections.length);
-    console.log('🔍 Looking for cardId:', cardId);
     
     let cardUpdated = false;
     let updatedCard = null;
-    let originalCard = null;
-    let collectionWithCard = null;
     
     // Search through all collections for the card
     for (const collection of collections) {
-      console.log('🔍 Checking collection:', collection.name, 'with', collection.cards.length, 'cards');
-      const card = collection.cards.find(c => {
-        const cardIdStr = c._id ? c._id.toString() : '';
-        const searchId = cardId.toString();
-        console.log('🔍 Comparing:', cardIdStr, '===', searchId, '?', cardIdStr === searchId);
-        return cardIdStr === searchId;
-      });
+      const card = collection.cards.find(c => c._id.toString() === cardId);
       
       if (card) {
-        originalCard = card;
-        collectionWithCard = collection;
-        console.log('✅ Found card in collection:', collection.name);
-        console.log('🔍 Card details:', {
-          id: card._id.toString(),
+        console.log('🔍 Found card in collection:', collection.name);
+        console.log('🔍 Card before update:', card.name, 'DMG:', card.damage, 'HP:', card.health);
+        
+        // Update the card
+        if (bonusType === 'damage') {
+          card.damage += bonusAmount;
+        } else if (bonusType === 'health') {
+          card.health += bonusAmount;
+        }
+        
+        console.log('🔍 Card after update:', card.name, 'DMG:', card.damage, 'HP:', card.health);
+        
+        // ✅ FIX: Save the WorldCard document directly, not just the collection
+        // Since PlayerCollection stores cards as references, we need to save the WorldCard document
+        await card.save();
+        
+        cardUpdated = true;
+        updatedCard = {
+          id: card._id,
           name: card.name,
           damage: card.damage,
           health: card.health,
-          type: card.type,
-          createdBy: card.createdBy
-        });
+          type: card.type
+        };
         break;
       }
     }
     
-    if (!originalCard) {
+    if (!cardUpdated) {
       console.log('❌ Card not found in any collection');
-      console.log('🔍 Available card IDs in collections:');
-      collections.forEach(col => {
-        col.cards.forEach(c => {
-          console.log('  -', c._id.toString(), c.name);
-        });
-      });
       return res.status(404).json({ message: 'Card not found in your collections' });
     }
-    
-    // Check if this is a shared card (created by GameMaster) or player-specific
-    // If shared, we need to create a player-specific copy
-    const isSharedCard = originalCard.createdBy && originalCard.createdBy.toString() !== req.user._id.toString();
-    
-    let cardToUpdate = originalCard;
-    
-    if (isSharedCard) {
-      console.log('🔍 Card is shared, creating player-specific copy...');
-      // Create a player-specific copy of the card with unique name (max 16 chars)
-      const userIdSuffix = req.user._id.toString().slice(-4);
-      const timestamp = Date.now().toString().slice(-6);
-      const uniqueName = `${originalCard.name.slice(0, 6)}${timestamp}${userIdSuffix}`.slice(0, 16);
-      const newCard = new WorldCard({
-        name: uniqueName,
-        damage: originalCard.damage,
-        health: originalCard.health,
-        type: originalCard.type,
-        isLeader: originalCard.isLeader,
-        originalCard: originalCard._id,
-        boostType: bonusType,
-        createdBy: req.user._id
-      });
-      
-      // Apply the reward to the new card
-      if (bonusType === 'damage') {
-        newCard.damage += bonusAmount;
-      } else if (bonusType === 'health') {
-        newCard.health += bonusAmount;
-      }
-      
-      await newCard.save();
-      console.log('✅ Created player-specific card:', newCard._id.toString());
-      
-      // Replace the reference in the collection
-      const cardIndex = collectionWithCard.cards.findIndex(c => c._id.toString() === cardId);
-      if (cardIndex !== -1) {
-        collectionWithCard.cards[cardIndex] = newCard._id;
-        await collectionWithCard.save();
-        console.log('✅ Updated collection with new card reference');
-      }
-      
-      cardToUpdate = newCard;
-    } else {
-      console.log('🔍 Card is player-specific, updating directly...');
-      // Update the existing card
-      if (bonusType === 'damage') {
-        cardToUpdate.damage += bonusAmount;
-      } else if (bonusType === 'health') {
-        cardToUpdate.health += bonusAmount;
-      }
-      
-      console.log('🔍 Card before save:', cardToUpdate.name, 'DMG:', cardToUpdate.damage, 'HP:', cardToUpdate.health);
-      await cardToUpdate.save();
-      console.log('✅ Card saved successfully');
-      
-      // Verify the save
-      const verifyCard = await WorldCard.findById(cardToUpdate._id);
-      console.log('🔍 Verified card after save:', verifyCard.name, 'DMG:', verifyCard.damage, 'HP:', verifyCard.health);
-    }
-    
-    cardUpdated = true;
-    updatedCard = {
-      id: cardToUpdate._id,
-      name: cardToUpdate.name,
-      damage: cardToUpdate.damage,
-      health: cardToUpdate.health,
-      type: cardToUpdate.type
-    };
     
     console.log('✅ Reward applied successfully');
     res.json({
@@ -521,7 +448,6 @@ router.post('/apply-reward', auth, async (req, res) => {
     
   } catch (error) {
     console.error('❌ Error applying reward:', error);
-    console.error('❌ Error stack:', error.stack);
     res.status(500).json({ 
       message: 'Error applying reward: ' + error.message
     });
