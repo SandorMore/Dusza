@@ -57,7 +57,7 @@ const PlayerDashboard: React.FC = () => {
                 Test your mettle against fearsome dungeon guardians! Forge your deck and claim victory in epic battles!
               </p>
               <button
-                onClick={() => navigate('/player/fight')}
+                onClick={() => navigate('/player/fight?tab=battle')}
                 className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-amber-100 px-8 py-4 rounded-xl transition-all duration-300 border-2 border-red-500 font-bold text-lg w-full shadow-lg hover:shadow-red-700/50"
               >
                 🏹 Enter Arena
@@ -74,7 +74,7 @@ const PlayerDashboard: React.FC = () => {
                 Browse your collection of legendary cards. Study your warriors and plan your strategies!
               </p>
               <button
-                onClick={() => navigate('/player/fight')}
+                onClick={() => navigate('/player/fight?tab=collection')}
                 className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-amber-100 px-8 py-4 rounded-xl transition-all duration-300 border-2 border-blue-500 font-bold text-lg w-full shadow-lg hover:shadow-blue-700/50"
               >
                 🏛️ View Archives
@@ -91,7 +91,7 @@ const PlayerDashboard: React.FC = () => {
                 Forge your battle formations! Create and command your decks of mighty warriors and cunning mages!
               </p>
               <button
-                onClick={() => navigate('/player/fight')}
+                onClick={() => navigate('/player/fight?tab=decks')}
                 className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-amber-100 px-8 py-4 rounded-xl transition-all duration-300 border-2 border-green-500 font-bold text-lg w-full shadow-lg hover:shadow-green-700/50"
               >
                 ⚒️ Forge Decks
@@ -120,7 +120,6 @@ const PlayerDashboard: React.FC = () => {
               </div>
             </div>
           </div>
-
         </div>
       </main>
 
