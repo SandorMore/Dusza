@@ -74,41 +74,42 @@ const Login: React.FC = () => {
   }
 
   return (
-    <div className='w-full h-screen flex justify-center items-center'>
-      <div className='flex justify-center items-center p-11 shadow-lg w-1/2'>
+    <div className='min-h-screen bg-gradient-to-br from-amber-50 to-amber-100 flex justify-center items-center py-12 px-4'>
+      <div className='bg-gradient-to-br from-amber-800 to-amber-900 rounded-2xl shadow-2xl p-8 md:p-12 w-full max-w-md border-4 border-amber-600'>
         <form onSubmit={handleSubmit} className='flex flex-col w-full'>
-          <h1 className='text-[3rem] mb-4'>Bejelentkezés</h1>
+          <h1 className='text-4xl font-bold text-amber-100 font-serif mb-2 text-center tracking-wider'>🏰 Castle Gates</h1>
+          <p className='text-amber-200 text-center mb-8 font-serif'>Enter the realm, brave soul!</p>
 
           {message && (
-            <div className={`p-3 mb-4 rounded ${
+            <div className={`p-4 mb-6 rounded-xl border-2 font-bold text-center ${
               message.includes('Sikeres') 
-                ? 'bg-green-100 text-green-800' 
-                : 'bg-red-100 text-red-800'
+                ? 'bg-green-800 text-amber-100 border-green-600' 
+                : 'bg-red-800 text-amber-100 border-red-600'
             }`}>
               {message}
             </div>
           )}
 
-          <div className='flex flex-col w-full mb-4'>
-            <label className='text-[1.2rem] font-medium' htmlFor="email">Email</label>
+          <div className='flex flex-col w-full mb-6'>
+            <label className='text-lg font-bold text-amber-100 font-serif mb-2' htmlFor="email">📧 Email</label>
             <input 
               id='email' 
               type="email" 
-              placeholder='Email' 
-              className='border p-2 rounded' 
+              placeholder='Enter your email' 
+              className='border-2 border-amber-600 bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500' 
               value={formData.email}
               onChange={handleChange}
               required
             />
           </div>
 
-          <div className='flex flex-col w-full mb-6'>
-            <label className='text-[1.2rem] font-medium' htmlFor="password">Jelszó</label>
+          <div className='flex flex-col w-full mb-8'>
+            <label className='text-lg font-bold text-amber-100 font-serif mb-2' htmlFor="password">🔐 Jelszó</label>
             <input 
               id='password' 
               type="password" 
-              placeholder='Password' 
-              className='border p-2 rounded' 
+              placeholder='Enter your password' 
+              className='border-2 border-amber-600 bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500' 
               value={formData.password}
               onChange={handleChange}
               required
@@ -116,17 +117,17 @@ const Login: React.FC = () => {
           </div>
 
           <button 
-            className='bg-black text-white p-3 rounded hover:bg-violet-600 disabled:bg-gray-400 transition-colors duration-200 font-medium' 
+            className='bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-amber-100 p-4 rounded-xl disabled:bg-gray-600 transition-all duration-200 font-bold text-lg border-2 border-amber-500 shadow-lg hover:shadow-amber-700/50' 
             type="submit"
             disabled={loading}
           >
-            {loading ? 'Bejelentkezés...' : 'Bejelentkezés'}
+            {loading ? '🔄 Entering...' : '⚔️ Enter Castle'}
           </button>
 
-          <p className='mt-4 text-center text-gray-600'>
-            Nincs fiókod?{' '}
-            <a href="/register" className='text-violet-600 hover:underline font-medium'>
-              Regisztrálj itt
+          <p className='mt-6 text-center text-amber-200 font-serif'>
+            No account yet?{' '}
+            <a href="/register" className='text-amber-100 hover:text-yellow-300 underline font-bold'>
+              Join the realm
             </a>
           </p>
         </form>

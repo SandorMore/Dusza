@@ -104,38 +104,38 @@ const GameMasterDashboard: React.FC = () => {
   // Show loading while checking authentication
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-amber-100">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-500 mx-auto mb-4"></div>
-          <p>Checking authentication...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-600 mx-auto mb-4"></div>
+          <p className="text-amber-800 font-serif text-lg">Consulting the royal archives...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-amber-100">
+      {/* Medieval Header */}
+      <header className="bg-gradient-to-r from-amber-800 to-amber-900 shadow-2xl border-b-4 border-amber-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Game Master Dashboard</h1>
-              <p className="text-gray-600">Welcome back, {user.username}!</p>
+          <div className="flex justify-between items-center py-6">
+            <div className="text-center">
+              <h1 className="text-3xl font-bold text-amber-100 font-serif tracking-wider">👑 Game Master's Sanctum</h1>
+              <p className="text-amber-200 font-medium mt-2">Hail, {user.username}! Forge the realm's destiny!</p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
               <button
                 onClick={loadData}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
+                className="bg-blue-700 hover:bg-blue-800 text-amber-100 px-6 py-3 rounded-xl transition-all border-2 border-blue-600 font-bold shadow-lg"
                 disabled={loading}
               >
-                {loading ? 'Refreshing...' : 'Refresh Data'}
+                {loading ? '🔄 Refreshing...' : '🔄 Refresh Archives'}
               </button>
               <button
                 onClick={logout}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
+                className="bg-red-700 hover:bg-red-800 text-amber-100 px-6 py-3 rounded-xl transition-all border-2 border-red-600 font-bold shadow-lg"
               >
-                Logout
+                ⚔️ Leave Sanctum
               </button>
             </div>
           </div>
@@ -145,32 +145,34 @@ const GameMasterDashboard: React.FC = () => {
       {/* Error Message */}
       {error && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {error}
+          <div className="bg-red-800 text-amber-100 border-4 border-red-600 px-6 py-4 rounded-xl font-bold text-center">
+            ❌ {error}
           </div>
         </div>
       )}
 
-      {/* Navigation Tabs */}
-      <div className="bg-white border-b">
+      {/* Medieval Navigation Tabs */}
+      <div className="bg-gradient-to-r from-amber-700 to-amber-800 border-b-4 border-amber-600">
         <div className="max-w-7xl mx-auto">
           <nav className="flex space-x-8">
             {[
-              { id: 'cards' as const, label: `Cards (${worldCards.length})`, icon: '🃏' },
-              { id: 'dungeons' as const, label: `Dungeons (${dungeons.length})`, icon: '🏰' },
-              { id: 'environments' as const, label: `Environments (${environments.length})`, icon: '🌍' }
+              { id: 'cards' as const, label: `🃏 World Cards (${worldCards.length})`, icon: '🃏' },
+              { id: 'dungeons' as const, label: `🏰 Dungeons (${dungeons.length})`, icon: '🏰' },
+              { id: 'environments' as const, label: `🌍 Environments (${environments.length})`, icon: '🌍' }
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
+                className={`py-5 px-3 border-b-4 font-bold text-lg font-serif transition-all ${
                   activeTab === tab.id
-                    ? 'border-violet-500 text-violet-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-amber-300 text-amber-100 bg-amber-900/50'
+                    : 'border-transparent text-amber-200 hover:text-amber-100 hover:border-amber-400'
                 }`}
               >
-                <span>{tab.icon}</span>
-                <span>{tab.label}</span>
+                <span className="flex items-center space-x-3">
+                  <span className="text-xl">{tab.icon}</span>
+                  <span>{tab.label}</span>
+                </span>
               </button>
             ))}
           </nav>
@@ -178,11 +180,11 @@ const GameMasterDashboard: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-500"></div>
-            <span className="ml-4">Loading game data...</span>
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-600"></div>
+            <span className="ml-4 text-amber-800 font-serif text-lg">Consulting the royal archives...</span>
           </div>
         ) : (
           <>
@@ -198,40 +200,40 @@ const GameMasterDashboard: React.FC = () => {
                 </div>
                 
                 {/* Cards List */}
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold">All World Cards ({worldCards.length})</h2>
-                    <span className="text-sm text-gray-500">
-                      {worldCards.filter(card => card.isLeader).length} Leaders, 
-                      {worldCards.filter(card => !card.isLeader).length} Regular
+                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-amber-100 font-serif">🃏 All World Cards ({worldCards.length})</h2>
+                    <span className="text-amber-300 font-bold">
+                      {worldCards.filter(card => card.isLeader).length} 👑 Leaders, 
+                      {' '}{worldCards.filter(card => !card.isLeader).length} ⚔️ Regular
                     </span>
                   </div>
                   
                   {worldCards.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      <p>No cards found. Create your first world card!</p>
+                    <div className="text-center py-8 text-amber-300 bg-gray-700/30 rounded-xl border-2 border-amber-500">
+                      <p className="text-lg font-serif">No cards found. Forge your first world card!</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {worldCards.map((card) => (
-                        <div key={card._id} className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                          <div className="flex justify-between items-start mb-2">
-                            <h3 className="font-semibold text-lg">{card.name}</h3>
+                        <div key={card._id} className="bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl p-5 border-4 border-amber-500 shadow-lg hover:shadow-amber-500/50 transition-all hover:scale-105">
+                          <div className="flex justify-between items-start mb-3">
+                            <h3 className="font-bold text-lg text-amber-100 font-serif">{card.name}</h3>
                             {card.isLeader && (
-                              <span className="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">
-                                Leader
+                              <span className="inline-block bg-gradient-to-r from-yellow-600 to-amber-700 text-amber-100 text-xs px-3 py-1 rounded-lg font-bold">
+                                👑 Leader
                               </span>
                             )}
                           </div>
-                          <div className="text-sm text-gray-600 space-y-1">
-                            <p>💥 Damage: {card.damage}</p>
-                            <p>❤️ Health: {card.health}</p>
-                            <p>🎯 Type: <span className="capitalize">{card.type}</span></p>
+                          <div className="text-sm text-amber-200 space-y-2">
+                            <p className="flex justify-between"><span>⚔️ Damage:</span> <span className="font-bold text-red-300">{card.damage}</span></p>
+                            <p className="flex justify-between"><span>❤️ Health:</span> <span className="font-bold text-green-300">{card.health}</span></p>
+                            <p className="flex justify-between"><span>🎯 Type:</span> <span className="font-bold capitalize">{card.type}</span></p>
                             {card.boostType && (
-                              <p>⚡ Boost: {card.boostType === 'damage' ? '2× Damage' : '2× Health'}</p>
+                              <p className="flex justify-between"><span>⚡ Boost:</span> <span className="font-bold text-yellow-300">{card.boostType === 'damage' ? '2× Damage' : '2× Health'}</span></p>
                             )}
-                            <p className="text-xs text-gray-400 mt-2">
-                              Created: {new Date(card.createdAt).toLocaleDateString()}
+                            <p className="text-xs text-amber-400 mt-3 pt-2 border-t border-amber-600">
+                              Forged: {new Date(card.createdAt).toLocaleDateString()}
                             </p>
                           </div>
                         </div>
@@ -251,38 +253,38 @@ const GameMasterDashboard: React.FC = () => {
                 />
                 
                 {/* Dungeons List */}
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h2 className="text-xl font-semibold mb-4">All Dungeons ({dungeons.length})</h2>
+                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
+                  <h2 className="text-2xl font-bold text-amber-100 font-serif mb-6">🏰 All Dungeons ({dungeons.length})</h2>
                   
                   {dungeons.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      <p>No dungeons found. Create your first dungeon!</p>
+                    <div className="text-center py-8 text-amber-300 bg-gray-700/30 rounded-xl border-2 border-amber-500">
+                      <p className="text-lg font-serif">No dungeons found. Forge your first dungeon!</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {dungeons.map((dungeon) => (
-                        <div key={dungeon._id} className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                          <h3 className="font-semibold text-lg mb-2">{dungeon.name}</h3>
-                          <div className="text-sm text-gray-600 space-y-1">
-                            <p>📊 Type: {dungeon.type}</p>
-                            <p>🃏 Cards: {dungeon.cards?.length || 0}</p>
-                            <p className="text-xs text-gray-400 mt-2">
-                              Created: {new Date(dungeon.createdAt).toLocaleDateString()}
+                        <div key={dungeon._id} className="bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl p-6 border-4 border-amber-500 shadow-lg hover:shadow-amber-500/50 transition-all hover:scale-105">
+                          <h3 className="font-bold text-xl text-amber-100 font-serif mb-4">{dungeon.name}</h3>
+                          <div className="text-sm text-amber-200 space-y-2 mb-4">
+                            <p className="flex justify-between"><span>📊 Type:</span> <span className="font-bold capitalize">{dungeon.type}</span></p>
+                            <p className="flex justify-between"><span>🃏 Cards:</span> <span className="font-bold text-blue-300">{dungeon.cards?.length || 0}</span></p>
+                            <p className="text-xs text-amber-400 mt-3 pt-2 border-t border-amber-600">
+                              Forged: {new Date(dungeon.createdAt).toLocaleDateString()}
                             </p>
                           </div>
                           
                           {/* Show dungeon cards if available */}
                           {dungeon.cards && dungeon.cards.length > 0 && (
-                            <div className="mt-3 pt-3 border-t">
-                              <p className="text-sm font-medium mb-2">Dungeon Cards:</p>
-                              <div className="space-y-1 max-h-32 overflow-y-auto">
+                            <div className="mt-4 pt-4 border-t-2 border-amber-600">
+                              <p className="text-sm font-bold text-amber-200 mb-3">Dungeon Guardians:</p>
+                              <div className="space-y-2 max-h-40 overflow-y-auto">
                                 {dungeon.cards.map((card, index) => (
-                                  <div key={card._id} className="flex justify-between text-xs">
-                                    <span>{index + 1}. {card.name}</span>
-                                    <span className={`px-1 rounded ${
-                                      card.isLeader ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-600'
+                                  <div key={card._id} className="flex justify-between items-center text-xs bg-gray-600/50 p-2 rounded">
+                                    <span className="text-amber-200">{index + 1}. {card.name}</span>
+                                    <span className={`px-2 py-1 rounded font-bold ${
+                                      card.isLeader ? 'bg-yellow-700 text-amber-100' : 'bg-gray-600 text-amber-200'
                                     }`}>
-                                      {card.isLeader ? 'Leader' : 'Regular'}
+                                      {card.isLeader ? '👑 Leader' : '⚔️ Regular'}
                                     </span>
                                   </div>
                                 ))}
@@ -307,58 +309,58 @@ const GameMasterDashboard: React.FC = () => {
                 />
                 
                 {/* Environments List */}
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h2 className="text-xl font-semibold mb-4">All Game Environments ({environments.length})</h2>
+                <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
+                  <h2 className="text-2xl font-bold text-amber-100 font-serif mb-6">🌍 All Game Environments ({environments.length})</h2>
                   
                   {environments.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      <p>No game environments found. Create your first environment!</p>
+                    <div className="text-center py-8 text-amber-300 bg-gray-700/30 rounded-xl border-2 border-amber-500">
+                      <p className="text-lg font-serif">No game environments found. Forge your first environment!</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 gap-4">
+                    <div className="grid grid-cols-1 gap-6">
                       {environments.map((env) => (
-                        <div key={env._id} className="border rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                          <h3 className="font-semibold text-lg mb-2">{env.name}</h3>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
-                            <div>
-                              <p className="font-medium">🃏 World Cards: {env.worldCards?.length || 0}</p>
+                        <div key={env._id} className="bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl p-6 border-4 border-amber-500 shadow-lg hover:shadow-amber-500/50 transition-all">
+                          <h3 className="font-bold text-xl text-amber-100 font-serif mb-4">{env.name}</h3>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm mb-4">
+                            <div className="bg-gray-600/50 rounded-lg p-4 border-2 border-amber-600">
+                              <p className="font-bold text-amber-200 mb-2">🃏 World Cards: <span className="text-blue-300">{env.worldCards?.length || 0}</span></p>
                               {env.worldCards && env.worldCards.length > 0 && (
-                                <ul className="text-xs mt-1 space-y-1">
+                                <ul className="text-xs mt-2 space-y-1 text-amber-300">
                                   {env.worldCards.slice(0, 3).map(card => (
                                     <li key={card._id}>• {card.name}</li>
                                   ))}
                                   {env.worldCards.length > 3 && (
-                                    <li>... and {env.worldCards.length - 3} more</li>
+                                    <li className="text-amber-400">... and {env.worldCards.length - 3} more</li>
                                   )}
                                 </ul>
                               )}
                             </div>
-                            <div>
-                              <p className="font-medium">🏰 Dungeons: {env.dungeons?.length || 0}</p>
+                            <div className="bg-gray-600/50 rounded-lg p-4 border-2 border-amber-600">
+                              <p className="font-bold text-amber-200 mb-2">🏰 Dungeons: <span className="text-red-300">{env.dungeons?.length || 0}</span></p>
                               {env.dungeons && env.dungeons.length > 0 && (
-                                <ul className="text-xs mt-1 space-y-1">
+                                <ul className="text-xs mt-2 space-y-1 text-amber-300">
                                   {env.dungeons.map(dungeon => (
                                     <li key={dungeon._id}>• {dungeon.name}</li>
                                   ))}
                                 </ul>
                               )}
                             </div>
-                            <div>
-                              <p className="font-medium">🎯 Starter Cards: {env.starterCollection?.length || 0}</p>
+                            <div className="bg-gray-600/50 rounded-lg p-4 border-2 border-amber-600">
+                              <p className="font-bold text-amber-200 mb-2">🎯 Starter Cards: <span className="text-green-300">{env.starterCollection?.length || 0}</span></p>
                               {env.starterCollection && env.starterCollection.length > 0 && (
-                                <ul className="text-xs mt-1 space-y-1">
+                                <ul className="text-xs mt-2 space-y-1 text-amber-300">
                                   {env.starterCollection.slice(0, 3).map(card => (
                                     <li key={card._id}>• {card.name}</li>
                                   ))}
                                   {env.starterCollection.length > 3 && (
-                                    <li>... and {env.starterCollection.length - 3} more</li>
+                                    <li className="text-amber-400">... and {env.starterCollection.length - 3} more</li>
                                   )}
                                 </ul>
                               )}
                             </div>
                           </div>
-                          <p className="text-xs text-gray-400 mt-3">
-                            Created: {new Date(env.createdAt).toLocaleDateString()}
+                          <p className="text-xs text-amber-400 mt-4 pt-3 border-t border-amber-600">
+                            Forged: {new Date(env.createdAt).toLocaleDateString()}
                           </p>
                         </div>
                       ))}
@@ -370,6 +372,16 @@ const GameMasterDashboard: React.FC = () => {
           </>
         )}
       </main>
+
+      {/* Medieval Footer */}
+      <footer className="bg-gradient-to-r from-amber-900 to-amber-800 border-t-4 border-amber-700 mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center text-amber-200">
+            <p className="font-serif text-lg">© 2024 Game Master's Sanctum - All rights reserved by royal decree</p>
+            <p className="text-amber-300 mt-2 font-bold">May your creations shape the realm!</p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

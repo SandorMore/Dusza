@@ -1,6 +1,7 @@
 // src/components/BattlefieldTab.tsx
-import React from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import type { WorldCard, PlayerDeck, Dungeon, BattleResult, BattleRound } from '../types/game'
+import AnimatedBattleView from '../components/AnimatedBattleView'
 
 interface BattlefieldTabProps {
   playerDecks: PlayerDeck[]
@@ -39,6 +40,138 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
   getDungeonColor,
   getCardRarityColor
 }) => {
+  const [showAnimatedBattle, setShowAnimatedBattle] = useState(false)
+  const [showUpgradePage, setShowUpgradePage] = useState(false)
+  const resultsRef = useRef<HTMLDivElement>(null)
+
+  // Show animated battle when battleResult is first set
+  useEffect(() => {
+    if (battleResult && !showAnimatedBattle && !showUpgradePage) {
+      setShowAnimatedBattle(true)
+    }
+  }, [battleResult, showAnimatedBattle, showUpgradePage])
+
+  // Scroll to results when viewing results
+  useEffect(() => {
+    if (battleResult && !showAnimatedBattle && !showUpgradePage && resultsRef.current) {
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+    }
+  }, [battleResult, showAnimatedBattle, showUpgradePage])
+
+  // Show animated battle view
+  if (battleResult && showAnimatedBattle && selectedDeck && selectedDungeon) {
+    return (
+      <AnimatedBattleView
+        battleResult={battleResult}
+        playerCards={selectedDeck.cards}
+        dungeonCards={selectedDungeon.cards}
+        onBattleComplete={() => {
+          setShowAnimatedBattle(false)
+          // If player won, show upgrade page directly
+          if (battleResult.playerWins && battleResult.playerReward) {
+            setShowUpgradePage(true)
+          }
+        }}
+        onExit={() => {
+          setShowAnimatedBattle(false)
+          setShowUpgradePage(false)
+          setBattleResult(null)
+          setSelectedDeck(null)
+          setSelectedDungeon(null)
+        }}
+      />
+    )
+  }
+
+  // Show dedicated upgrade page if player won
+  if (battleResult && showUpgradePage && battleResult.playerWins && battleResult.playerReward) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-amber-100 py-8">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="bg-gradient-to-br from-yellow-800 to-orange-900 rounded-2xl shadow-2xl p-8 border-4 border-yellow-600">
+            <h2 className="text-3xl font-bold text-amber-100 font-serif mb-4 text-center">⚜️ Victory Spoils!</h2>
+            <p className="text-center mb-8 text-amber-200 text-xl">
+              You earned <span className="font-bold text-yellow-300 text-2xl">+{battleResult.playerReward.bonusAmount} {battleResult.playerReward.bonusType}</span>!
+            </p>
+            <p className="text-center mb-8 text-amber-100 text-lg">
+              Choose a warrior to bestow this boon upon:
+            </p>
+            
+            {availableCards.length === 0 ? (
+              <div className="text-center p-8 bg-gray-700/50 rounded-xl border-2 border-yellow-500">
+                <p className="text-amber-300 text-lg mb-4">No warriors available to upgrade</p>
+                <p className="text-amber-400 text-sm">Create a war formation with warriors to upgrade them with victory spoils!</p>
+                <button
+                  onClick={() => {
+                    setShowUpgradePage(false)
+                    setActiveTab('decks')
+                  }}
+                  className="mt-6 bg-amber-600 hover:bg-amber-700 text-amber-100 px-8 py-3 rounded-xl transition-all border-2 border-amber-500 font-bold"
+                >
+                  🛡️ Forge New Formation
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                  {availableCards.map((card: WorldCard) => (
+                    <button
+                      key={card._id}
+                      onClick={() => applyReward(card._id)}
+                      className="p-6 border-4 border-yellow-500 rounded-xl text-left bg-gradient-to-br from-gray-700 to-gray-800 hover:from-yellow-900/50 hover:to-orange-900/50 transition-all transform hover:scale-105 shadow-lg"
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="font-bold text-amber-100 text-xl">{card.name}</div>
+                        <div className={`px-3 py-1 rounded-lg font-bold text-sm ${getTypeColor(card.type)}`}>
+                          {getTypeEmoji(card.type)}
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="text-amber-300 text-sm">
+                          <div className="flex justify-between items-center mb-1">
+                            <span>Current Damage:</span>
+                            <span className="font-bold">⚔️{card.damage}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span>Current Health:</span>
+                            <span className="font-bold">❤️{card.health}</span>
+                          </div>
+                        </div>
+                        <div className="border-t-2 border-yellow-500 pt-3">
+                          <div className="text-green-300 font-bold text-sm">
+                            <div className="flex justify-between items-center mb-1">
+                              <span>After Upgrade:</span>
+                              <span className="text-lg">
+                                ⚔️{card.damage + (battleResult.playerReward?.bonusType === 'damage' ? battleResult.playerReward.bonusAmount : 0)} 
+                                {' '}❤️{card.health + (battleResult.playerReward?.bonusType === 'health' ? battleResult.playerReward.bonusAmount : 0)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                <div className="text-center">
+                  <button
+                    onClick={() => {
+                      setShowUpgradePage(false)
+                    }}
+                    className="bg-gray-600 hover:bg-gray-700 text-amber-100 px-8 py-3 rounded-xl transition-all border-2 border-gray-500 font-bold"
+                  >
+                    Skip Upgrade
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-8">
       {/* Battle Preparation */}
@@ -192,7 +325,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
 
       {/* Battle Results */}
       {battleResult && (
-        <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
+        <div ref={resultsRef} className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
           <h2 className="text-2xl font-bold text-amber-100 font-serif mb-8 text-center">🏆 Battle Results</h2>
           
           {/* Overall Result */}
@@ -301,9 +434,18 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
           )}
 
           <div className="mt-8 flex justify-center space-x-6">
+            {battleResult.playerWins && battleResult.playerReward && !showUpgradePage && (
+              <button
+                onClick={() => setShowUpgradePage(true)}
+                className="bg-yellow-600 hover:bg-yellow-700 text-amber-100 px-8 py-4 rounded-xl transition-all border-2 border-yellow-500 font-bold text-lg"
+              >
+                ⚜️ Claim Rewards
+              </button>
+            )}
             <button
               onClick={() => {
                 setBattleResult(null);
+                setShowUpgradePage(false);
                 setSelectedDeck(null);
                 setSelectedDungeon(null);
               }}
@@ -312,7 +454,10 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
               🔄 Battle Again
             </button>
             <button
-              onClick={() => setActiveTab('decks')}
+              onClick={() => {
+                setShowUpgradePage(false);
+                setActiveTab('decks');
+              }}
               className="bg-amber-600 hover:bg-amber-700 text-amber-100 px-8 py-4 rounded-xl transition-all border-2 border-amber-500 font-bold text-lg"
             >
               🛡️ Forge New Formation
