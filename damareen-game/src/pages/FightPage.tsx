@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/pages/FightPage.tsx - REFACTORED WITH COMPONENTS
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
@@ -164,6 +165,7 @@ const FightPage: React.FC = () => {
       setBattleResult(battleRes.result)
       setMessage(battleRes.message)
       handleTabChange('battle')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setMessage('❌ Error commencing battle: ' + (error.response?.data?.message || error.message))
     } finally {
@@ -247,10 +249,10 @@ const FightPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-amber-100">
+    <div className="min-h-screen bg-[url('/assets/paper-1074131_1280.png')] bg-cover bg-center">
       {/* Medieval Header */}
       <header className="bg-gradient-to-r from-amber-800 to-amber-900 shadow-2xl border-b-4 border-amber-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-1xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="text-center">
               <h1 className="text-3xl font-bold text-amber-100 font-serif tracking-wider">⚔️ Grand Battle Arena</h1>
@@ -272,6 +274,7 @@ const FightPage: React.FC = () => {
                       const result = await apiService.initializeStarterData();
                       setMessage(result.message);
                       await loadData();
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     } catch (error: any) {
                       setMessage('❌ Royal Decree Error: ' + (error.response?.data?.message || error.message));
                     }
@@ -288,8 +291,8 @@ const FightPage: React.FC = () => {
 
       {/* Medieval Navigation Tabs */}
       <div className="bg-gradient-to-r from-amber-700 to-amber-800 border-b-4 border-amber-600">
-        <div className="max-w-7xl mx-auto">
-          <nav className="flex space-x-8">
+        <div className="max-w-1xl mx-auto">
+          <nav className="flex justify-center space-x-6">
             {[
               { id: 'decks' as const, label: ` War Formations (${playerDecks.length})`, icon: '🛡️' },
               { id: 'battle' as const, label: ' Battlefield', icon: '⚔️' },
@@ -404,14 +407,14 @@ const FightPage: React.FC = () => {
       </main>
 
       {/* Medieval Footer */}
-      <footer className="bg-gradient-to-r from-amber-900 to-amber-800 border-t-4 border-amber-700 mt-12">
+      {/* <footer className="bg-gradient-to-r from-amber-900 to-amber-800 border-t-4 border-amber-700 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-amber-200">
             <p className="font-serif text-lg">© 2024 Royal Card Battle Arena - All rights reserved by royal decree</p>
             <p className="text-amber-300 mt-2 font-bold">May your sword stay sharp and your formations stay mighty!</p>
           </div>
         </div>
-      </footer>
+      </footer> */}
     </div>
   )
 }

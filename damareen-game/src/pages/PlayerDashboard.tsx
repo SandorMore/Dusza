@@ -16,20 +16,20 @@ const PlayerDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-amber-100">
+    <div className="min-h-screen flex flex-col bg-[url('/assets/paper-1074131_1280.png')] bg-cover bg-center">
       {/* Medieval Header with Banner */}
-      <header className="bg-gradient-to-r from-amber-800 to-amber-900 shadow-lg border-b-4 border-amber-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="bg-gradient-to-r from-amber-700 via-orange-800 to-amber-700 shadow-lg">
+        <div className="max-w-1xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="text-center">
               <h1 className="text-3xl font-bold text-amber-100 font-serif tracking-wider">🏰 Royal Command Post</h1>
-              <p className="text-amber-200 font-medium mt-2">Hail, {user?.username}! The kingdom awaits your valor!</p>
+              <p className="text-amber-100 text-sm italic">Hail, {user?.username}! The kingdom awaits your valor!</p>
             </div>
             <button
               onClick={logout}
               className="bg-red-700 hover:bg-red-800 text-amber-100 px-6 py-3 rounded-lg transition-colors border-2 border-red-600 font-bold shadow-lg hover:shadow-red-800/50"
             >
-              ⚔️ Leave Castle
+              <img className='size-8' src="public/assets/back-arrow.png" alt="" />
             </button>
           </div>
         </div>
@@ -37,7 +37,7 @@ const PlayerDashboard: React.FC = () => {
 
       <main className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
         {/* Medieval Banner */}
-        <div className="bg-gradient-to-r from-amber-600 to-amber-700 rounded-xl shadow-2xl border-4 border-amber-500 p-6 mb-8 text-center">
+        <div className="bg-gradient-to-r from-amber-600 to-amber-700 rounded-xl shadow-2xl p-6 mb-8 text-center">
           <h2 className="text-2xl font-bold text-amber-100 font-serif tracking-wide">
             🛡️ Choose Your Quest, Brave Warrior! 🛡️
           </h2>
@@ -49,60 +49,61 @@ const PlayerDashboard: React.FC = () => {
         {/* Quest Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Battle Arena Card */}
-          <div className="bg-gradient-to-br from-red-800 to-red-900 rounded-2xl shadow-2xl p-8 hover:shadow-red-900/50 transition-all duration-300 border-4 border-red-600 hover:scale-105 transform">
+          <div className="bg-gradient-to-b from-red-700 to-red-800 rounded-2xl shadow-xl shadow-red-900/40 p-6 hover:shadow-red-900/50 transition-all duration-300 border border-red-900/40 hover:scale-105 transform flex flex-col justify-between">
             <div className="text-center">
               <div className="text-6xl mb-6 filter drop-shadow-lg">⚔️</div>
               <h2 className="text-2xl font-bold text-amber-100 font-serif mb-4 tracking-wide">Grand Arena</h2>
               <p className="text-amber-200 mb-6 leading-relaxed">
                 Test your mettle against fearsome dungeon guardians! Forge your deck and claim victory in epic battles!
               </p>
+
+            </div>
               <button
                 onClick={() => navigate('/player/fight?tab=battle')}
                 className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-amber-100 px-8 py-4 rounded-xl transition-all duration-300 border-2 border-red-500 font-bold text-lg w-full shadow-lg hover:shadow-red-700/50"
               >
                 🏹 Enter Arena
               </button>
-            </div>
           </div>
 
           {/* Royal Collection Card */}
-          <div className="bg-gradient-to-br from-blue-800 to-blue-900 rounded-2xl shadow-2xl p-8 hover:shadow-blue-900/50 transition-all duration-300 border-4 border-blue-600 hover:scale-105 transform">
+          <div className="bg-gradient-to-b from-blue-700 to-blue-800 rounded-2xl shadow-xl shadow-blue-900/40 p-6 hover:shadow-blue-900/50 transition-all duration-300 border border-blue-900/40 hover:scale-105 transform flex flex-col justify-between">
             <div className="text-center">
               <div className="text-6xl mb-6 filter drop-shadow-lg">📜</div>
               <h2 className="text-2xl font-bold text-amber-100 font-serif mb-4 tracking-wide">Royal Archives</h2>
               <p className="text-amber-200 mb-6 leading-relaxed">
                 Browse your collection of legendary cards. Study your warriors and plan your strategies!
               </p>
-              <button
-                onClick={() => navigate('/player/fight?tab=collection')}
-                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-amber-100 px-8 py-4 rounded-xl transition-all duration-300 border-2 border-blue-500 font-bold text-lg w-full shadow-lg hover:shadow-blue-700/50"
-              >
-                🏛️ View Archives
-              </button>
             </div>
+            <button
+              onClick={() => navigate('/player/fight?tab=collection')}
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-amber-100 px-8 py-4 rounded-xl transition-all duration-300 border-2 border-blue-500 font-bold text-lg w-full shadow-lg hover:shadow-blue-700/50"
+            >
+              🏛️ View Archives
+            </button>
           </div>
 
           {/* War Room Card */}
-          <div className="bg-gradient-to-br from-green-800 to-green-900 rounded-2xl shadow-2xl p-8 hover:shadow-green-900/50 transition-all duration-300 border-4 border-green-600 hover:scale-105 transform">
+          <div className="bg-gradient-to-b from-green-800 to-green-900 rounded-2xl shadow-xl shadow-green-900/40 p-6 hover:shadow-green-900/50 transition-all duration-300 border border-green-900/40 hover:scale-105 transform flex flex-col justify-between">
             <div className="text-center">
               <div className="text-6xl mb-6 filter drop-shadow-lg">🛡️</div>
               <h2 className="text-2xl font-bold text-amber-100 font-serif mb-4 tracking-wide">War Room</h2>
               <p className="text-amber-200 mb-6 leading-relaxed">
                 Forge your battle formations! Create and command your decks of mighty warriors and cunning mages!
               </p>
-              <button
-                onClick={() => navigate('/player/fight?tab=decks')}
-                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-amber-100 px-8 py-4 rounded-xl transition-all duration-300 border-2 border-green-500 font-bold text-lg w-full shadow-lg hover:shadow-green-700/50"
-              >
-                ⚒️ Forge Decks
-              </button>
             </div>
+            <button
+              onClick={() => navigate('/player/fight?tab=decks')}
+              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-amber-100 px-8 py-4 rounded-xl transition-all duration-300 border-2 border-green-500 font-bold text-lg w-full shadow-lg hover:shadow-green-700/50"
+            >
+              ⚒️ Forge Decks
+            </button>
           </div>
+
         </div>
 
         {/* Medieval Footer Section */}
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Stats Panel */}
+        {/* <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-gradient-to-br from-amber-700 to-amber-800 rounded-xl p-6 border-4 border-amber-600 shadow-lg">
             <h3 className="text-xl font-bold text-amber-100 font-serif mb-4 text-center">🏆 Your Legend</h3>
             <div className="space-y-3">
@@ -120,11 +121,11 @@ const PlayerDashboard: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </main>
 
       {/* Medieval Footer */}
-      <footer className="bg-gradient-to-r from-amber-900 to-amber-800 border-t-4 border-amber-700 mt-12">
+      <footer className="mt-auto bg-gradient-to-r from-amber-900 to-amber-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="text-center text-amber-200">
             <p className="font-serif">©Damareen - All rights reserved by royal decree</p>

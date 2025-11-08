@@ -6,10 +6,10 @@ const LandingPage: React.FC = () => {
   const { isAuthenticated, user } = useAuth()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-amber-100 flex flex-col items-center justify-center py-12 px-4">
-      <div className="text-center max-w-4xl">
-        <h1 className="text-5xl md:text-6xl font-bold text-amber-900 font-serif mb-6 tracking-wider">
-          🏰 Welcome to Damareen
+    <div className="min-h-screen bg-[url('/assets/freepik__the-style-is-rich-with-textured-brushstrokes-deep-__21312.png')] bg-cover bg-center flex flex-col items-center justify-center">
+      <div className="text-center max-w-4xl p-5 md:p-10 backdrop-blur-sm bg-white/30 rounded-3xl shadow-2xl">
+        <h1 className="text-5xl md:text-6xl font-bold text-amber-800 font-serif mb-6 tracking-wider">
+           Welcome to Damareen
         </h1>
         <p className="text-2xl md:text-3xl text-amber-800 font-serif mb-12">
           A realm of fantasy card battles and legendary warriors
@@ -17,7 +17,7 @@ const LandingPage: React.FC = () => {
         
         {isAuthenticated() ? (
           <div className="bg-gradient-to-br from-amber-800 to-amber-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
-            <p className="text-2xl text-amber-100 font-serif mb-6">Hail, {user?.username}!</p>
+            <p className="text-2xl text-amber-100 font-serif mb-6">Welcome, {user?.username}!</p>
             <div className="space-x-4">
               <a 
                 href={user?.role === 'gameMaster' ? '/game-master' : '/player'}
@@ -40,7 +40,7 @@ const LandingPage: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="bg-gradient-to-br from-amber-800 to-amber-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
+          <div className="bg-gradient-to-br from-amber-800 to-amber-900 rounded-2xl shadow-2xl p-8">
             <p className="text-xl text-amber-200 font-serif mb-8">Begin your legendary journey!</p>
             <div className="space-x-4">
               <a 

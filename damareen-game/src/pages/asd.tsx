@@ -44,7 +44,7 @@ const WarFormationsTab: React.FC<WarFormationsTabProps> = ({
   return (
     <div className="space-y-8">
       {/* Forge New War Formation */}
-      <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
+      <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4">
         <h2 className="text-2xl font-bold text-amber-100 font-serif mb-6 text-center">🛡️ Forge New War Formation</h2>
         <div className="space-y-6">
           <div>

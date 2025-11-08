@@ -67,8 +67,8 @@ const Register: React.FC = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-amber-50 to-amber-100 flex justify-center items-center py-12 px-4'>
-      <div className='bg-gradient-to-br from-amber-800 to-amber-900 rounded-2xl shadow-2xl p-8 md:p-12 w-full max-w-md border-4 border-amber-600'>
+    <div className="min-h-screen bg-[url('/public/assets/freepik__the-style-is-rich-with-textured-brushstrokes-deep-__21311.png')] bg-cover bg-center flex justify-center items-center py-12 px-4">
+      <div className='backdrop-blur-sm bg-white/30 rounded-3xl shadow-2xl p-8 md:p-12 w-full max-w-md'>
         <form onSubmit={handleSubmit} className='flex flex-col w-full'>
           <h1 className='text-4xl font-bold text-amber-100 font-serif mb-2 text-center tracking-wider'>⚜️ Join the Realm</h1>
           <p className='text-amber-200 text-center mb-8 font-serif'>Forge your legend today!</p>
@@ -89,7 +89,7 @@ const Register: React.FC = () => {
               id='username' 
               type="text" 
               placeholder='Enter your username' 
-              className='border-2 border-amber-600 bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500' 
+              className=' bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500' 
               value={formData.username}
               onChange={handleChange}
               required
@@ -102,7 +102,7 @@ const Register: React.FC = () => {
               id='email' 
               type="email" 
               placeholder='Enter your email' 
-              className='border-2 border-amber-600 bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500' 
+              className=' bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500' 
               value={formData.email}
               onChange={handleChange}
               required
@@ -115,7 +115,7 @@ const Register: React.FC = () => {
               id='password' 
               type="password" 
               placeholder='Enter your password (min 6 chars)' 
-              className='border-2 border-amber-600 bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500' 
+              className=' bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500' 
               value={formData.password}
               onChange={handleChange}
               required
@@ -127,7 +127,7 @@ const Register: React.FC = () => {
             <label className='text-lg font-bold text-amber-100 font-serif mb-2' htmlFor="role">👑 Szerepkör</label>
             <select 
               id="role"
-              className='border-2 border-amber-600 bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500 font-bold'
+              className=' bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500 font-bold'
               value={formData.role}
               onChange={handleChange}
             >
@@ -137,7 +137,7 @@ const Register: React.FC = () => {
           </div>
 
           <button 
-            className='bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-amber-100 p-4 rounded-xl disabled:bg-gray-600 transition-all duration-200 font-bold text-lg border-2 border-amber-500 shadow-lg hover:shadow-amber-700/50' 
+            className='bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-amber-100 p-4 rounded-xl disabled:bg-gray-600 transition-all duration-200 font-bold text-lg shadow-lg hover:shadow-amber-700/50' 
             type="submit"
             disabled={loading}
           >
