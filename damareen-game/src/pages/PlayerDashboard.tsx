@@ -121,46 +121,6 @@ const PlayerDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Quick Actions */}
-          <div className="bg-gradient-to-br from-purple-700 to-purple-800 rounded-xl p-6 border-4 border-purple-600 shadow-lg">
-            <h3 className="text-xl font-bold text-amber-100 font-serif mb-4 text-center">⚡ Quick Deeds</h3>
-            <div className="space-y-3">
-              <button className="w-full bg-purple-600 hover:bg-purple-700 text-amber-100 py-2 rounded-lg transition-colors border-2 border-purple-500">
-                🎯 Daily Quest
-              </button>
-              <button className="w-full bg-purple-600 hover:bg-purple-700 text-amber-100 py-2 rounded-lg transition-colors border-2 border-purple-500">
-                📜 View Trophies
-              </button>
-              <button className="w-full bg-purple-600 hover:bg-purple-700 text-amber-100 py-2 rounded-lg transition-colors border-2 border-purple-500">
-                🏰 Kingdom News
-              </button>
-            </div>
-          </div>
-
-          {/* Guild Info */}
-          <div className="bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl p-6 border-4 border-gray-600 shadow-lg">
-            <h3 className="text-xl font-bold text-amber-100 font-serif mb-4 text-center">🏛️ Guild Hall</h3>
-            <p className="text-amber-200 text-center mb-4">
-              Join fellow warriors in the grand guild!
-            </p>
-            <button className="w-full bg-gray-600 hover:bg-gray-700 text-amber-100 py-3 rounded-lg transition-colors border-2 border-gray-500 font-bold">
-              👥 Join Guild
-            </button>
-          </div>
-        </div>
-
-        {/* Medieval Decorative Elements */}
-        <div className="mt-12 text-center">
-          <div className="inline-flex space-x-8">
-            <div className="text-4xl">⚔️</div>
-            <div className="text-4xl">🛡️</div>
-            <div className="text-4xl">🏹</div>
-            <div className="text-4xl">🐉</div>
-            <div className="text-4xl">🏰</div>
-          </div>
-          <p className="text-amber-700 mt-4 font-serif italic">
-            "Fortune favors the bold, and glory awaits the brave!"
-          </p>
         </div>
       </main>
 
@@ -168,8 +128,7 @@ const PlayerDashboard: React.FC = () => {
       <footer className="bg-gradient-to-r from-amber-900 to-amber-800 border-t-4 border-amber-700 mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="text-center text-amber-200">
-            <p className="font-serif">© 2024 Royal Card Battle Arena - All rights reserved by royal decree</p>
-            <p className="text-sm mt-2 text-amber-300">May your sword stay sharp and your cards stay mighty!</p>
+            <p className="font-serif">©Damareen - All rights reserved by royal decree</p>
           </div>
         </div>
       </footer>
