@@ -82,7 +82,14 @@ class ApiService {
       }
     )
   }
-
+  async applyReward(cardId: string, bonusType: 'damage' | 'health', bonusAmount: number): Promise<{message: string, card: any}> {
+    const response: AxiosResponse<{message: string, card: any}> = await this.api.post('/player/apply-reward', {
+      cardId,
+      bonusType,
+      bonusAmount
+    });
+    return response.data;
+  }
   // Auth methods
   async register(userData: RegisterFormData): Promise<AuthResponse> {
     const response: AxiosResponse<AuthResponse> = await this.api.post('/auth/register', userData)

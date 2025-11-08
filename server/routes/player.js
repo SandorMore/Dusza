@@ -317,5 +317,68 @@ function getTypeAdvantage(type1, type2) {
   if (advantages[type2]?.includes(type1)) return -1;
   return 0;
 }
-
+router.post('/apply-reward', auth, async (req, res) => {
+  try {
+    console.log('🔍 POST /apply-reward - User:', req.user.username);
+    const { cardId, bonusType, bonusAmount } = req.body;
+    
+    if (!cardId || !bonusType || !bonusAmount) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+    
+    // Find all collections for this user
+    const collections = await PlayerCollection.find({ createdBy: req.user._id }).populate('cards');
+    
+    let cardUpdated = false;
+    let updatedCard = null;
+    
+    // Search through all collections for the card
+    for (const collection of collections) {
+      const card = collection.cards.find(c => c._id.toString() === cardId);
+      
+      if (card) {
+        console.log('🔍 Found card in collection:', collection.name);
+        console.log('🔍 Card before update:', card.name, 'DMG:', card.damage, 'HP:', card.health);
+        
+        // Update the card
+        if (bonusType === 'damage') {
+          card.damage += bonusAmount;
+        } else if (bonusType === 'health') {
+          card.health += bonusAmount;
+        }
+        
+        console.log('🔍 Card after update:', card.name, 'DMG:', card.damage, 'HP:', card.health);
+        
+        await collection.save();
+        
+        cardUpdated = true;
+        updatedCard = {
+          id: card._id,
+          name: card.name,
+          damage: card.damage,
+          health: card.health,
+          type: card.type
+        };
+        break;
+      }
+    }
+    
+    if (!cardUpdated) {
+      console.log('❌ Card not found in any collection');
+      return res.status(404).json({ message: 'Card not found in your collections' });
+    }
+    
+    console.log('✅ Reward applied successfully');
+    res.json({
+      message: 'Reward applied successfully!',
+      card: updatedCard
+    });
+    
+  } catch (error) {
+    console.error('❌ Error applying reward:', error);
+    res.status(500).json({ 
+      message: 'Error applying reward: ' + error.message
+    });
+  }
+});
 module.exports = router;

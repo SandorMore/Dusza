@@ -130,28 +130,33 @@ const FightPage: React.FC = () => {
     }
   }
 
-  const applyReward = async (cardId: string): Promise<void> => {
-    if (!battleResult?.playerWins || !battleResult.playerReward) return
+  // Replace the applyReward function in FightPage.tsx
+const applyReward = async (cardId: string): Promise<void> => {
+  if (!battleResult?.playerWins || !battleResult.playerReward) return
 
-    try {
-      const collectionId = collections[0]?._id
-      if (!collectionId) {
-        setMessage('No collection found')
-        return
-      }
-
-      await apiService.updateCollectionCard(
-        collectionId,
-        cardId,
-        battleResult.playerReward.bonusType,
-        battleResult.playerReward.bonusAmount
-      )
-      setMessage('🎁 Reward applied successfully!')
-      await loadData()
-    } catch (error: any) {
-      setMessage('❌ Error applying reward: ' + (error.response?.data?.message || error.message))
-    }
+  try {
+    setLoading(true);
+    
+    // Use the new reward endpoint
+    const result = await apiService.applyReward(
+      cardId,
+      battleResult.playerReward.bonusType,
+      battleResult.playerReward.bonusAmount
+    );
+    
+    setMessage('🎁 ' + result.message);
+    console.log('✅ Reward applied:', result.card);
+    
+    // Reload data to show updated cards
+    await loadData();
+    
+  } catch (error: any) {
+    console.error('❌ Error applying reward:', error);
+    setMessage('❌ Error applying reward: ' + (error.response?.data?.message || error.message));
+  } finally {
+    setLoading(false);
   }
+}
 
   const toggleCardForDeck = (cardId: string): void => {
     setSelectedCardsForDeck(prev => 
