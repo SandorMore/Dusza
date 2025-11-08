@@ -34,6 +34,9 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
   const [battleRounds, setBattleRounds] = useState<BattleRound[]>(battleResult.rounds)
   const [totalRounds, setTotalRounds] = useState(battleResult.totalRounds || battleResult.rounds.length)
   const [isFetchingRound, setIsFetchingRound] = useState(false)
+  const [displayAbleResult, setDisplayAbleResult] = useState(false)
+  const [finalBattleResult, setFinalBattleResult] = useState<BattleResult | null>(null)
+  const [isCalculatingFinal, setIsCalculatingFinal] = useState(false)
 
   useEffect(() => {
     // Initialize health arrays
@@ -43,6 +46,7 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
 
   // Reset round state when round changes
   useEffect(() => {
+    setDisplayAbleResult(false)
     setRoundStarted(false)
     setRoundCompleted(false)
     setIsAnimating(false)
@@ -93,15 +97,46 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
       })
       
       setShowAttack(false)
-
+      setDisplayAbleResult(true)
+      
       // Wait longer before allowing next round
       setTimeout(() => {
         setIsAnimating(false)
         setRoundCompleted(true)
+        
+        // If this is the final round, start calculating final result after a delay
+        if (currentRound >= totalRounds - 1) {
+          setTimeout(() => {
+            calculateFinalResult()
+          }, 1000) // Additional delay before calculating final result
+        }
       }, 1500) // Slower animation completion
-    }, 2000) // Slower attack animation (was 800ms)
+    }, 2000) // Slower attack animation
 
     return () => clearTimeout(timer)
+  }
+
+  const calculateFinalResult = async () => {
+    if (isCalculatingFinal || finalBattleResult) return
+    
+    setIsCalculatingFinal(true)
+    try {
+      const finalResult = await apiService.completeBattle(deckId, dungeonId, cardOrder, battleRounds)
+      setFinalBattleResult(finalResult.result)
+    } catch (error: any) {
+      console.error('Error completing battle:', error)
+      // Calculate locally if API fails
+      const playerWinsCount = battleRounds.filter(r => r.playerWins).length
+      const playerWins = playerWinsCount >= Math.ceil(battleRounds.length / 2)
+      const localResult: BattleResult = {
+        ...battleResult,
+        playerWins,
+        rounds: battleRounds
+      }
+      setFinalBattleResult(localResult)
+    } finally {
+      setIsCalculatingFinal(false)
+    }
   }
 
   const getTypeColor = (type: string): string => {
@@ -124,32 +159,22 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
     }
   }
 
+  const handleViewRewards = () => {
+    if (finalBattleResult) {
+      onBattleComplete(finalBattleResult)
+    }
+  }
+
   const currentRoundData = battleRounds[currentRound]
   const isBattleComplete = currentRound >= totalRounds - 1 && !isAnimating && roundCompleted
   
-  // Complete battle when all rounds are done
+  // Calculate final result when battle is complete (fallback)
   useEffect(() => {
-    if (isBattleComplete && battleResult.playerWins === null && battleRounds.length === totalRounds) {
-      const completeBattle = async () => {
-        try {
-          const finalResult = await apiService.completeBattle(deckId, dungeonId, cardOrder, battleRounds)
-          onBattleComplete(finalResult.result)
-        } catch (error: any) {
-          console.error('Error completing battle:', error)
-          // Calculate locally if API fails
-          const playerWinsCount = battleRounds.filter(r => r.playerWins).length
-          const playerWins = playerWinsCount >= Math.ceil(battleRounds.length / 2)
-          onBattleComplete({
-            ...battleResult,
-            playerWins,
-            rounds: battleRounds
-          })
-        }
-      }
-      completeBattle()
+    if (isBattleComplete && battleResult.playerWins === null && battleRounds.length === totalRounds && !finalBattleResult && !isCalculatingFinal) {
+      calculateFinalResult()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isBattleComplete, battleRounds.length, totalRounds, battleResult.playerWins])
+  }, [isBattleComplete, battleRounds.length, totalRounds, battleResult.playerWins, finalBattleResult, isCalculatingFinal])
 
   return (
     <div className="animated-battle-view">
@@ -263,7 +288,7 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
           </div>
 
           {/* Round Result Display */}
-          {!showAttack && currentRoundData && (
+          {!showAttack && currentRoundData  && displayAbleResult && (
             <div className={`round-result ${currentRoundData.playerWins ? 'player-win' : 'dungeon-win'}`}>
               {currentRoundData.playerWins ? '✅ Victory' : '❌ Defeat'}
             </div>
@@ -313,23 +338,21 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
 
       {/* Battle Controls */}
       <div className="battle-controls">
-        {isBattleComplete && battleResult.playerWins !== null ? (
+        {finalBattleResult ? (
           <div className="battle-complete">
-            <div className={`final-result ${battleResult.playerWins ? 'victory' : 'defeat'}`}>
-              {battleResult.playerWins ? '🎉 GLORIOUS VICTORY! 🎉' : '💀 VALIANT DEFEAT! 💀'}
+            <div className={`final-result ${finalBattleResult.playerWins ? 'victory' : 'defeat'}`}>
+              {finalBattleResult.playerWins ? '🎉 GLORIOUS VICTORY! 🎉' : '💀 VALIANT DEFEAT! 💀'}
             </div>
             <div className="control-buttons">
-              {battleResult.playerWins ? (
-                <button onClick={() => onBattleComplete(battleResult)} className="btn-continue">
-                  ⚜️ View Results
-                </button>
-              ) : null}
+              <button onClick={handleViewRewards} className="btn-continue">
+                {finalBattleResult.playerWins ? '🏆 View Rewards' : '📊 View Results'}
+              </button>
               <button onClick={onExit} className="btn-exit">
                 ⚔️ Exit Battle
               </button>
             </div>
           </div>
-        ) : isBattleComplete && battleResult.playerWins === null ? (
+        ) : isCalculatingFinal ? (
           <div className="round-status">
             ⏳ Calculating final result...
           </div>
@@ -358,7 +381,11 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
                   >
                     {isFetchingRound ? '⏳ Loading...' : '⏭️ Next Round'}
                   </button>
-                ) : null}
+                ) : (
+                  <div className="round-status">
+                    ⏳ Finalizing battle...
+                  </div>
+                )}
               </div>
             ) : null}
           </div>
@@ -369,4 +396,3 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
 }
 
 export default AnimatedBattleView
-
