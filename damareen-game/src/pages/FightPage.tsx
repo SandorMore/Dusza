@@ -93,25 +93,22 @@ const FightPage: React.FC = () => {
       setAllGameCards(allCardsRes.cards || [])
       setAllGameDungeons(allDungeonsRes.dungeons || [])
 
-      // Get all unique cards from player decks (since PlayerCollection was dropped)
-      const allDeckCards: WorldCard[] = (decksRes.decks || []).flatMap(deck => deck.cards || [])
-      // Remove duplicates by card _id
-      const uniqueCardsMap = new Map<string, WorldCard>()
-      allDeckCards.forEach(card => {
-        if (card._id && !uniqueCardsMap.has(card._id)) {
-          uniqueCardsMap.set(card._id, card)
-        }
-      })
-      const playerCards: WorldCard[] = Array.from(uniqueCardsMap.values())
-      console.log('🃏 Player cards loaded from decks:', playerCards.length);
+      // Get all base cards (non-leader, unupgraded) created by gamemasters
+      // Base cards are those where isLeader === false and originalCard is not set
+      // This ensures all players can use all base cards in war formations (unupgraded)
+      const baseCards: WorldCard[] = (allCardsRes.cards || []).filter(card => 
+        !card.isLeader && !card.originalCard
+      )
+      console.log('🃏 Base cards available for war formations:', baseCards.length);
+      console.log('🃏 Total cards from gamemasters:', allCardsRes.cards?.length || 0);
 
-      setAvailableCards(playerCards)
+      setAvailableCards(baseCards)
 
       console.log('✅ Loaded:', {
         decks: decksRes.decks?.length || 0,
         dungeons: dungeonsRes.dungeons?.length || 0,
         collections: collectionsRes.collections?.length || 0,
-        availableCards: playerCards.length,
+        availableCards: baseCards.length,
         allGameCards: allCardsRes.cards?.length || 0,
         allGameDungeons: allDungeonsRes.dungeons?.length || 0
       })
@@ -148,20 +145,22 @@ const FightPage: React.FC = () => {
     }
   }
 
-  const startBattle = async (): Promise<void> => {
+  const startBattle = async (cardOrder?: string[]): Promise<void> => {
     if (!selectedDeck || !selectedDungeon) {
       setMessage('Please select both a war formation and a dungeon')
       return
     }
 
-    if (selectedDeck.cards.length !== selectedDungeon.cards.length) {
-      setMessage(`❌ War formation must have exactly ${selectedDungeon.cards.length} warriors for this dungeon`)
+    // Strict validation: must be 1-1, 4-4, or 6-6
+    const validCounts = [1, 4, 6]
+    if (!validCounts.includes(selectedDeck.cards.length) || selectedDeck.cards.length !== selectedDungeon.cards.length) {
+      setMessage(`❌ War formation and dungeon must both have exactly 1, 4, or 6 warriors. Current: ${selectedDeck.cards.length} vs ${selectedDungeon.cards.length}`)
       return
     }
 
     setLoading(true)
     try {
-      const battleRes = await apiService.startBattle(selectedDeck._id, selectedDungeon._id)
+      const battleRes = await apiService.startBattle(selectedDeck._id, selectedDungeon._id, cardOrder)
       setBattleResult(battleRes.result)
       setMessage(battleRes.message)
       handleTabChange('battle')
@@ -368,6 +367,7 @@ const FightPage: React.FC = () => {
                 startBattle={startBattle}
                 applyReward={applyReward}
                 availableCards={availableCards}
+                allGameCards={allGameCards}
                 setActiveTab={handleTabChange}
                 getTypeColor={getTypeColor}
                 getTypeEmoji={getTypeEmoji}

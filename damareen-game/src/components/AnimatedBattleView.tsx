@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import type { BattleResult, BattleRound, WorldCard } from '../types/game'
+import { apiService } from '../services/api'
 import './AnimatedBattleView.css'
 
 interface AnimatedBattleViewProps {
   battleResult: BattleResult
   playerCards: WorldCard[]
   dungeonCards: WorldCard[]
-  onBattleComplete: () => void
+  deckId: string
+  dungeonId: string
+  cardOrder: string[]
+  onBattleComplete: (finalResult: BattleResult) => void
   onExit: () => void
 }
 
@@ -14,6 +18,9 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
   battleResult,
   playerCards,
   dungeonCards,
+  deckId,
+  dungeonId,
+  cardOrder,
   onBattleComplete,
   onExit
 }) => {
@@ -22,6 +29,11 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
   const [showAttack, setShowAttack] = useState(false)
   const [playerHealth, setPlayerHealth] = useState<number[]>([])
   const [dungeonHealth, setDungeonHealth] = useState<number[]>([])
+  const [roundStarted, setRoundStarted] = useState(false)
+  const [roundCompleted, setRoundCompleted] = useState(false)
+  const [battleRounds, setBattleRounds] = useState<BattleRound[]>(battleResult.rounds)
+  const [totalRounds, setTotalRounds] = useState(battleResult.totalRounds || battleResult.rounds.length)
+  const [isFetchingRound, setIsFetchingRound] = useState(false)
 
   useEffect(() => {
     // Initialize health arrays
@@ -29,45 +41,68 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
     setDungeonHealth(dungeonCards.map(card => card.health))
   }, [playerCards, dungeonCards])
 
+  // Reset round state when round changes
   useEffect(() => {
-    if (currentRound < battleResult.rounds.length) {
-      // Start attack animation
-      setIsAnimating(true)
-      setShowAttack(true)
+    setRoundStarted(false)
+    setRoundCompleted(false)
+    setIsAnimating(false)
+    setShowAttack(false)
+  }, [currentRound])
 
-      // After attack animation, update health
-      const timer = setTimeout(() => {
-        const round = battleResult.rounds[currentRound]
-        
-        setPlayerHealth(prev => {
-          const newHealth = [...prev]
-          newHealth[currentRound] = Math.max(0, (newHealth[currentRound] || playerCards[currentRound]?.health || 0) - round.dungeonCardDamage)
-          return newHealth
-        })
-        
-        setDungeonHealth(prev => {
-          const newHealth = [...prev]
-          newHealth[currentRound] = Math.max(0, (newHealth[currentRound] || dungeonCards[currentRound]?.health || 0) - round.playerCardDamage)
-          return newHealth
-        })
-        
-        setShowAttack(false)
-
-        // Wait before next round or completion
-        setTimeout(() => {
-          setIsAnimating(false)
-          if (currentRound < battleResult.rounds.length - 1) {
-            // Auto-advance to next round after a delay
-            setTimeout(() => {
-              setCurrentRound(prev => prev + 1)
-            }, 1000)
-          }
-        }, 500)
-      }, 800)
-
-      return () => clearTimeout(timer)
+  const handleNextRound = async () => {
+    if (currentRound < totalRounds - 1 && roundCompleted && !isAnimating && !isFetchingRound) {
+      setIsFetchingRound(true)
+      try {
+        const nextRoundData = await apiService.getNextRound(deckId, dungeonId, cardOrder, currentRound)
+        setBattleRounds(prev => [...prev, nextRoundData.round])
+        setCurrentRound(nextRoundData.roundIndex)
+      } catch (error: any) {
+        console.error('Error fetching next round:', error)
+        // Still advance to next round even if fetch fails
+        setCurrentRound(prev => prev + 1)
+      } finally {
+        setIsFetchingRound(false)
+      }
     }
-  }, [currentRound, battleResult.rounds, playerCards, dungeonCards])
+  }
+
+  const handleStartRound = () => {
+    if (isAnimating || roundStarted) return
+    
+    const round = battleRounds[currentRound]
+    if (!round) return
+    
+    setRoundStarted(true)
+    
+    // Start attack animation
+    setIsAnimating(true)
+    setShowAttack(true)
+
+    // After slower attack animation, update health
+    const timer = setTimeout(() => {
+      setPlayerHealth(prev => {
+        const newHealth = [...prev]
+        newHealth[currentRound] = Math.max(0, (newHealth[currentRound] || playerCards[currentRound]?.health || 0) - round.dungeonCardDamage)
+        return newHealth
+      })
+      
+      setDungeonHealth(prev => {
+        const newHealth = [...prev]
+        newHealth[currentRound] = Math.max(0, (newHealth[currentRound] || dungeonCards[currentRound]?.health || 0) - round.playerCardDamage)
+        return newHealth
+      })
+      
+      setShowAttack(false)
+
+      // Wait longer before allowing next round
+      setTimeout(() => {
+        setIsAnimating(false)
+        setRoundCompleted(true)
+      }, 1500) // Slower animation completion
+    }, 2000) // Slower attack animation (was 800ms)
+
+    return () => clearTimeout(timer)
+  }
 
   const getTypeColor = (type: string): string => {
     switch (type) {
@@ -89,15 +124,39 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
     }
   }
 
-  const currentRoundData = battleResult.rounds[currentRound]
-  const isBattleComplete = currentRound >= battleResult.rounds.length - 1 && !isAnimating
+  const currentRoundData = battleRounds[currentRound]
+  const isBattleComplete = currentRound >= totalRounds - 1 && !isAnimating && roundCompleted
+  
+  // Complete battle when all rounds are done
+  useEffect(() => {
+    if (isBattleComplete && battleResult.playerWins === null && battleRounds.length === totalRounds) {
+      const completeBattle = async () => {
+        try {
+          const finalResult = await apiService.completeBattle(deckId, dungeonId, cardOrder, battleRounds)
+          onBattleComplete(finalResult.result)
+        } catch (error: any) {
+          console.error('Error completing battle:', error)
+          // Calculate locally if API fails
+          const playerWinsCount = battleRounds.filter(r => r.playerWins).length
+          const playerWins = playerWinsCount >= Math.ceil(battleRounds.length / 2)
+          onBattleComplete({
+            ...battleResult,
+            playerWins,
+            rounds: battleRounds
+          })
+        }
+      }
+      completeBattle()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isBattleComplete, battleRounds.length, totalRounds, battleResult.playerWins])
 
   return (
     <div className="animated-battle-view">
       {/* Top Banner with Round Number */}
       <div className="battle-banner">
         <div className="round-indicator">
-          {currentRound + 1}-{battleResult.rounds.length}
+          {currentRound + 1}-{totalRounds}
         </div>
       </div>
 
@@ -115,7 +174,7 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
                 className={`player-card-slot ${isActive ? 'active' : ''} ${isDefeated ? 'defeated' : ''}`}
               >
                 {isActive && (
-                  <div className="card-label">Név</div>
+                  <div className="card-label">{card.name}</div>
                 )}
                 <div className="card-stats-display">
                   <div className="stat-line">
@@ -165,56 +224,15 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
             )}
           </div>
 
-          {/* Attack Arrows */}
+          {/* Sword Clashing GIF */}
           {showAttack && (
-            <>
-              <svg className="attack-arrow arrow-left" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <defs>
-                  <filter id="glow-amber">
-                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                    <feMerge>
-                      <feMergeNode in="coloredBlur"/>
-                      <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                  </filter>
-                  <marker id="arrowhead-amber" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto">
-                    <polygon points="0 0, 12 4, 0 8" fill="#fbbf24" stroke="#d97706" strokeWidth="1"/>
-                  </marker>
-                </defs>
-                <path
-                  d="M 0 20 Q 30 0, 50 20 T 100 20"
-                  stroke="#fbbf24"
-                  strokeWidth="4"
-                  fill="none"
-                  markerEnd="url(#arrowhead-amber)"
-                  className="arrow-path"
-                  filter="url(#glow-amber)"
-                />
-              </svg>
-              <svg className="attack-arrow arrow-right" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <defs>
-                  <filter id="glow-blue">
-                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                    <feMerge>
-                      <feMergeNode in="coloredBlur"/>
-                      <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                  </filter>
-                  <marker id="arrowhead-blue" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto">
-                    <polygon points="0 0, 12 4, 0 8" fill="#3b82f6" stroke="#1e40af" strokeWidth="1"/>
-                  </marker>
-                </defs>
-                <path
-                  d="M 100 20 Q 70 0, 50 20 T 0 20"
-                  stroke="#3b82f6"
-                  strokeWidth="4"
-                  fill="none"
-                  markerEnd="url(#arrowhead-blue)"
-                  className="arrow-path"
-                  filter="url(#glow-blue)"
-                />
-              </svg>
-            </>
+            <div className="sword-clash-container">
+              <img 
+                src="/assets/swordClashing.gif" 
+                alt="Swords clashing" 
+                className="sword-clash-gif"
+              />
+            </div>
           )}
 
           {/* Dungeon Central Card */}
@@ -265,7 +283,7 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
                 className={`dungeon-card-slot ${isActive ? 'active' : ''} ${isDefeated ? 'defeated' : ''}`}
               >
                 {isActive && (
-                  <div className="card-label">Név</div>
+                  <div className="card-label">{card.name}</div>
                 )}
                 <div className="card-stats-display">
                   <div className="stat-line">
@@ -295,32 +313,54 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
 
       {/* Battle Controls */}
       <div className="battle-controls">
-        {isBattleComplete ? (
+        {isBattleComplete && battleResult.playerWins !== null ? (
           <div className="battle-complete">
             <div className={`final-result ${battleResult.playerWins ? 'victory' : 'defeat'}`}>
               {battleResult.playerWins ? '🎉 GLORIOUS VICTORY! 🎉' : '💀 VALIANT DEFEAT! 💀'}
             </div>
             <div className="control-buttons">
-              <button onClick={onBattleComplete} className="btn-continue">
-                ⚜️ View Results
-              </button>
+              {battleResult.playerWins ? (
+                <button onClick={() => onBattleComplete(battleResult)} className="btn-continue">
+                  ⚜️ View Results
+                </button>
+              ) : null}
               <button onClick={onExit} className="btn-exit">
                 ⚔️ Exit Battle
               </button>
             </div>
           </div>
+        ) : isBattleComplete && battleResult.playerWins === null ? (
+          <div className="round-status">
+            ⏳ Calculating final result...
+          </div>
         ) : (
           <div className="round-info">
             <div className="round-reason">{currentRoundData?.reason}</div>
-            {!isAnimating && (
+            {!roundStarted ? (
               <button
-                onClick={() => setCurrentRound(prev => Math.min(prev + 1, battleResult.rounds.length - 1))}
-                className="btn-next-round"
+                onClick={handleStartRound}
+                className="btn-start-round"
                 disabled={isAnimating}
               >
-                ⚔️ Next Round
+                ⚔️ Start Round {currentRound + 1}
               </button>
-            )}
+            ) : isAnimating || showAttack ? (
+              <div className="round-status">
+                ⚔️ Battle in progress...
+              </div>
+            ) : roundCompleted ? (
+              <div className="round-controls">
+                {currentRound < totalRounds - 1 ? (
+                  <button
+                    onClick={handleNextRound}
+                    className="btn-next-round"
+                    disabled={isFetchingRound}
+                  >
+                    {isFetchingRound ? '⏳ Loading...' : '⏭️ Next Round'}
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         )}
       </div>

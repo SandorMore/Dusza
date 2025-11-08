@@ -15,6 +15,7 @@ interface BattlefieldTabProps {
   startBattle: () => Promise<void>
   applyReward: (cardId: string) => Promise<void>
   availableCards: WorldCard[]
+  allGameCards: WorldCard[]
   setActiveTab: (tab: 'decks' | 'battle' | 'collection' | 'allcards') => void
   getTypeColor: (type: string) => string
   getTypeEmoji: (type: string) => string
@@ -34,6 +35,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
   startBattle,
   applyReward,
   availableCards,
+  allGameCards,
   setActiveTab,
   getTypeColor,
   getTypeEmoji,
@@ -43,6 +45,40 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
   const [showAnimatedBattle, setShowAnimatedBattle] = useState(false)
   const [showUpgradePage, setShowUpgradePage] = useState(false)
   const resultsRef = useRef<HTMLDivElement>(null)
+  const [previewDeckCards, setPreviewDeckCards] = useState<WorldCard[]>([])
+
+  // Initialize preview deck cards when selectedDeck changes
+  useEffect(() => {
+    if (selectedDeck) {
+      setPreviewDeckCards([...selectedDeck.cards])
+    }
+  }, [selectedDeck])
+
+  const moveCardUp = (index: number) => {
+    if (index === 0) return
+    const newCards = [...previewDeckCards]
+    const temp = newCards[index]
+    newCards[index] = newCards[index - 1]
+    newCards[index - 1] = temp
+    setPreviewDeckCards(newCards)
+    // Update selectedDeck with new order
+    if (selectedDeck) {
+      setSelectedDeck({ ...selectedDeck, cards: newCards })
+    }
+  }
+
+  const moveCardDown = (index: number) => {
+    if (index === previewDeckCards.length - 1) return
+    const newCards = [...previewDeckCards]
+    const temp = newCards[index]
+    newCards[index] = newCards[index + 1]
+    newCards[index + 1] = temp
+    setPreviewDeckCards(newCards)
+    // Update selectedDeck with new order
+    if (selectedDeck) {
+      setSelectedDeck({ ...selectedDeck, cards: newCards })
+    }
+  }
 
   // Show animated battle when battleResult is first set
   useEffect(() => {
@@ -67,10 +103,14 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
         battleResult={battleResult}
         playerCards={selectedDeck.cards}
         dungeonCards={selectedDungeon.cards}
-        onBattleComplete={() => {
+        deckId={selectedDeck._id}
+        dungeonId={selectedDungeon._id}
+        cardOrder={previewDeckCards.map(card => card._id)}
+        onBattleComplete={(finalResult) => {
+          setBattleResult(finalResult)
           setShowAnimatedBattle(false)
           // If player won, show upgrade page directly
-          if (battleResult.playerWins && battleResult.playerReward) {
+          if (finalResult.playerWins && finalResult.playerReward) {
             setShowUpgradePage(true)
           }
         }}
@@ -99,10 +139,10 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
               Choose a warrior to bestow this boon upon:
             </p>
             
-            {availableCards.length === 0 ? (
+            {allGameCards.length === 0 ? (
               <div className="text-center p-8 bg-gray-700/50 rounded-xl border-2 border-yellow-500">
                 <p className="text-amber-300 text-lg mb-4">No warriors available to upgrade</p>
-                <p className="text-amber-400 text-sm">Create a war formation with warriors to upgrade them with victory spoils!</p>
+                <p className="text-amber-400 text-sm">Game Masters must create cards first!</p>
                 <button
                   onClick={() => {
                     setShowUpgradePage(false)
@@ -110,13 +150,13 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                   }}
                   className="mt-6 bg-amber-600 hover:bg-amber-700 text-amber-100 px-8 py-3 rounded-xl transition-all border-2 border-amber-500 font-bold"
                 >
-                  🛡️ Forge New Formation
+                  🛡️ Return to Formations
                 </button>
               </div>
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                  {availableCards.map((card: WorldCard) => (
+                  {allGameCards.map((card: WorldCard) => (
                     <button
                       key={card._id}
                       onClick={() => applyReward(card._id)}
@@ -263,10 +303,29 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                   <h4 className="font-bold text-blue-300 text-xl mb-4 font-serif">🛡️ Your Formation</h4>
+                  <p className="text-amber-300 text-sm mb-3">Reorder your warriors by clicking the arrows:</p>
                   <div className="space-y-3">
-                    {selectedDeck.cards.map((card: WorldCard, index: number) => (
+                    {previewDeckCards.map((card: WorldCard, index: number) => (
                       <div key={card._id} className="flex justify-between items-center p-4 bg-gray-700 rounded-xl border-2 border-blue-500">
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-3 flex-1">
+                          <div className="flex flex-col space-y-1">
+                            <button
+                              onClick={() => moveCardUp(index)}
+                              disabled={index === 0}
+                              className="text-amber-300 hover:text-amber-100 disabled:text-gray-600 disabled:cursor-not-allowed text-xs"
+                              title="Move up"
+                            >
+                              ▲
+                            </button>
+                            <button
+                              onClick={() => moveCardDown(index)}
+                              disabled={index === previewDeckCards.length - 1}
+                              className="text-amber-300 hover:text-amber-100 disabled:text-gray-600 disabled:cursor-not-allowed text-xs"
+                              title="Move down"
+                            >
+                              ▼
+                            </button>
+                          </div>
                           <span className="text-amber-300 w-6">{index + 1}.</span>
                           <span className="font-bold text-amber-100">{card.name}</span>
                         </div>
@@ -311,8 +370,8 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                   {selectedDeck.cards.length} vs {selectedDungeon.cards.length} warriors
                 </div>
                 <button
-                  onClick={startBattle}
-                  disabled={!selectedDeck || !selectedDungeon || selectedDeck.cards.length !== selectedDungeon.cards.length}
+                  onClick={() => startBattle(previewDeckCards.map(card => card._id))}
+                  disabled={!selectedDeck || !selectedDungeon || ![1, 4, 6].includes(previewDeckCards.length) || previewDeckCards.length !== selectedDungeon.cards.length}
                   className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-amber-100 py-4 px-12 rounded-2xl disabled:bg-gray-600 transition-all text-xl font-bold border-2 border-red-500 shadow-2xl"
                 >
                   ⚔️ COMMENCE BATTLE! ⚔️
@@ -406,14 +465,14 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                 You earned <span className="font-bold text-yellow-300">+{battleResult.playerReward.bonusAmount} {battleResult.playerReward.bonusType}</span>!
                 Bestow this boon upon one of your warriors:
               </p>
-              {availableCards.length === 0 ? (
+              {allGameCards.length === 0 ? (
                 <div className="text-center p-8 bg-gray-700/50 rounded-xl border-2 border-yellow-500">
                   <p className="text-amber-300 text-lg mb-4">No warriors available to upgrade</p>
-                  <p className="text-amber-400 text-sm">Create a war formation with warriors to upgrade them with victory spoils!</p>
+                  <p className="text-amber-400 text-sm">Game Masters must create cards first!</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-80 overflow-y-auto">
-                  {availableCards.map((card: WorldCard) => (
+                  {allGameCards.map((card: WorldCard) => (
                     <button
                       key={card._id}
                       onClick={() => applyReward(card._id)}

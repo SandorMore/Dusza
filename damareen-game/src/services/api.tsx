@@ -21,7 +21,8 @@ import type {
   PlayerDeckData,
   CreatePlayerDeckResponse,
   PlayerDecksResponse,
-  BattleResponse
+  BattleResponse,
+  BattleRound
 } from '../types/game'
 
 // Response típusok
@@ -175,8 +176,32 @@ class ApiService {
     return response.data
   }
 
-  async startBattle(deckId: string, dungeonId: string): Promise<BattleResponse> {
-    const response: AxiosResponse<BattleResponse> = await this.api.post('/player/battle', { deckId, dungeonId })
+  async startBattle(deckId: string, dungeonId: string, cardOrder?: string[]): Promise<BattleResponse> {
+    const response: AxiosResponse<BattleResponse> = await this.api.post('/player/battle', { 
+      deckId, 
+      dungeonId,
+      ...(cardOrder && { cardOrder })
+    })
+    return response.data
+  }
+
+  async getNextRound(deckId: string, dungeonId: string, cardOrder: string[], currentRound: number): Promise<{message: string, round: BattleRound, roundIndex: number}> {
+    const response: AxiosResponse<{message: string, round: BattleRound, roundIndex: number}> = await this.api.post('/player/battle/next-round', {
+      deckId,
+      dungeonId,
+      cardOrder,
+      currentRound
+    })
+    return response.data
+  }
+
+  async completeBattle(deckId: string, dungeonId: string, cardOrder: string[], rounds: BattleRound[]): Promise<BattleResponse> {
+    const response: AxiosResponse<BattleResponse> = await this.api.post('/player/battle/complete', {
+      deckId,
+      dungeonId,
+      cardOrder,
+      rounds
+    })
     return response.data
   }
 

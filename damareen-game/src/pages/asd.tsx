@@ -63,15 +63,15 @@ const WarFormationsTab: React.FC<WarFormationsTabProps> = ({
               Select Warriors ({selectedCardsForDeck.length} chosen)
               {availableCards.length === 0 && (
                 <span className="text-orange-300 text-sm ml-3 font-normal">
-                  No warriors available. Summon starter warriors above!
+                  No base warriors available. Game Masters must create cards first!
                 </span>
               )}
             </label>
             <div className="border-2 border-amber-500 rounded-xl p-6 max-h-96 overflow-y-auto bg-gray-700/50">
               {availableCards.length === 0 ? (
                 <div className="text-center py-12 text-amber-300">
-                  <p className="text-xl mb-4">No warriors in your ranks</p>
-                  <p className="text-lg">Summon your first warriors to begin your conquest!</p>
+                  <p className="text-xl mb-4">No base warriors available</p>
+                  <p className="text-lg">Game Masters must create base cards first!</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

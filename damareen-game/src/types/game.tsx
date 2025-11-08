@@ -94,8 +94,10 @@ export interface PlayerDeckData {
 }
 
 export interface BattleResult {
-  playerWins: boolean
+  playerWins: boolean | null
   rounds: BattleRound[]
+  totalRounds?: number
+  currentRound?: number
   playerReward?: {
     cardId: string
     bonusType: 'damage' | 'health'

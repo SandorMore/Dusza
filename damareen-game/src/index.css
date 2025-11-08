@@ -1,1 +1,72 @@
 @import "tailwindcss";
+
+/* Custom Scrollbar Design - Medieval Amber Theme */
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+::-webkit-scrollbar-track {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%);
+  border: 2px solid #d97706;
+  border-radius: 10px;
+  box-shadow: inset 0 0 6px rgba(146, 64, 14, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 50%, #92400e 100%);
+  border: 2px solid #78350f;
+  border-radius: 10px;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(251, 191, 36, 0.3);
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+  border-color: #fbbf24;
+  box-shadow: 
+    0 3px 6px rgba(146, 64, 14, 0.5),
+    inset 0 1px 0 rgba(251, 191, 36, 0.5),
+    0 0 8px rgba(251, 191, 36, 0.4);
+  transform: scale(1.05);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(135deg, #92400e 0%, #78350f 50%, #92400e 100%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+::-webkit-scrollbar-corner {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%);
+  border: 2px solid #d97706;
+  border-radius: 10px;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d97706 #fef3c7;
+}
+
+/* Dark scrollbar for dark backgrounds */
+.dark-scrollbar::-webkit-scrollbar-track {
+  background: linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%);
+  border: 2px solid #d97706;
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+  border: 2px solid #fcd34d;
+}
+
+.dark-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%);
+  border-color: #fbbf24;
+}
+
+.dark-scrollbar {
+  scrollbar-color: #fbbf24 #78350f;
+}
