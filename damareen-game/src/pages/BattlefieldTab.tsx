@@ -273,23 +273,30 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                 You earned <span className="font-bold text-yellow-300">+{battleResult.playerReward.bonusAmount} {battleResult.playerReward.bonusType}</span>!
                 Bestow this boon upon one of your warriors:
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-80 overflow-y-auto">
-                {availableCards.map((card: WorldCard) => (
-                  <button
-                    key={card._id}
-                    onClick={() => applyReward(card._id)}
-                    className="p-4 border-2 border-yellow-500 rounded-xl text-left bg-gray-700 hover:bg-yellow-900/30 transition-all"
-                  >
-                    <div className="font-bold text-amber-100 text-lg">{card.name}</div>
-                    <div className="text-amber-300 text-sm mt-2">
-                      Current: ⚔️{card.damage} ❤️{card.health}
-                    </div>
-                    <div className="text-green-300 font-bold text-sm mt-2">
-                      After: ⚔️{card.damage + (battleResult.playerReward?.bonusType === 'damage' ? battleResult.playerReward.bonusAmount : 0)} ❤️{card.health + (battleResult.playerReward?.bonusType === 'health' ? battleResult.playerReward.bonusAmount : 0)}
-                    </div>
-                  </button>
-                ))}
-              </div>
+              {availableCards.length === 0 ? (
+                <div className="text-center p-8 bg-gray-700/50 rounded-xl border-2 border-yellow-500">
+                  <p className="text-amber-300 text-lg mb-4">No warriors available to upgrade</p>
+                  <p className="text-amber-400 text-sm">Create a war formation with warriors to upgrade them with victory spoils!</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-80 overflow-y-auto">
+                  {availableCards.map((card: WorldCard) => (
+                    <button
+                      key={card._id}
+                      onClick={() => applyReward(card._id)}
+                      className="p-4 border-2 border-yellow-500 rounded-xl text-left bg-gray-700 hover:bg-yellow-900/30 transition-all"
+                    >
+                      <div className="font-bold text-amber-100 text-lg">{card.name}</div>
+                      <div className="text-amber-300 text-sm mt-2">
+                        Current: ⚔️{card.damage} ❤️{card.health}
+                      </div>
+                      <div className="text-green-300 font-bold text-sm mt-2">
+                        After: ⚔️{card.damage + (battleResult.playerReward?.bonusType === 'damage' ? battleResult.playerReward.bonusAmount : 0)} ❤️{card.health + (battleResult.playerReward?.bonusType === 'health' ? battleResult.playerReward.bonusAmount : 0)}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 

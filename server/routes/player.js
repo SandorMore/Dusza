@@ -396,49 +396,49 @@ router.post('/apply-reward', auth, async (req, res) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
     
-    // Find all collections for this user
-    const collections = await PlayerCollection.find({ createdBy: req.user._id }).populate('cards');
+    // Find all decks for this user and populate cards
+    const decks = await PlayerDeck.find({ createdBy: req.user._id }).populate('cards');
     
-    let cardUpdated = false;
-    let updatedCard = null;
+    // Check if the card exists in any of the user's decks
+    let cardFound = false;
+    let card = null;
     
-    // Search through all collections for the card
-    for (const collection of collections) {
-      const card = collection.cards.find(c => c._id.toString() === cardId);
-      
-      if (card) {
-        console.log('🔍 Found card in collection:', collection.name);
-        console.log('🔍 Card before update:', card.name, 'DMG:', card.damage, 'HP:', card.health);
-        
-        // Update the card
-        if (bonusType === 'damage') {
-          card.damage += bonusAmount;
-        } else if (bonusType === 'health') {
-          card.health += bonusAmount;
-        }
-        
-        console.log('🔍 Card after update:', card.name, 'DMG:', card.damage, 'HP:', card.health);
-        
-        // ✅ FIX: Save the WorldCard document directly, not just the collection
-        // Since PlayerCollection stores cards as references, we need to save the WorldCard document
-        await card.save();
-        
-        cardUpdated = true;
-        updatedCard = {
-          id: card._id,
-          name: card.name,
-          damage: card.damage,
-          health: card.health,
-          type: card.type
-        };
+    for (const deck of decks) {
+      const foundCard = deck.cards.find(c => c._id.toString() === cardId);
+      if (foundCard) {
+        cardFound = true;
+        card = foundCard;
+        console.log('🔍 Found card in deck:', deck.name);
         break;
       }
     }
     
-    if (!cardUpdated) {
-      console.log('❌ Card not found in any collection');
-      return res.status(404).json({ message: 'Card not found in your collections' });
+    if (!cardFound || !card) {
+      console.log('❌ Card not found in any deck');
+      return res.status(404).json({ message: 'Card not found in your decks' });
     }
+    
+    console.log('🔍 Card before update:', card.name, 'DMG:', card.damage, 'HP:', card.health);
+    
+    // Update the card
+    if (bonusType === 'damage') {
+      card.damage += bonusAmount;
+    } else if (bonusType === 'health') {
+      card.health += bonusAmount;
+    }
+    
+    console.log('🔍 Card after update:', card.name, 'DMG:', card.damage, 'HP:', card.health);
+    
+    // Save the WorldCard document directly
+    await card.save();
+    
+    const updatedCard = {
+      id: card._id,
+      name: card.name,
+      damage: card.damage,
+      health: card.health,
+      type: card.type
+    };
     
     console.log('✅ Reward applied successfully');
     res.json({

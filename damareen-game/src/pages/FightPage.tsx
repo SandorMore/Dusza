@@ -93,8 +93,17 @@ const FightPage: React.FC = () => {
       setAllGameCards(allCardsRes.cards || [])
       setAllGameDungeons(allDungeonsRes.dungeons || [])
 
-      const playerCards: WorldCard[] = collectionsRes.collections?.flatMap(col => col.cards) || []
-      console.log('🃏 Player cards loaded:', playerCards.length);
+      // Get all unique cards from player decks (since PlayerCollection was dropped)
+      const allDeckCards: WorldCard[] = (decksRes.decks || []).flatMap(deck => deck.cards || [])
+      // Remove duplicates by card _id
+      const uniqueCardsMap = new Map<string, WorldCard>()
+      allDeckCards.forEach(card => {
+        if (card._id && !uniqueCardsMap.has(card._id)) {
+          uniqueCardsMap.set(card._id, card)
+        }
+      })
+      const playerCards: WorldCard[] = Array.from(uniqueCardsMap.values())
+      console.log('🃏 Player cards loaded from decks:', playerCards.length);
 
       setAvailableCards(playerCards)
 
@@ -179,13 +188,14 @@ const FightPage: React.FC = () => {
       console.log('✅ Reward API response:', result);
       setMessage('⚜️ ' + result.message);
 
-      console.log('🔄 Reloading data after reward...');
-      await loadData();
+      // Redirect to player dashboard after successful upgrade to prevent multiple upgrades
+      setTimeout(() => {
+        window.location.href = '/player';
+      }, 1000); // Small delay to show the success message
 
     } catch (error: any) {
       console.error('❌ Error applying reward:', error);
       setMessage('❌ Error bestowing reward: ' + (error.response?.data?.message || error.message));
-    } finally {
       setLoading(false);
     }
   }
