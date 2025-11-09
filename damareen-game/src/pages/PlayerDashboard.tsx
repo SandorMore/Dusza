@@ -1,4 +1,3 @@
-// src/pages/PlayerDashboard.tsx - MEDIEVAL STYLE
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { User } from '../types/auth'
@@ -22,8 +21,8 @@ const PlayerDashboard: React.FC = () => {
         <div className="max-w-1xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-amber-100 font-serif tracking-wider">🏰 Royal Command Post</h1>
-              <p className="text-amber-100 text-sm italic">Hail, {user?.username}! The kingdom awaits your valor!</p>
+              <h1 className="text-3xl font-bold text-amber-100 font-serif tracking-wider">🏰 Királyi Parancsnoki Poszt</h1>
+              <p className="text-amber-100 text-sm italic">Üdvözöllek, {user?.username}! A királyság várja a bátorságodat!</p>
             </div>
             <button
               onClick={logout}
@@ -39,22 +38,20 @@ const PlayerDashboard: React.FC = () => {
         {/* Medieval Banner */}
         <div className="bg-gradient-to-r from-amber-600 to-amber-700 rounded-xl shadow-2xl p-6 mb-8 text-center">
           <h2 className="text-2xl font-bold text-amber-100 font-serif tracking-wide">
-            🛡️ Choose Your Quest, Brave Warrior! 🛡️
+            🛡️ Válaszd ki a Küldetésedet, Bátor Harcos! 🛡️
           </h2>
           <p className="text-amber-200 mt-2 text-lg">
-            Forge your destiny in the halls of battle and glory!
+            Kovácsold meg a sorsodat a csata és dicsőség csarnokaiban!
           </p>
         </div>
 
-        {/* Quest Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Battle Arena Card */}
           <div className="bg-gradient-to-b from-red-700 to-red-800 rounded-2xl shadow-xl shadow-red-900/40 p-6 hover:shadow-red-900/50 transition-all duration-300 border border-red-900/40 hover:scale-105 transform flex flex-col justify-between">
             <div className="text-center">
               <div className="text-6xl mb-6 filter drop-shadow-lg">⚔️</div>
-              <h2 className="text-2xl font-bold text-amber-100 font-serif mb-4 tracking-wide">Grand Arena</h2>
+              <h2 className="text-2xl font-bold text-amber-100 font-serif mb-4 tracking-wide">Nagy Aréna</h2>
               <p className="text-amber-200 mb-6 leading-relaxed">
-                Test your mettle against fearsome dungeon guardians! Forge your deck and claim victory in epic battles!
+                Próbáld ki magad a félelmetes kazamata őrzőkkel szemben! Kovácsold meg a paklidat és szerezz győzelmet epikus csatákban!
               </p>
 
             </div>
@@ -62,41 +59,39 @@ const PlayerDashboard: React.FC = () => {
                 onClick={() => navigate('/player/fight?tab=battle')}
                 className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-amber-100 px-8 py-4 rounded-xl transition-all duration-300 border-2 border-red-500 font-bold text-lg w-full shadow-lg hover:shadow-red-700/50"
               >
-                🏹 Enter Arena
+                🏹 Aréna Belépés
               </button>
           </div>
 
-          {/* Royal Collection Card */}
           <div className="bg-gradient-to-b from-blue-700 to-blue-800 rounded-2xl shadow-xl shadow-blue-900/40 p-6 hover:shadow-blue-900/50 transition-all duration-300 border border-blue-900/40 hover:scale-105 transform flex flex-col justify-between">
             <div className="text-center">
               <div className="text-6xl mb-6 filter drop-shadow-lg">📜</div>
-              <h2 className="text-2xl font-bold text-amber-100 font-serif mb-4 tracking-wide">Royal Archives</h2>
+              <h2 className="text-2xl font-bold text-amber-100 font-serif mb-4 tracking-wide">Királyi Archívum</h2>
               <p className="text-amber-200 mb-6 leading-relaxed">
-                Browse your collection of legendary cards. Study your warriors and plan your strategies!
+                Böngészd a legendás kártyák gyűjteményét. Tanulmányozd a harcosaidat és tervezd meg a stratégiáidat!
               </p>
             </div>
             <button
               onClick={() => navigate('/player/fight?tab=collection')}
               className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-amber-100 px-8 py-4 rounded-xl transition-all duration-300 border-2 border-blue-500 font-bold text-lg w-full shadow-lg hover:shadow-blue-700/50"
             >
-              🏛️ View Archives
+              🏛️ Archívum Megtekintése
             </button>
           </div>
 
-          {/* War Room Card */}
           <div className="bg-gradient-to-b from-green-800 to-green-900 rounded-2xl shadow-xl shadow-green-900/40 p-6 hover:shadow-green-900/50 transition-all duration-300 border border-green-900/40 hover:scale-105 transform flex flex-col justify-between">
             <div className="text-center">
               <div className="text-6xl mb-6 filter drop-shadow-lg">🛡️</div>
-              <h2 className="text-2xl font-bold text-amber-100 font-serif mb-4 tracking-wide">War Room</h2>
+              <h2 className="text-2xl font-bold text-amber-100 font-serif mb-4 tracking-wide">Háború Szobája</h2>
               <p className="text-amber-200 mb-6 leading-relaxed">
-                Forge your battle formations! Create and command your decks of mighty warriors and cunning mages!
+                Kovácsold meg a harci formációidat! Hozz létre és irányíts paklikat hatalmas harcosokból és ravasz mágusokból!
               </p>
             </div>
             <button
               onClick={() => navigate('/player/fight?tab=decks')}
               className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-amber-100 px-8 py-4 rounded-xl transition-all duration-300 border-2 border-green-500 font-bold text-lg w-full shadow-lg hover:shadow-green-700/50"
             >
-              ⚒️ Forge Decks
+              ⚒️ Paklik Kovácsolása
             </button>
           </div>
 

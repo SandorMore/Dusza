@@ -1,4 +1,3 @@
-// src/components/WarFormationsTab.tsx
 import React from 'react'
 import type { WorldCard, PlayerDeck } from '../types/game'
 
@@ -45,33 +44,33 @@ const WarFormationsTab: React.FC<WarFormationsTabProps> = ({
     <div className="space-y-8">
       {/* Forge New War Formation */}
       <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4">
-        <h2 className="text-2xl font-bold text-amber-100 font-serif mb-6 text-center">🛡️ Forge New War Formation</h2>
+        <h2 className="text-2xl font-bold text-amber-100 font-serif mb-6 text-center">🛡️ Új Harci Formáció Kovácsolása</h2>
         <div className="space-y-6">
           <div>
-            <label className="block text-lg font-medium text-amber-200 mb-3 font-serif">Formation Name</label>
+            <label className="block text-lg font-medium text-amber-200 mb-3 font-serif">Formáció Neve</label>
             <input
               type="text"
               value={newDeckName}
               onChange={(e) => setNewDeckName(e.target.value)}
               className="w-full bg-gray-700 border-2 border-amber-500 rounded-xl px-4 py-3 text-amber-100 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 font-serif"
-              placeholder="Enter formation name..."
+              placeholder="Add meg a formáció nevét..."
             />
           </div>
           
           <div>
             <label className="block text-lg font-medium text-amber-200 mb-3 font-serif">
-              Select Warriors ({selectedCardsForDeck.length} chosen)
+              Válassz Harcosokat ({selectedCardsForDeck.length} kiválasztva)
               {availableCards.length === 0 && (
                 <span className="text-orange-300 text-sm ml-3 font-normal">
-                  No base warriors available. Game Masters must create cards first!
+                  Nincs elérhető alap harcos. A Game Master-eknek először kártyákat kell létrehozniuk!
                 </span>
               )}
             </label>
             <div className="border-2  rounded-xl p-6 max-h-96 overflow-y-auto bg-gray-700/50">
               {availableCards.length === 0 ? (
                 <div className="text-center py-12 text-amber-300">
-                  <p className="text-xl mb-4">No base warriors available</p>
-                  <p className="text-lg">Game Masters must create base cards first!</p>
+                  <p className="text-xl mb-4">Nincs elérhető alap harcos</p>
+                  <p className="text-lg">A Game Master-eknek először alap kártyákat kell létrehozniuk!</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -94,7 +93,7 @@ const WarFormationsTab: React.FC<WarFormationsTabProps> = ({
                             </span>
                             {card.isLeader && (
                               <span className="bg-yellow-700 text-amber-100 text-xs px-2 py-1 rounded-lg font-bold">
-                                👑 Commander
+                                👑 Parancsnok
                               </span>
                             )}
                           </div>
@@ -116,24 +115,23 @@ const WarFormationsTab: React.FC<WarFormationsTabProps> = ({
             disabled={!newDeckName.trim() || selectedCardsForDeck.length === 0 || isCreatingDeck}
             className="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-amber-100 py-4 px-6 rounded-xl disabled:bg-gray-600 transition-all border-2 border-amber-500 font-bold text-lg shadow-lg"
           >
-            {isCreatingDeck ? '⚒️ Forging Formation...' : '⚒️ Forge War Formation'}
+            {isCreatingDeck ? '⚒️ Formáció Kovácsolása...' : '⚒️ Harci Formáció Kovácsolása'}
           </button>
         </div>
       </div>
 
-      {/* Existing War Formations */}
       <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 ">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-amber-100 font-serif">My War Formations</h2>
+          <h2 className="text-2xl font-bold text-amber-100 font-serif">Harci Formációim</h2>
           <span className="text-amber-200 font-bold">
-            {playerDecks.length} formation{playerDecks.length !== 1 ? 's' : ''}
+            {playerDecks.length} formáció{playerDecks.length !== 1 ? '' : ''}
           </span>
         </div>
         
         {playerDecks.length === 0 ? (
           <div className="text-center py-12 text-amber-300">
-            <p className="text-xl mb-4">No formations forged yet</p>
-            <p className="text-lg">Forge your first war formation above to commence battle!</p>
+            <p className="text-xl mb-4">Még nincs kovácsolt formáció</p>
+            <p className="text-lg">Kovácsold meg az első harci formációdat fent, hogy elkezdhesd a csatát!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -150,7 +148,7 @@ const WarFormationsTab: React.FC<WarFormationsTabProps> = ({
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="font-bold text-amber-100 text-xl">{deck.name}</h3>
                   <span className="bg-blue-700 text-amber-100 text-sm px-3 py-1 rounded-lg font-bold">
-                    {deck.cards.length} warriors
+                    {deck.cards.length} harcos
                   </span>
                 </div>
                 
@@ -172,7 +170,7 @@ const WarFormationsTab: React.FC<WarFormationsTabProps> = ({
                 
                 {selectedDeck?._id === deck._id && (
                   <div className="mt-4 pt-4 border-t border-amber-500">
-                    <span className="text-amber-300 font-bold text-sm">✓ Chosen for battle</span>
+                    <span className="text-amber-300 font-bold text-sm">✓ Kiválasztva csatára</span>
                   </div>
                 )}
               </div>

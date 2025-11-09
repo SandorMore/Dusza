@@ -332,20 +332,20 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
         {finalBattleResult ? (
           <div className="battle-complete">
             <div className={`final-result ${finalBattleResult.playerWins ? 'victory' : 'defeat'}`}>
-              {finalBattleResult.playerWins ? '🎉 GLORIOUS VICTORY! 🎉' : '💀 VALIANT DEFEAT! 💀'}
+              {finalBattleResult.playerWins ? '🎉 DICSŐSÉGES GYŐZELEM! 🎉' : '💀 BÁTORSÁGOS VERESÉG! 💀'}
             </div>
             <div className="control-buttons">
               <button onClick={handleViewRewards} className="btn-continue">
-                {finalBattleResult.playerWins ? '🏆 View Rewards' : '📊 View Results'}
+                {finalBattleResult.playerWins ? '🏆 Jutalmak Megtekintése' : '📊 Eredmények Megtekintése'}
               </button>
               <button onClick={onExit} className="btn-exit">
-                ⚔️ Exit Battle
+                ⚔️ Csata Kilépés
               </button>
             </div>
           </div>
         ) : isCalculatingFinal ? (
           <div className="round-status">
-            ⏳ Calculating final result...
+            ⏳ Végeredmény számítása...
           </div>
         ) : (
           <div className="round-info">
@@ -356,11 +356,11 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
                 className="btn-start-round"
                 disabled={isAnimating}
               >
-                ⚔️ Start Round {currentRound + 1}
+                ⚔️ {currentRound + 1}. Kör Kezdése
               </button>
             ) : isAnimating || showAttack ? (
               <div className="round-status">
-                ⚔️ Battle in progress...
+                ⚔️ Csata folyamatban...
               </div>
             ) : roundCompleted ? (
               <div className="round-controls">
@@ -370,11 +370,11 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
                     className="btn-next-round"
                     disabled={isFetchingRound}
                   >
-                    {isFetchingRound ? '⏳ Loading...' : '⏭️ Next Round'}
+                    {isFetchingRound ? '⏳ Betöltés...' : '⏭️ Következő Kör'}
                   </button>
                 ) : (
                   <div className="round-status">
-                    ⏳ Finalizing battle...
+                    ⏳ Csata befejezése...
                   </div>
                 )}
               </div>

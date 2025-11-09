@@ -164,13 +164,11 @@ const FightPage: React.FC = () => {
       );
 
       setMessage('⚜️ ' + result.message);
-
-      setTimeout(() => {
-        window.location.href = '/player';
-      }, 1000);
+      await loadData();
 
     } catch (error: any) {
       setMessage('❌ Hiba a jutalom odaítélésénél: ' + (error.response?.data?.message || error.message));
+    } finally {
       setLoading(false);
     }
   }

@@ -1,4 +1,3 @@
-// src/components/RoyalArchivesTab.tsx
 import React from 'react'
 import { apiService } from '../services/api'
 import type { WorldCard } from '../types/game'
@@ -33,16 +32,16 @@ const RoyalArchivesTab: React.FC<RoyalArchivesTabProps> = ({
   return (
     <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 ">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold text-amber-100 font-serif">📜 Royal Archives</h2>
+        <h2 className="text-2xl font-bold text-amber-100 font-serif">📜 Királyi Archívum</h2>
         <div className="flex space-x-4">
           <button
             onClick={loadData}
             className="bg-blue-700 hover:bg-blue-800 text-amber-100 px-6 py-3 rounded-xl transition-all border-2 border-blue-600 font-bold"
           >
-            🔄 Update Archives
+            🔄 Archívum Frissítése
           </button>
           <span className="text-amber-200 font-bold text-lg">
-            {availableCards.length} warrior{availableCards.length !== 1 ? 's' : ''}
+            {availableCards.length} harcos{availableCards.length !== 1 ? '' : ''}
           </span>
         </div>
       </div>
@@ -50,12 +49,12 @@ const RoyalArchivesTab: React.FC<RoyalArchivesTabProps> = ({
       {availableCards.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-6xl mb-6">🛡️</div>
-          <p className="text-xl text-amber-300 mb-6">Your archives are empty</p>
+          <p className="text-xl text-amber-300 mb-6">Az archívumod üres</p>
           <button
             onClick={handleInitializeStarterData}
             className="bg-orange-700 hover:bg-orange-800 text-amber-100 px-8 py-4 rounded-xl transition-all border-2 border-orange-600 font-bold text-lg"
           >
-            ⚜️ Summon Starter Warriors
+            ⚜️ Kezdő Harcosok Idézése
           </button>
         </div>
       ) : (
@@ -71,18 +70,18 @@ const RoyalArchivesTab: React.FC<RoyalArchivesTabProps> = ({
               
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-red-300 font-bold">⚔️ Might</span>
+                  <span className="text-red-300 font-bold">⚔️ Erő</span>
                   <span className="font-bold text-amber-100">{card.damage}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-green-300 font-bold">❤️ Resilience</span>
+                  <span className="text-green-300 font-bold">❤️ Állóképesség</span>
                   <span className="font-bold text-amber-100">{card.health}</span>
                 </div>
                 
                 {card.boostType && (
                   <div className="bg-purple-700 border border-purple-500 rounded-xl p-3 mt-3">
                     <div className="text-xs text-purple-200 font-bold">
-                      ⚡ {card.boostType === 'damage' ? '2× Might' : '2× Resilience'}
+                      ⚡ {card.boostType === 'damage' ? '2× Erő' : '2× Állóképesség'}
                     </div>
                   </div>
                 )}
@@ -90,7 +89,7 @@ const RoyalArchivesTab: React.FC<RoyalArchivesTabProps> = ({
                 {card.isLeader && (
                   <div className="bg-yellow-700 border border-yellow-500 rounded-xl p-3 mt-3">
                     <div className="text-xs text-yellow-200 font-bold flex items-center">
-                      👑 Formation Commander
+                      👑 Formáció Parancsnok
                     </div>
                   </div>
                 )}

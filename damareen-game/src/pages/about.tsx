@@ -9,44 +9,44 @@ const AboutTab: React.FC<AboutTabProps> = ({ version = "1.0.0" }) => {
     <div className="bg-gradient-to-br from-gray-800 to-gray-900 p-8 rounded-xl shadow-2xl border-4 border-black text-amber-100 font-serif">
 
       <h2 className="text-3xl font-bold text-center mb-6 tracking-wide">
-         Guide
+         Útmutató
       </h2>
 
       <p className="mb-4 text-lg leading-relaxed">
-        Welcome, traveller! This realm is a place of epic battles, ancient magic, and heroic warriors. 
-        Build mighty war formations, conquer dungeons, and collect legendary warriors to become the most feared champion of the kingdom!
+        Üdvözöllek, utazó! Ez a birodalom epikus csaták, ősi mágia és hősies harcosok helye. 
+        Építs hatalmas harci formációkat, hódítsd meg a kazamatákat, és gyűjts legendás harcosokat, hogy a királyság legfélelmetesebb bajnoka válj!
       </p>
 
       <div className="mt-6">
-        <h3 className="text-2xl font-bold mb-3"> Game Objective</h3>
+        <h3 className="text-2xl font-bold mb-3">Játék Célja</h3>
         <p className="leading-relaxed">
-          Your mission is to create powerful decks, defeat dangerous dungeons, and upgrade your cards to form an unbeatable army.
-          Each victory may reward you with blessings that enhance your warriors.
+          A küldetésed, hogy hatalmas paklikat hozz létre, legyőzd a veszélyes kazamatákat, és fejleszd a kártyáidat, hogy legyőzhetetlen hadsereget alkoss.
+          Minden győzelem áldásokat adhat, amelyek fejlesztik a harcosaidat.
         </p>
       </div>
 
       <div className="mt-6">
-        <h3 className="text-2xl font-bold mb-3"> Core Gameplay</h3>
+        <h3 className="text-2xl font-bold mb-3">Alapvető Játékmenet</h3>
         <ul className="list-disc list-inside space-y-2 text-amber-200">
-          <li>Create war formations (1, 4, or 6 warrior decks)</li>
-          <li>Battle against dungeons of increasing difficulty</li>
-          <li>Collect warriors and unlock powerful upgrades</li>
-          <li>Strategize based on traits such as Fire, Water, Earth, and Air</li>
+          <li>Harci formációk létrehozása (1, 4 vagy 6 harcos paklik)</li>
+          <li>Csata növekvő nehézségű kazamaták ellen</li>
+          <li>Harcosok gyűjtése és hatalmas fejlesztések feloldása</li>
+          <li>Stratégia készítése a Tűz, Víz, Föld és Levegő tulajdonságok alapján</li>
         </ul>
       </div>
 
       <div className="mt-6">
-        <h3 className="text-2xl font-bold mb-3"> Future Features</h3>
+        <h3 className="text-2xl font-bold mb-3">Jövőbeli Funkciók</h3>
         <ul className="list-disc list-inside space-y-2 text-amber-200">
-          <li>Online PvP arena</li>
-          <li>Guilds and alliances</li>
-          <li>Seasonal events</li>
-          <li>Crafting and enchanting system</li>
+          <li>Online PvP aréna</li>
+          <li>Céhek és szövetségek</li>
+          <li>Szezonális események</li>
+          <li>Készítés és varázslás rendszer</li>
         </ul>
       </div>
 
       <div className="mt-10 text-center text-amber-300 italic">
-        Version {version} — “May your blade strike true!”
+        Verzió {version} — "Legyen éles a pengéd!"
       </div>
     </div>
   )
