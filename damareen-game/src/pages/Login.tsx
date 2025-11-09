@@ -77,7 +77,7 @@ const Login: React.FC = () => {
     <div className="min-h-screen bg-[url('/assets/freepik__the-style-is-rich-with-textured-brushstrokes-deep-__21314.png')] bg-cover bg-center flex justify-center items-center py-12 px-4">
       <div className='backdrop-blur-sm bg-white/30 rounded-3xl shadow-2xl p-8 md:p-12 w-full max-w-md'>
         <form onSubmit={handleSubmit} className='flex flex-col w-full'>
-          <h1 className='text-4xl font-bold text-amber-100 font-serif mb-2 text-center tracking-wider'>🏰 Castle Gates</h1>
+          <h1 className='text-4xl font-bold text-amber-200 drop-shadow-[0_0_3px_black] font-serif mb-2 text-center tracking-wider'>🏰 <br /> Castle Gates</h1>
           <p className='text-amber-200 text-center mb-8 font-serif'>Enter the realm, brave soul!</p>
 
           {message && (
@@ -124,7 +124,7 @@ const Login: React.FC = () => {
             {loading ? '🔄 Entering...' : '⚔️ Enter Castle'}
           </button>
 
-          <p className='mt-6 text-center text-amber-200 font-serif'>
+          <p className='mt-6 text-center text-1xl font-bold text-amber-200 drop-shadow-[0_0_3px_black]'>
             No account yet?{' '}
             <a href="/register" className='text-amber-100 hover:text-yellow-300 underline font-bold'>
               Join the realm

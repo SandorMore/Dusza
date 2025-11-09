@@ -191,11 +191,11 @@ router.post('/decks', auth, async (req, res) => {
   }
 });
 
-// Start battle - Initialize battle and return first round only
+// Start battle
 router.post('/battle', auth, async (req, res) => {
   try {
     console.log('🔍 POST /battle - User:', req.user.username);
-    const { deckId, dungeonId, cardOrder } = req.body;
+    const { deckId, dungeonId } = req.body;
     
     const deck = await PlayerDeck.findById(deckId).populate('cards');
     const dungeon = await Dungeon.findById(dungeonId).populate('cards');
@@ -204,148 +204,15 @@ router.post('/battle', auth, async (req, res) => {
       return res.status(404).json({ message: 'Deck or dungeon not found' });
     }
     
-    // Strict validation: must be 1-1, 4-4, or 6-6
-    const validCounts = [1, 4, 6];
-    if (!validCounts.includes(deck.cards.length) || deck.cards.length !== dungeon.cards.length) {
-      return res.status(400).json({ 
-        message: `Deck and dungeon must both have exactly 1, 4, or 6 cards. Current: ${deck.cards.length} vs ${dungeon.cards.length}` 
-      });
+    if (deck.cards.length !== dungeon.cards.length) {
+      return res.status(400).json({ message: 'Deck size must match dungeon size' });
     }
     
-    // Use custom card order if provided, otherwise use deck's card order
-    let orderedCards = deck.cards;
-    if (cardOrder && Array.isArray(cardOrder) && cardOrder.length === deck.cards.length) {
-      // Reorder cards based on provided order
-      const cardMap = new Map(deck.cards.map(card => [card._id.toString(), card]));
-      orderedCards = cardOrder.map(cardId => cardMap.get(cardId)).filter(Boolean);
-      if (orderedCards.length !== deck.cards.length) {
-        // If order is invalid, use default order
-        orderedCards = deck.cards;
-      }
-    }
+    const battleResult = simulateBattle(deck.cards, dungeon.cards, dungeon.type);
     
-    // Only calculate the first round
-    const firstRound = simulateRound(orderedCards[0], dungeon.cards[0]);
-    
-    // Return battle state with only first round
-    res.json({ 
-      message: 'Battle started', 
-      result: {
-        totalRounds: orderedCards.length,
-        currentRound: 0,
-        rounds: [firstRound],
-        playerWins: null, // Will be determined after all rounds
-        playerReward: null // Will be determined after all rounds
-      }
-    });
+    res.json({ message: 'Battle completed', result: battleResult });
   } catch (error) {
     console.error('Error starting battle:', error);
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Get next round result
-router.post('/battle/next-round', auth, async (req, res) => {
-  try {
-    console.log('🔍 POST /battle/next-round - User:', req.user.username);
-    const { deckId, dungeonId, cardOrder, currentRound } = req.body;
-    
-    if (currentRound === undefined || currentRound < 0) {
-      return res.status(400).json({ message: 'Invalid current round' });
-    }
-    
-    const deck = await PlayerDeck.findById(deckId).populate('cards');
-    const dungeon = await Dungeon.findById(dungeonId).populate('cards');
-    
-    if (!deck || !dungeon) {
-      return res.status(404).json({ message: 'Deck or dungeon not found' });
-    }
-    
-    // Use custom card order if provided
-    let orderedCards = deck.cards;
-    if (cardOrder && Array.isArray(cardOrder) && cardOrder.length === deck.cards.length) {
-      const cardMap = new Map(deck.cards.map(card => [card._id.toString(), card]));
-      orderedCards = cardOrder.map(cardId => cardMap.get(cardId)).filter(Boolean);
-      if (orderedCards.length !== deck.cards.length) {
-        orderedCards = deck.cards;
-      }
-    }
-    
-    const nextRoundIndex = currentRound + 1;
-    
-    if (nextRoundIndex >= orderedCards.length) {
-      return res.status(400).json({ message: 'No more rounds available' });
-    }
-    
-    // Calculate next round
-    const nextRound = simulateRound(orderedCards[nextRoundIndex], dungeon.cards[nextRoundIndex]);
-    
-    res.json({ 
-      message: 'Next round calculated', 
-      round: nextRound,
-      roundIndex: nextRoundIndex
-    });
-  } catch (error) {
-    console.error('Error getting next round:', error);
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// Complete battle - Calculate final result
-router.post('/battle/complete', auth, async (req, res) => {
-  try {
-    console.log('🔍 POST /battle/complete - User:', req.user.username);
-    const { deckId, dungeonId, cardOrder, rounds } = req.body;
-    
-    if (!rounds || !Array.isArray(rounds)) {
-      return res.status(400).json({ message: 'Rounds data required' });
-    }
-    
-    const deck = await PlayerDeck.findById(deckId).populate('cards');
-    const dungeon = await Dungeon.findById(dungeonId).populate('cards');
-    
-    if (!deck || !dungeon) {
-      return res.status(404).json({ message: 'Deck or dungeon not found' });
-    }
-    
-    // Calculate final result
-    const playerWinsCount = rounds.filter(r => r.playerWins).length;
-    const playerWins = playerWinsCount >= Math.ceil(rounds.length / 2);
-    
-    // Determine reward based on dungeon type
-    let playerReward = null;
-    if (playerWins) {
-      if (dungeon.type === 'Egyszerű találkozás') {
-        playerReward = {
-          cardId: null,
-          bonusType: 'damage',
-          bonusAmount: 1
-        };
-      } else if (dungeon.type === 'Kis kazamata') {
-        playerReward = {
-          cardId: null,
-          bonusType: 'health',
-          bonusAmount: 2
-        };
-      } else if (dungeon.type === 'Nagy kazamata') {
-        playerReward = {
-          cardId: null,
-          bonusType: 'damage',
-          bonusAmount: 3
-        };
-      }
-    }
-    
-    res.json({ 
-      message: 'Battle completed', 
-      result: {
-        playerWins,
-        rounds,
-        playerReward
-      }
-    });
-  } catch (error) {
-    console.error('Error completing battle:', error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -529,42 +396,49 @@ router.post('/apply-reward', auth, async (req, res) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
     
-    // Find the card directly from WorldCard collection (allow upgrading any card)
-    const card = await WorldCard.findById(cardId);
+    // Find all collections for this user
+    const collections = await PlayerCollection.find({ createdBy: req.user._id }).populate('cards');
     
-    if (!card) {
-      console.log('❌ Card not found');
-      return res.status(404).json({ message: 'Card not found' });
+    let cardUpdated = false;
+    let updatedCard = null;
+    
+    // Search through all collections for the card
+    for (const collection of collections) {
+      const card = collection.cards.find(c => c._id.toString() === cardId);
+      
+      if (card) {
+        console.log('🔍 Found card in collection:', collection.name);
+        console.log('🔍 Card before update:', card.name, 'DMG:', card.damage, 'HP:', card.health);
+        
+        // Update the card
+        if (bonusType === 'damage') {
+          card.damage += bonusAmount;
+        } else if (bonusType === 'health') {
+          card.health += bonusAmount;
+        }
+        
+        console.log('🔍 Card after update:', card.name, 'DMG:', card.damage, 'HP:', card.health);
+        
+        // ✅ FIX: Save the WorldCard document directly, not just the collection
+        // Since PlayerCollection stores cards as references, we need to save the WorldCard document
+        await card.save();
+        
+        cardUpdated = true;
+        updatedCard = {
+          id: card._id,
+          name: card.name,
+          damage: card.damage,
+          health: card.health,
+          type: card.type
+        };
+        break;
+      }
     }
     
-    // Check if card is a base card (not a leader card derived from another card)
-    // Players can upgrade any base card they have access to
-    if (card.isLeader && card.originalCard) {
-      // If it's a leader card, we might want to upgrade the original instead
-      // But for now, allow upgrading any card
+    if (!cardUpdated) {
+      console.log('❌ Card not found in any collection');
+      return res.status(404).json({ message: 'Card not found in your collections' });
     }
-    
-    console.log('🔍 Card before update:', card.name, 'DMG:', card.damage, 'HP:', card.health);
-    
-    // Update the card
-    if (bonusType === 'damage') {
-      card.damage += bonusAmount;
-    } else if (bonusType === 'health') {
-      card.health += bonusAmount;
-    }
-    
-    console.log('🔍 Card after update:', card.name, 'DMG:', card.damage, 'HP:', card.health);
-    
-    // Save the WorldCard document
-    await card.save();
-    
-    const updatedCard = {
-      id: card._id,
-      name: card.name,
-      damage: card.damage,
-      health: card.health,
-      type: card.type
-    };
     
     console.log('✅ Reward applied successfully');
     res.json({

@@ -2,6 +2,21 @@
 import React, { useState, useRef, useEffect } from 'react'
 import type { WorldCard, PlayerDeck, Dungeon, BattleResult, BattleRound } from '../types/game'
 import AnimatedBattleView from '../components/AnimatedBattleView'
+import type { DragEndEvent } from '@dnd-kit/core'
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 interface BattlefieldTabProps {
   playerDecks: PlayerDeck[]
@@ -12,7 +27,7 @@ interface BattlefieldTabProps {
   setSelectedDungeon: (dungeon: Dungeon | null) => void
   battleResult: BattleResult | null
   setBattleResult: (result: BattleResult | null) => void
-  startBattle: () => Promise<void>
+  startBattle: (cardOrder: string[]) => Promise<void>
   applyReward: (cardId: string) => Promise<void>
   availableCards: WorldCard[]
   allGameCards: WorldCard[]
@@ -21,6 +36,43 @@ interface BattlefieldTabProps {
   getTypeEmoji: (type: string) => string
   getDungeonColor: (type: string) => string
   getCardRarityColor: (card: WorldCard) => string
+}
+
+const SortableCard: React.FC<{
+  card: WorldCard
+  index: number
+  getTypeColor: (t: string) => string
+  getTypeEmoji: (t: string) => string
+}> = ({ card, index, getTypeColor, getTypeEmoji }) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: card._id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="flex justify-between items-center p-4 bg-gray-700 rounded-xl border-2 border-blue-500 cursor-grab active:cursor-grabbing"
+    >
+      <div className="flex items-center space-x-3 flex-1">
+        <span className="text-amber-300 w-6">{index + 1}.</span>
+        <span className="font-bold text-amber-100">{card.name}</span>
+      </div>
+      <div className="text-sm text-amber-300">
+        <span className={`px-2 py-1 rounded-lg ${getTypeColor(card.type)}`}>
+          {getTypeEmoji(card.type)}
+        </span>
+        <span className="mx-2 text-red-300">⚔️{card.damage}</span>
+        <span className="text-green-300">❤️{card.health}</span>
+      </div>
+    </div>
+  )
 }
 
 const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
@@ -54,29 +106,25 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
     }
   }, [selectedDeck])
 
-  const moveCardUp = (index: number) => {
-    if (index === 0) return
-    const newCards = [...previewDeckCards]
-    const temp = newCards[index]
-    newCards[index] = newCards[index - 1]
-    newCards[index - 1] = temp
-    setPreviewDeckCards(newCards)
-    // Update selectedDeck with new order
-    if (selectedDeck) {
-      setSelectedDeck({ ...selectedDeck, cards: newCards })
-    }
-  }
-
-  const moveCardDown = (index: number) => {
-    if (index === previewDeckCards.length - 1) return
-    const newCards = [...previewDeckCards]
-    const temp = newCards[index]
-    newCards[index] = newCards[index + 1]
-    newCards[index + 1] = temp
-    setPreviewDeckCards(newCards)
-    // Update selectedDeck with new order
-    if (selectedDeck) {
-      setSelectedDeck({ ...selectedDeck, cards: newCards })
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    })
+  )
+  
+  // DnD reorder handler
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (over && active.id !== over.id) {
+      const oldIndex = previewDeckCards.findIndex(card => card._id === active.id)
+      const newIndex = previewDeckCards.findIndex(card => card._id === over.id)
+      const newCards = arrayMove(previewDeckCards, oldIndex, newIndex)
+      setPreviewDeckCards(newCards)
+      if (selectedDeck) {
+        setSelectedDeck({ ...selectedDeck, cards: newCards })
+      }
     }
   }
 
@@ -216,7 +264,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
     <div className="space-y-8">
       {/* Battle Preparation */}
       {!battleResult && (
-        <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
+        <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 ">
           <h2 className="text-2xl font-bold text-amber-100 font-serif mb-8 text-center">⚔️ Prepare for Battle</h2>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -224,7 +272,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
             <div className="space-y-6">
               <h3 className="font-bold text-xl text-amber-200 font-serif">🛡️ Choose Your War Formation</h3>
               {playerDecks.length === 0 ? (
-                <div className="p-8 border-4 border-dashed border-amber-500 rounded-2xl text-center bg-gray-700/30">
+                <div className="p-8 rounded-2xl text-center bg-gray-700/30">
                   <p className="text-amber-300 mb-4 text-lg">No formations available</p>
                   <button
                     onClick={() => setActiveTab('decks')}
@@ -241,7 +289,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                       className={`p-5 border-4 rounded-2xl cursor-pointer transition-all ${
                         selectedDeck?._id === deck._id 
                           ? 'border-amber-400 bg-amber-900/30 shadow-2xl' 
-                          : 'border-amber-600 bg-gray-700/50 hover:border-amber-400'
+                          : ' bg-gray-700/50 hover:border-amber-600'
                       }`}
                       onClick={() => setSelectedDeck(deck)}
                     >
@@ -302,43 +350,30 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
               <h3 className="font-bold text-2xl text-amber-100 font-serif mb-6 text-center">🎯 Battle Preview</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                  <h4 className="font-bold text-blue-300 text-xl mb-4 font-serif">🛡️ Your Formation</h4>
-                  <p className="text-amber-300 text-sm mb-3">Reorder your warriors by clicking the arrows:</p>
-                  <div className="space-y-3">
-                    {previewDeckCards.map((card: WorldCard, index: number) => (
-                      <div key={card._id} className="flex justify-between items-center p-4 bg-gray-700 rounded-xl border-2 border-blue-500">
-                        <div className="flex items-center space-x-3 flex-1">
-                          <div className="flex flex-col space-y-1">
-                            <button
-                              onClick={() => moveCardUp(index)}
-                              disabled={index === 0}
-                              className="text-amber-300 hover:text-amber-100 disabled:text-gray-600 disabled:cursor-not-allowed text-xs"
-                              title="Move up"
-                            >
-                              ▲
-                            </button>
-                            <button
-                              onClick={() => moveCardDown(index)}
-                              disabled={index === previewDeckCards.length - 1}
-                              className="text-amber-300 hover:text-amber-100 disabled:text-gray-600 disabled:cursor-not-allowed text-xs"
-                              title="Move down"
-                            >
-                              ▼
-                            </button>
-                          </div>
-                          <span className="text-amber-300 w-6">{index + 1}.</span>
-                          <span className="font-bold text-amber-100">{card.name}</span>
-                        </div>
-                        <div className="text-sm text-amber-300">
-                          <span className={`px-2 py-1 rounded-lg ${getTypeColor(card.type)}`}>
-                            {getTypeEmoji(card.type)}
-                          </span>
-                          <span className="mx-2 text-red-300">⚔️{card.damage}</span>
-                          <span className="text-green-300">❤️{card.health}</span>
-                        </div>
+                  <h4 className="font-bold text-blue-300 text-xl mb-4 font-serif">🛡️ Your Formation (Drag and drop)</h4>
+                  <p className="text-amber-300 text-sm mb-3"></p>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={previewDeckCards.map(c => c._id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div className="space-y-3">
+                        {previewDeckCards.map((card, index) => (
+                          <SortableCard
+                            key={card._id}
+                            card={card}
+                            index={index}
+                            getTypeColor={getTypeColor}
+                            getTypeEmoji={getTypeEmoji}
+                          />
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </SortableContext>
+                  </DndContext>
                 </div>
                 <div>
                   <h4 className="font-bold text-red-300 text-xl mb-4 font-serif">🏰 Dungeon Guardians</h4>
@@ -528,4 +563,4 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
   )
 }
 
-export default BattlefieldTab
+export default BattlefieldTab 

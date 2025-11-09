@@ -31,7 +31,7 @@ const RoyalArchivesTab: React.FC<RoyalArchivesTabProps> = ({
   }
 
   return (
-    <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
+    <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 ">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-2xl font-bold text-amber-100 font-serif">📜 Royal Archives</h2>
         <div className="flex space-x-4">
@@ -61,7 +61,7 @@ const RoyalArchivesTab: React.FC<RoyalArchivesTabProps> = ({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {availableCards.map((card: WorldCard) => (
-            <div key={card._id} className={`border-2 rounded-2xl p-5 transition-all transform hover:scale-105 ${getCardRarityColor(card)} border-amber-500 hover:shadow-2xl`}>
+            <div key={card._id} className={`border-2 rounded-2xl p-5 transition-all transform hover:scale-105 ${getCardRarityColor(card)} hover:shadow-2xl`}>
               <div className="flex justify-between items-start mb-4">
                 <h3 className="font-bold text-amber-100 text-lg">{card.name}</h3>
                 <span className={`px-3 py-1 rounded-lg text-sm font-bold ${getTypeColor(card.type)}`}>

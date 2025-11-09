@@ -16,11 +16,12 @@ import Asd from '../pages/asd'
 import BattlefieldTab from '../pages/BattlefieldTab'
 import RoyalArchivesTab from '../pages/RoyalArchivesTab'
 import KingdomLoreTab from '../pages/KingdomLoreTab'
+import AboutTab from './about'
 
 const FightPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const tabParam = searchParams.get('tab') as 'decks' | 'battle' | 'collection' | 'allcards' | null
-  const [activeTab, setActiveTab] = useState<'decks' | 'battle' | 'collection' | 'allcards'>(
+  const [activeTab, setActiveTab] = useState<'decks' | 'battle' | 'collection' | 'allcards'| 'about'>(
     tabParam && ['decks', 'battle', 'collection', 'allcards'].includes(tabParam) ? tabParam : 'decks'
   )
   const [playerDecks, setPlayerDecks] = useState<PlayerDeck[]>([])
@@ -69,7 +70,7 @@ const FightPage: React.FC = () => {
   }, [searchParams])
 
   // Update URL when active tab changes (but only if it's a valid tab)
-  const handleTabChange = (tab: 'decks' | 'battle' | 'collection' | 'allcards') => {
+  const handleTabChange = (tab: 'decks' | 'battle' | 'collection' | 'allcards'| 'about') => {
     setActiveTab(tab)
     setSearchParams({ tab })
   }
@@ -289,15 +290,16 @@ const FightPage: React.FC = () => {
         </div>
       </header>
 
-      {/* Medieval Navigation Tabs */}
-      <div className="bg-gradient-to-r from-amber-700 to-amber-800 border-b-4 border-amber-600">
+      
+      <div className="bg-gradient-to-r from-amber-700 to-amber-800">
         <div className="max-w-1xl mx-auto">
           <nav className="flex justify-center space-x-6">
             {[
               { id: 'decks' as const, label: ` War Formations (${playerDecks.length})`, icon: '🛡️' },
               { id: 'battle' as const, label: ' Battlefield', icon: '⚔️' },
               { id: 'collection' as const, label: ` Royal Archives (${availableCards.length})`, icon: '📜' },
-              { id: 'allcards' as const, label: ` Kingdom Lore (${allGameCards.length})`, icon: '🏰' }
+              { id: 'allcards' as const, label: ` Kingdom Lore (${allGameCards.length})`, icon: '🏰' },
+              { id: 'about' as const, label: ' About', icon: '📖' }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -401,6 +403,10 @@ const FightPage: React.FC = () => {
                 getDungeonColor={getDungeonColor}
                 getCardRarityColor={getCardRarityColor}
               />
+            )}
+
+            {activeTab === 'about' && (
+              <AboutTab version="1.0.0" />
             )}
           </>
         )}

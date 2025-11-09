@@ -67,7 +67,7 @@ const WarFormationsTab: React.FC<WarFormationsTabProps> = ({
                 </span>
               )}
             </label>
-            <div className="border-2 border-amber-500 rounded-xl p-6 max-h-96 overflow-y-auto bg-gray-700/50">
+            <div className="border-2  rounded-xl p-6 max-h-96 overflow-y-auto bg-gray-700/50">
               {availableCards.length === 0 ? (
                 <div className="text-center py-12 text-amber-300">
                   <p className="text-xl mb-4">No base warriors available</p>
@@ -81,7 +81,7 @@ const WarFormationsTab: React.FC<WarFormationsTabProps> = ({
                       className={`p-4 border-2 rounded-xl cursor-pointer transition-all transform hover:scale-105 ${
                         selectedCardsForDeck.includes(card._id)
                           ? 'border-amber-400 bg-amber-900/30 shadow-lg'
-                          : `${getCardRarityColor(card)} border-amber-600 hover:border-amber-400`
+                          : `${getCardRarityColor(card)} hover:border-amber-400`
                       }`}
                       onClick={() => toggleCardForDeck(card._id)}
                     >
@@ -122,7 +122,7 @@ const WarFormationsTab: React.FC<WarFormationsTabProps> = ({
       </div>
 
       {/* Existing War Formations */}
-      <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
+      <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 ">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-amber-100 font-serif">My War Formations</h2>
           <span className="text-amber-200 font-bold">
@@ -143,7 +143,7 @@ const WarFormationsTab: React.FC<WarFormationsTabProps> = ({
                 className={`border-4 rounded-2xl p-6 cursor-pointer transition-all transform hover:scale-105 ${
                   selectedDeck?._id === deck._id 
                     ? 'border-amber-400 bg-amber-900/30 shadow-2xl' 
-                    : 'border-amber-600 bg-gray-700/50 hover:border-amber-400 hover:shadow-lg'
+                    : ' bg-gray-700/50 hover:border-amber-600 hover:shadow-lg'
                 }`}
                 onClick={() => setSelectedDeck(deck)}
               >
