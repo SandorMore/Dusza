@@ -16,11 +16,10 @@ const KingdomLoreTab: React.FC<KingdomLoreTabProps> = ({
   allGameDungeons,
   getTypeColor,
   getTypeEmoji,
-  getDungeonColor,
-  getCardRarityColor
+  getDungeonColor
 }) => {
   return (
-    <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4">
+    <div className="bg-linear-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-2xl font-bold text-amber-100 font-serif">🏰 Kingdom Lore ({allGameCards.length})</h2>
         <div className="text-amber-200 font-bold">
@@ -56,7 +55,7 @@ const KingdomLoreTab: React.FC<KingdomLoreTabProps> = ({
                     <span>Commanders: {dungeon.cards.filter(c => c.isLeader).length}</span>
                   </div>
                   <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {dungeon.cards.map((card: WorldCard, index: number) => (
+                    {dungeon.cards.map((card: WorldCard) => (
                       <div key={card._id} className="flex justify-between items-center p-2 bg-purple-700 rounded-lg text-xs">
                         <span className="font-bold text-amber-100">{card.name}</span>
                         <span className="text-amber-300">

@@ -88,14 +88,11 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
   setBattleResult,
   startBattle,
   applyReward,
-  availableCards,
-  allGameCards,
   playerOwnedCards,
   setActiveTab,
   getTypeColor,
   getTypeEmoji,
-  getDungeonColor,
-  getCardRarityColor
+  getDungeonColor
 }) => {
   const [showAnimatedBattle, setShowAnimatedBattle] = useState(false)
   const [showUpgradePage, setShowUpgradePage] = useState(false)

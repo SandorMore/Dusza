@@ -8,8 +8,7 @@ import type {
   Dungeon,
   PlayerDeck,
   PlayerCollection,
-  BattleResult,
-  BattleRound
+  BattleResult
 } from '../types/game'
 import type { User } from '../types/auth'
 import Asd from '../pages/asd'
