@@ -55,10 +55,10 @@ const WorldCardCreator: React.FC<Props> = ({ onCardCreated }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold mb-4">Create World Card</h2>
+      <h2 className="text-xl font-semibold mb-4">Világ kártya létrehozás</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Card Name</label>
+          <label className="block text-sm font-medium text-gray-700">Kártya neve</label>
           <input
             name="name"
             type="text"
@@ -66,13 +66,13 @@ const WorldCardCreator: React.FC<Props> = ({ onCardCreated }) => {
             value={formData.name}
             onChange={handleInputChange}
             className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-violet-500 focus:border-violet-500"
-            placeholder="Enter card name"
+            placeholder="Add meg a kártya nevét"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Damage</label>
+            <label className="block text-sm font-medium text-gray-700">Sebzés</label>
             <input
               name="damage"
               type="number"
@@ -85,7 +85,7 @@ const WorldCardCreator: React.FC<Props> = ({ onCardCreated }) => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Health</label>
+            <label className="block text-sm font-medium text-gray-700">Életerő</label>
             <input
               name="health"
               type="number"
@@ -100,7 +100,7 @@ const WorldCardCreator: React.FC<Props> = ({ onCardCreated }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Type</label>
+          <label className="block text-sm font-medium text-gray-700">Típus</label>
           <select
             value={formData.type}
             onChange={handleSelectChange}
@@ -118,7 +118,7 @@ const WorldCardCreator: React.FC<Props> = ({ onCardCreated }) => {
           disabled={loading}
           className="w-full bg-violet-500 text-white py-2 px-4 rounded-md hover:bg-violet-600 disabled:bg-gray-400 transition-colors"
         >
-          {loading ? 'Creating...' : 'Create Card'}
+          {loading ? 'Folyamatban...' : 'Kártya létrehozása'}
         </button>
 
         {message && (

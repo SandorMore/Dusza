@@ -334,24 +334,23 @@ const FightPage: React.FC = () => {
 
             {activeTab === 'battle' && (
               <BattlefieldTab
-                playerDecks={playerDecks}
-                dungeons={dungeons}
-                selectedDeck={selectedDeck}
-                setSelectedDeck={setSelectedDeck}
-                selectedDungeon={selectedDungeon}
-                setSelectedDungeon={setSelectedDungeon}
-                battleResult={battleResult}
-                setBattleResult={setBattleResult}
-                startBattle={startBattle}
-                applyReward={applyReward}
-                availableCards={availableCards}
-                allGameCards={allGameCards}
-                setActiveTab={handleTabChange}
-                getTypeColor={getTypeColor}
-                getTypeEmoji={getTypeEmoji}
-                getDungeonColor={getDungeonColor}
-                getCardRarityColor={getCardRarityColor}
-              />
+                  playerDecks={playerDecks}
+                  dungeons={dungeons}
+                  selectedDeck={selectedDeck}
+                  setSelectedDeck={setSelectedDeck}
+                  selectedDungeon={selectedDungeon}
+                  setSelectedDungeon={setSelectedDungeon}
+                  battleResult={battleResult}
+                  setBattleResult={setBattleResult}
+                  startBattle={startBattle}
+                  applyReward={applyReward}
+                  availableCards={availableCards}
+                  allGameCards={allGameCards}
+                  setActiveTab={handleTabChange}
+                  getTypeColor={getTypeColor}
+                  getTypeEmoji={getTypeEmoji}
+                  getDungeonColor={getDungeonColor}
+                  getCardRarityColor={getCardRarityColor} playerOwnedCards={[]}              />
             )}
 
             {activeTab === 'collection' && (

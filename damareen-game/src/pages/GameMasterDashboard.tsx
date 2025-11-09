@@ -95,7 +95,7 @@ const GameMasterDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-amber-100">
+    <div className="min-h-screen bg-[url('/assets/paper-1074131_1280.png')] bg-cover bg-center">
       {/* Medieval Header */}
       <header className="bg-gradient-to-r from-amber-800 to-amber-900 shadow-2xl border-b-4 border-amber-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -32,6 +32,7 @@ interface BattlefieldTabProps {
   applyReward: (cardId: string) => Promise<void>
   availableCards: WorldCard[]
   allGameCards: WorldCard[]
+  playerOwnedCards: WorldCard[]
   setActiveTab: (tab: 'decks' | 'battle' | 'collection' | 'allcards') => void
   getTypeColor: (type: string) => string
   getTypeEmoji: (type: string) => string
@@ -89,6 +90,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
   applyReward,
   availableCards,
   allGameCards,
+  playerOwnedCards,
   setActiveTab,
   getTypeColor,
   getTypeEmoji,
@@ -100,17 +102,6 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
   const resultsRef = useRef<HTMLDivElement>(null)
   const [previewDeckCards, setPreviewDeckCards] = useState<WorldCard[]>([])
   const navigate = useNavigate()
-
-  const handleApplyReward = async (cardId: string) => {
-    try {
-      await applyReward(cardId)
-      setTimeout(() => {
-        setShowUpgradePage(false)
-        setBattleResult(null)
-      }, 1000)
-    } catch (error) {
-    }
-  }
 
   // Initialize preview deck cards when selectedDeck changes
   useEffect(() => {
@@ -141,6 +132,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
     }
   }
 
+  // Show animated battle when battleResult is first set
   useEffect(() => {
     if (battleResult && !showAnimatedBattle && !showUpgradePage) {
       setShowAnimatedBattle(true)
@@ -191,18 +183,18 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
       <div className="min-h-screen py-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="bg-gradient-to-br from-yellow-800 to-orange-900 rounded-2xl shadow-2xl p-8 border-4 border-yellow-600">
-            <h2 className="text-3xl font-bold text-amber-100 font-serif mb-4 text-center">⚜️ Győzelmi Zsákmány!</h2>
+            <h2 className="text-3xl font-bold text-amber-100 font-serif mb-4 text-center">⚜️ Victory Spoils!</h2>
             <p className="text-center mb-8 text-amber-200 text-xl">
-              Kerestél <span className="font-bold text-yellow-300 text-2xl">+{battleResult.playerReward.bonusAmount} {battleResult.playerReward.bonusType === 'damage' ? 'sebzés' : 'életerő'}</span>!
+              You earned <span className="font-bold text-yellow-300 text-2xl">+{battleResult.playerReward.bonusAmount} {battleResult.playerReward.bonusType}</span>!
             </p>
             <p className="text-center mb-8 text-amber-100 text-lg">
-              Válassz egy harcost, akire ezt az áldást ruházod:
+              Choose a warrior to bestow this boon upon:
             </p>
             
-            {availableCards.filter(card => !card.isLeader).length === 0 ? (
+            {playerOwnedCards.filter(card => !card.isLeader).length === 0 ? (
               <div className="text-center p-8 bg-gray-700/50 rounded-xl border-2 border-yellow-500">
-                <p className="text-amber-300 text-lg mb-4">Nincs elérhető harcos a fejlesztéshez</p>
-                <p className="text-amber-400 text-sm">Nincs kártyád a gyűjteményedben!</p>
+                <p className="text-amber-300 text-lg mb-4">No warriors available to upgrade</p>
+                <p className="text-amber-400 text-sm">You don't have any cards in your collection!</p>
                 <button
                   onClick={() => {
                     setShowUpgradePage(false)
@@ -210,16 +202,16 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                   }}
                   className="mt-6 bg-amber-600 hover:bg-amber-700 text-amber-100 px-8 py-3 rounded-xl transition-all border-2 border-amber-500 font-bold"
                 >
-                  🛡️ Vissza a Formációkhoz
+                  🛡️ Return to Formations
                 </button>
               </div>
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                  {availableCards.filter(card => !card.isLeader).map((card: WorldCard) => (
+                  {playerOwnedCards.filter(card => !card.isLeader).map((card: WorldCard) => (
                     <button
                       key={card._id}
-                      onClick={() => handleApplyReward(card._id)}
+                      onClick={() => applyReward(card._id)}
                       className="p-6 rounded-xl text-left bg-gradient-to-br from-gray-700 to-gray-800 hover:from-yellow-900/50 hover:to-orange-900/50 transition-all transform hover:scale-105 shadow-lg"
                     >
                       <div className="flex items-center justify-between mb-4">
@@ -231,18 +223,18 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                       <div className="space-y-3">
                         <div className="text-amber-300 text-sm">
                           <div className="flex justify-between items-center mb-1">
-                            <span>Jelenlegi Sebzés:</span>
+                            <span>Current Damage:</span>
                             <span className="font-bold">⚔️{card.damage}</span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span>Jelenlegi Életerő:</span>
+                            <span>Current Health:</span>
                             <span className="font-bold">❤️{card.health}</span>
                           </div>
                         </div>
                         <div className="border-t-2 border-yellow-500 pt-3">
                           <div className="text-green-300 font-bold text-sm">
                             <div className="flex justify-between items-center mb-1">
-                              <span>Fejlesztés Után:</span>
+                              <span>After Upgrade:</span>
                               <span className="text-lg">
                                 ⚔️{card.damage + (battleResult.playerReward?.bonusType === 'damage' ? battleResult.playerReward.bonusAmount : 0)} 
                                 {' '}❤️{card.health + (battleResult.playerReward?.bonusType === 'health' ? battleResult.playerReward.bonusAmount : 0)}
@@ -259,7 +251,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                     onClick={() => navigate("/player")}
                     className="bg-gray-600 hover:bg-gray-700 text-amber-100 px-8 py-3 rounded-xl transition-all border-2 border-gray-500 font-bold"
                   >
-                    Fejlesztés Kihagyása
+                    Fejlesztés kihagyása
                   </button>
                 </div>
               </>
@@ -275,19 +267,20 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
       {/* Battle Preparation */}
       {!battleResult && (
         <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 ">
-          <h2 className="text-2xl font-bold text-amber-100 font-serif mb-8 text-center">⚔️ Csata Előkészítése</h2>
+          <h2 className="text-2xl font-bold text-amber-100 font-serif mb-8 text-center">⚔️Készülj a harcra!</h2>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* War Formation Selection */}
             <div className="space-y-6">
-              <h3 className="font-bold text-xl text-amber-200 font-serif">🛡️ Válaszd ki a Harci Formációdat</h3>
+              <h3 className="font-bold text-xl text-amber-200 font-serif">🛡️ Válaszd ki a felállásod</h3>
               {playerDecks.length === 0 ? (
                 <div className="p-8 rounded-2xl text-center bg-gray-700/30">
-                  <p className="text-amber-300 mb-4 text-lg">Nincs elérhető formáció</p>
+                  <p className="text-amber-300 mb-4 text-lg">Nincs elérhető felállás</p>
                   <button
                     onClick={() => setActiveTab('decks')}
                     className="bg-amber-600 hover:bg-amber-700 text-amber-100 px-6 py-3 rounded-xl transition-all border-2 border-amber-500 font-bold"
                   >
-                    Kovácsold az Első Formációdat
+                    Készítsd el az első paklid
                   </button>
                 </div>
               ) : (
@@ -305,10 +298,10 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                       <div className="flex justify-between items-center">
                         <div>
                           <h4 className="font-bold text-amber-100 text-lg">{deck.name}</h4>
-                          <p className="text-amber-300">{deck.cards.length} harcos</p>
+                          <p className="text-amber-300">{deck.cards.length} harcosok</p>
                         </div>
                         {selectedDeck?._id === deck._id && (
-                          <span className="bg-amber-600 text-amber-100 text-sm px-3 py-1 rounded-lg font-bold">Kiválasztva</span>
+                          <span className="bg-amber-600 text-amber-100 text-sm px-3 py-1 rounded-lg font-bold">Kiválasztott</span>
                         )}
                       </div>
                     </div>
@@ -317,11 +310,12 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
               )}
             </div>
 
+            {/* Dungeon Selection */}
             <div className="space-y-6">
-              <h3 className="font-bold text-xl text-amber-200 font-serif">🏰 Válaszd ki a Hódításodat</h3>
+              <h3 className="font-bold text-xl text-amber-200 font-serif">🏰 Válassza a hódítását</h3>
               {dungeons.length === 0 ? (
                 <div className="p-8 border-4 border-dashed border-amber-500 rounded-2xl text-center bg-gray-700/30">
-                  <p className="text-amber-300">Nincs elérhető kazamata a hódításhoz</p>
+                  <p className="text-amber-300">Nincsenek meghódítható kazamaták</p>
                 </div>
               ) : (
                 <div className="space-y-4 max-h-96 overflow-y-auto">
@@ -339,10 +333,10 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                         <div>
                           <h4 className="font-bold text-amber-100 text-lg">{dungeon.name}</h4>
                           <p className="text-amber-300 capitalize">{dungeon.type}</p>
-                          <p className="text-amber-400 text-sm">{dungeon.cards.length} őrző</p>
+                          <p className="text-amber-400 text-sm">{dungeon.cards.length} védelmezők</p>
                         </div>
                         {selectedDungeon?._id === dungeon._id && (
-                          <span className="bg-amber-600 text-amber-100 text-sm px-3 py-1 rounded-lg font-bold">Kiválasztva</span>
+                          <span className="bg-amber-600 text-amber-100 text-sm px-3 py-1 rounded-lg font-bold">Chosen</span>
                         )}
                       </div>
                     </div>
@@ -352,12 +346,13 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
             </div>
           </div>
 
+          {/* Battle Preview */}
           {selectedDeck && selectedDungeon && (
             <div className=" mt-8 p-8 rounded-2xl border-4 border-">
-              <h3 className="font-bold text-2xl text-amber-100 font-serif mb-6 text-center">🎯 Csata Előnézet</h3>
+              <h3 className="font-bold text-2xl text-amber-100 font-serif mb-6 text-center">🎯 Csata előnézete</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                  <h4 className="font-bold text-blue-300 text-xl mb-4 font-serif">🛡️ A Formációd (Húzd és ejtsd)</h4>
+                  <h4 className="font-bold text-blue-300 text-xl mb-4 font-serif">🛡️ A formációd (Drag and drop)</h4>
                   <p className="text-amber-300 text-sm mb-3"></p>
                   <DndContext
                     sensors={sensors}
@@ -383,7 +378,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                   </DndContext>
                 </div>
                 <div>
-                  <h4 className="font-bold text-red-300 text-xl mb-4 font-serif">🏰 Kazamata Őrzői</h4>
+                  <h4 className="font-bold text-red-300 text-xl mb-4 font-serif">🏰 Dungeon őrök</h4>
                   <div className="space-y-3">
                     {selectedDungeon.cards.map((card: WorldCard, index: number) => (
                       <div key={card._id} className="flex justify-between items-center p-4 bg-gray-700 rounded-xl border-2 border-red-500">
@@ -409,14 +404,14 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
               
               <div className="mt-6 text-center">
                 <div className="text-amber-300 text-lg mb-4 font-bold">
-                  {selectedDeck.cards.length} vs {selectedDungeon.cards.length} harcos
+                  {selectedDeck.cards.length} vs {selectedDungeon.cards.length} warriors
                 </div>
                 <button
                   onClick={() => startBattle(previewDeckCards.map(card => card._id))}
                   disabled={!selectedDeck || !selectedDungeon || ![1, 4, 6].includes(previewDeckCards.length) || previewDeckCards.length !== selectedDungeon.cards.length}
                   className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-amber-100 py-4 px-12 rounded-2xl disabled:bg-gray-600 transition-all text-xl font-bold border-2 border-red-500 shadow-2xl"
                 >
-                  ⚔️ CSATA KEZDÉSE! ⚔️
+                  ⚔️ COMMENCE BATTLE! ⚔️
                 </button>
               </div>
             </div>
@@ -427,61 +422,66 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
       {/* Battle Results */}
       {battleResult && (
         <div ref={resultsRef} className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
-          <h2 className="text-2xl font-bold text-amber-100 font-serif mb-8 text-center">🏆 Csata Eredmények</h2>
+          <h2 className="text-2xl font-bold text-amber-100 font-serif mb-8 text-center">🏆 Battle Results</h2>
           
+          {/* Overall Result */}
           <div className={`p-8 rounded-2xl mb-8 text-center border-4 ${
             battleResult.playerWins 
               ? 'bg-gradient-to-r from-green-800 to-emerald-900 border-green-600' 
               : 'bg-gradient-to-r from-red-800 to-pink-900 border-red-600'
           }`}>
             <div className="text-3xl font-bold mb-4">
-              {battleResult.playerWins ? '🎉 DICSŐSÉGES GYŐZELEM! 🎉' : '💀 BÁTORSÁGOS VERESÉG! 💀'}
+              {battleResult.playerWins ? '🎉 GLORIOUS VICTORY! 🎉' : '💀 VALIANT DEFEAT! 💀'}
             </div>
             <div className="text-xl text-amber-100">
-              {battleResult.rounds.filter(r => r.playerWins).length} ütközetet nyertél {battleResult.rounds.length}-ből
+              You claimed {battleResult.rounds.filter(r => r.playerWins).length} out of {battleResult.rounds.length} engagements
             </div>
           </div>
 
+          {/* Engagement Details */}
           <div className="space-y-6 mb-8">
-            <h3 className="font-bold text-2xl text-amber-200 font-serif text-center">📜 Csata Ütközetei</h3>
+            <h3 className="font-bold text-2xl text-amber-200 font-serif text-center">📜 Battle Engagements</h3>
             {battleResult.rounds.map((round: BattleRound, index: number) => (
               <div key={index} className="border-2 border-amber-500 rounded-2xl p-6 bg-gray-700/50">
                 <div className="text-lg font-bold mb-4 text-center bg-amber-900/30 py-3 rounded-xl text-amber-100">
-                  Ütközet {index + 1}
+                  Engagement {index + 1}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                  {/* Your Warrior */}
                   <div className="text-center p-4 bg-gray-600 rounded-xl border-2 border-blue-500">
                     <div className="font-bold text-blue-300 text-lg">{round.playerCard.name}</div>
                     <div className="mt-3 space-y-2">
-                      <div>⚔️ Erő: {round.playerCard.damage}</div>
-                      <div>❤️ Élet: {round.playerCard.health}</div>
+                      <div>⚔️ Might: {round.playerCard.damage}</div>
+                      <div>❤️ Resilience: {round.playerCard.health}</div>
                       <div className={`px-3 py-1 rounded-lg font-bold inline-block ${getTypeColor(round.playerCard.type)}`}>
                         {getTypeEmoji(round.playerCard.type)} {round.playerCard.type}
                       </div>
                     </div>
                   </div>
                   
+                  {/* Result */}
                   <div className="text-center flex items-center justify-center">
                     <div className={`px-6 py-3 rounded-full font-bold text-lg border-2 ${
                       round.playerWins 
                         ? 'bg-green-800 text-amber-100 border-green-600' 
                         : 'bg-red-800 text-amber-100 border-red-600'
                     }`}>
-                      {round.playerWins ? '✅ GYŐZELEM' : '❌ VERESÉG'}
+                      {round.playerWins ? '✅ VICTORY' : '❌ DEFEAT'}
                     </div>
                   </div>
                   
+                  {/* Dungeon Guardian */}
                   <div className="text-center p-4 bg-gray-600 rounded-xl border-2 border-red-500">
                     <div className="font-bold text-red-300 text-lg">{round.dungeonCard.name}</div>
                     <div className="mt-3 space-y-2">
-                      <div>⚔️ Erő: {round.dungeonCard.damage}</div>
-                      <div>❤️ Élet: {round.dungeonCard.health}</div>
+                      <div>⚔️ Might: {round.dungeonCard.damage}</div>
+                      <div>❤️ Resilience: {round.dungeonCard.health}</div>
                       <div className={`px-3 py-1 rounded-lg font-bold inline-block ${getTypeColor(round.dungeonCard.type)}`}>
                         {getTypeEmoji(round.dungeonCard.type)} {round.dungeonCard.type}
                       </div>
                       {round.dungeonCard.isLeader && (
                         <div className="bg-yellow-700 text-amber-100 text-sm px-2 py-1 rounded-lg mt-2 font-bold">
-                          👑 Őrző Parancsnok
+                          👑 Guardian Commander
                         </div>
                       )}
                     </div>
@@ -494,32 +494,33 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
             ))}
           </div>
 
+          {/* Victory Rewards */}
           {battleResult.playerWins && battleResult.playerReward && (
             <div className="mt-8 p-8 bg-gradient-to-r from-yellow-800 to-orange-900 rounded-2xl border-4 border-yellow-600">
-              <h3 className="font-bold text-2xl text-amber-100 font-serif mb-6 text-center">⚜️ Győzelmi Zsákmány!</h3>
+              <h3 className="font-bold text-2xl text-amber-100 font-serif mb-6 text-center">⚜️ Victory Spoils!</h3>
               <p className="text-center mb-6 text-amber-200 text-lg">
-                Kerestél <span className="font-bold text-yellow-300">+{battleResult.playerReward.bonusAmount} {battleResult.playerReward.bonusType === 'damage' ? 'sebzés' : 'életerő'}</span>!
-                Ruházd ezt az áldást egy harcosodra:
+                You earned <span className="font-bold text-yellow-300">+{battleResult.playerReward.bonusAmount} {battleResult.playerReward.bonusType}</span>!
+                Bestow this boon upon one of your warriors:
               </p>
-              {availableCards.filter(card => !card.isLeader).length === 0 ? (
+              {playerOwnedCards.filter(card => !card.isLeader).length === 0 ? (
                 <div className="text-center p-8 bg-gray-700/50 rounded-xl border-2 border-yellow-500">
-                  <p className="text-amber-300 text-lg mb-4">Nincs elérhető harcos a fejlesztéshez</p>
-                  <p className="text-amber-400 text-sm">Nincs kártyád a gyűjteményedben!</p>
+                  <p className="text-amber-300 text-lg mb-4">No warriors available to upgrade</p>
+                  <p className="text-amber-400 text-sm">You don't have any cards in your collection!</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-80 overflow-y-auto">
-                  {availableCards.filter(card => !card.isLeader).map((card: WorldCard) => (
+                  {playerOwnedCards.filter(card => !card.isLeader).map((card: WorldCard) => (
                     <button
                       key={card._id}
-                      onClick={() => handleApplyReward(card._id)}
+                      onClick={() => applyReward(card._id)}
                       className="p-4 border-2 border-yellow-500 rounded-xl text-left bg-gray-700 hover:bg-yellow-900/30 transition-all"
                     >
                       <div className="font-bold text-amber-100 text-lg">{card.name}</div>
                       <div className="text-amber-300 text-sm mt-2">
-                        Jelenleg: ⚔️{card.damage} ❤️{card.health}
+                        Current: ⚔️{card.damage} ❤️{card.health}
                       </div>
                       <div className="text-green-300 font-bold text-sm mt-2">
-                        Utána: ⚔️{card.damage + (battleResult.playerReward?.bonusType === 'damage' ? battleResult.playerReward.bonusAmount : 0)} ❤️{card.health + (battleResult.playerReward?.bonusType === 'health' ? battleResult.playerReward.bonusAmount : 0)}
+                        After: ⚔️{card.damage + (battleResult.playerReward?.bonusType === 'damage' ? battleResult.playerReward.bonusAmount : 0)} ❤️{card.health + (battleResult.playerReward?.bonusType === 'health' ? battleResult.playerReward.bonusAmount : 0)}
                       </div>
                     </button>
                   ))}
@@ -534,7 +535,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                 onClick={() => setShowUpgradePage(true)}
                 className="bg-yellow-600 hover:bg-yellow-700 text-amber-100 px-8 py-4 rounded-xl transition-all border-2 border-yellow-500 font-bold text-lg"
               >
-                ⚜️ Jutalom Igénylése
+                ⚜️ Claim Rewards
               </button>
             )}
             <button
@@ -546,7 +547,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
               }}
               className="bg-gray-600 hover:bg-gray-700 text-amber-100 px-8 py-4 rounded-xl transition-all border-2 border-gray-500 font-bold text-lg"
             >
-              🔄 Újra Csata
+              🔄 Battle Again
             </button>
             <button
               onClick={() => {
@@ -555,7 +556,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
               }}
               className="bg-amber-600 hover:bg-amber-700 text-amber-100 px-8 py-4 rounded-xl transition-all border-2 border-amber-500 font-bold text-lg"
             >
-              🛡️ Új Formáció Kovácsolása
+              🛡️ Forge New Formation
             </button>
           </div>
         </div>

@@ -13,15 +13,15 @@ const AboutTab: React.FC<AboutTabProps> = ({ version = "1.0.0" }) => {
       </h2>
 
       <p className="mb-4 text-lg leading-relaxed">
-        Üdvözöllek, utazó! Ez a birodalom epikus csaták, ősi mágia és hősies harcosok helye. 
-        Építs hatalmas harci formációkat, hódítsd meg a kazamatákat, és gyűjts legendás harcosokat, hogy a királyság legfélelmetesebb bajnoka válj!
+        Üdvözöllek, utazó! Ez a birodalom a csaták, mágia és harcosok helye. 
+        Építs harci formációkat, hódítsd meg a kazamatákat, és gyűjts legendás harcosokat, hogy a királyság legfélelmetesebb bajnokává válj!
       </p>
 
       <div className="mt-6">
         <h3 className="text-2xl font-bold mb-3">Játék Célja</h3>
         <p className="leading-relaxed">
-          A küldetésed, hogy hatalmas paklikat hozz létre, legyőzd a veszélyes kazamatákat, és fejleszd a kártyáidat, hogy legyőzhetetlen hadsereget alkoss.
-          Minden győzelem áldásokat adhat, amelyek fejlesztik a harcosaidat.
+          A feladatod, hogy paklikat hozz létre, legyőzd a veszélyes kazamatákat, és fejleszd a kártyáidat, hogy verhetetlen hadsereget alkoss.
+          Minden győzelem nyereményeket adhat, amelyek fejlesztik a harcosaidat.
         </p>
       </div>
 
