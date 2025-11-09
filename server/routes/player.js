@@ -83,31 +83,53 @@ router.post('/initialize-starter', auth, async (req, res) => {
       });
     }
     
-    // Get some basic world cards to use as starter cards
-    const starterCards = await WorldCard.find().limit(6);
+    // Get base world cards (non-leader, original cards created by game masters)
+    const baseCards = await WorldCard.find({ 
+      isLeader: false, 
+      originalCard: null 
+    }).limit(6);
     
-    if (starterCards.length === 0) {
+    if (baseCards.length === 0) {
       return res.status(400).json({ 
         message: 'No world cards found. Please create some cards first as Game Master.' 
       });
     }
     
-    // Create starter collection
+    // Create player-specific copies of base cards
+    const playerCardCopies = [];
+    for (const baseCard of baseCards) {
+      const userIdSuffix = req.user._id.toString().slice(-4);
+      const baseName = baseCard.name.length > 12 ? baseCard.name.substring(0, 12) : baseCard.name;
+      const playerCardCopy = new WorldCard({
+        name: `${baseName}-${userIdSuffix}`,
+        damage: baseCard.damage,
+        health: baseCard.health,
+        type: baseCard.type,
+        isLeader: false,
+        originalCard: baseCard._id,
+        boostType: null,
+        createdBy: req.user._id
+      });
+      await playerCardCopy.save();
+      playerCardCopies.push(playerCardCopy._id);
+    }
+    
+    // Create starter collection with player-specific card copies
     const collection = new PlayerCollection({
       name: 'Starter Collection',
-      cards: starterCards.map(card => card._id),
+      cards: playerCardCopies,
       createdBy: req.user._id
     });
     
     await collection.save();
     await collection.populate('cards');
     
-    console.log('✅ Starter collection created with', starterCards.length, 'cards');
+    console.log('✅ Starter collection created with', playerCardCopies.length, 'player-specific card copies');
     
     res.json({
       message: 'Starter collection created successfully!',
       collection: collection,
-      cardsCount: starterCards.length
+      cardsCount: playerCardCopies.length
     });
     
   } catch (error) {
@@ -243,7 +265,14 @@ router.get('/collections', auth, async (req, res) => {
   try {
     console.log('🔍 GET /collections - User:', req.user.username);
     const collections = await PlayerCollection.find({ createdBy: req.user._id }).populate('cards');
-    res.json({ collections: collections || [] });
+    
+    // Also get all player-owned cards (in case they're not in collections)
+    const playerCards = await WorldCard.find({ createdBy: req.user._id });
+    
+    res.json({ 
+      collections: collections || [],
+      playerCards: playerCards || []
+    });
   } catch (error) {
     console.error('Error fetching collections:', error);
     res.status(500).json({ message: error.message });
@@ -331,7 +360,7 @@ function simulateBattle(playerCards, dungeonCards, dungeonType) {
   // Determine reward based on dungeon type
   let playerReward = null;
   if (playerWins) {
-    if (dungeonType === 'Egyszerű találkozás') {
+    if (dungeonType === 'Egyszerű') {
       playerReward = {
         cardId: null, // To be chosen by player
         bonusType: 'damage',
@@ -417,54 +446,77 @@ router.post('/apply-reward', auth, async (req, res) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
     
-    // Find all collections for this user
-    const collections = await PlayerCollection.find({ createdBy: req.user._id }).populate('cards');
+    // Find the card - it should be owned by this user
+    let card = await WorldCard.findOne({ 
+      _id: cardId, 
+      createdBy: req.user._id 
+    });
     
-    let cardUpdated = false;
-    let updatedCard = null;
-    
-    // Search through all collections for the card
-    for (const collection of collections) {
-      const card = collection.cards.find(c => c._id.toString() === cardId);
+    // If card not found or not owned by user, check if it's a base card
+    // In that case, create a player-specific copy
+    if (!card) {
+      const baseCard = await WorldCard.findById(cardId);
+      if (!baseCard) {
+        return res.status(404).json({ message: 'Card not found' });
+      }
       
-      if (card) {
-        console.log('🔍 Found card in collection:', collection.name);
-        console.log('🔍 Card before update:', card.name, 'DMG:', card.damage, 'HP:', card.health);
-        
-        // Update the card
-        if (bonusType === 'damage') {
-          card.damage += bonusAmount;
-        } else if (bonusType === 'health') {
-          card.health += bonusAmount;
-        }
-        
-        console.log('🔍 Card after update:', card.name, 'DMG:', card.damage, 'HP:', card.health);
-        
-        // ✅ FIX: Save the WorldCard document directly, not just the collection
-        // Since PlayerCollection stores cards as references, we need to save the WorldCard document
+      // Check if user already has a copy of this base card
+      const existingCopy = await WorldCard.findOne({
+        originalCard: baseCard._id,
+        createdBy: req.user._id
+      });
+      
+      if (existingCopy) {
+        card = existingCopy;
+      } else {
+        // Create a new player-specific copy
+        const userIdSuffix = req.user._id.toString().slice(-4);
+        const baseName = baseCard.name.length > 12 ? baseCard.name.substring(0, 12) : baseCard.name;
+        card = new WorldCard({
+          name: `${baseName}-${userIdSuffix}`,
+          damage: baseCard.damage,
+          health: baseCard.health,
+          type: baseCard.type,
+          isLeader: baseCard.isLeader,
+          originalCard: baseCard._id,
+          boostType: baseCard.boostType,
+          createdBy: req.user._id
+        });
         await card.save();
         
-        cardUpdated = true;
-        updatedCard = {
-          id: card._id,
-          name: card.name,
-          damage: card.damage,
-          health: card.health,
-          type: card.type
-        };
-        break;
+        // Add to player's collection if they have one
+        const collection = await PlayerCollection.findOne({ createdBy: req.user._id });
+        if (collection) {
+          collection.cards.push(card._id);
+          await collection.save();
+        }
       }
     }
     
-    if (!cardUpdated) {
-      console.log('❌ Card not found in any collection');
-      return res.status(404).json({ message: 'Card not found in your collections' });
+    console.log('🔍 Card before update:', card.name, 'DMG:', card.damage, 'HP:', card.health);
+    
+    // Update the card
+    if (bonusType === 'damage') {
+      card.damage += bonusAmount;
+    } else if (bonusType === 'health') {
+      card.health += bonusAmount;
     }
+    
+    console.log('🔍 Card after update:', card.name, 'DMG:', card.damage, 'HP:', card.health);
+    
+    // Save the card
+    await card.save();
     
     console.log('✅ Reward applied successfully');
     res.json({
       message: 'Reward applied successfully!',
-      card: updatedCard
+      card: {
+        id: card._id,
+        name: card.name,
+        damage: card.damage,
+        health: card.health,
+        type: card.type
+      }
     });
     
   } catch (error) {

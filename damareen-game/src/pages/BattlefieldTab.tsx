@@ -32,6 +32,7 @@ interface BattlefieldTabProps {
   applyReward: (cardId: string) => Promise<void>
   availableCards: WorldCard[]
   allGameCards: WorldCard[]
+  playerOwnedCards: WorldCard[]
   setActiveTab: (tab: 'decks' | 'battle' | 'collection' | 'allcards') => void
   getTypeColor: (type: string) => string
   getTypeEmoji: (type: string) => string
@@ -89,6 +90,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
   applyReward,
   availableCards,
   allGameCards,
+  playerOwnedCards,
   setActiveTab,
   getTypeColor,
   getTypeEmoji,
@@ -189,10 +191,10 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
               Choose a warrior to bestow this boon upon:
             </p>
             
-            {allGameCards.length === 0 ? (
+            {playerOwnedCards.filter(card => !card.isLeader).length === 0 ? (
               <div className="text-center p-8 bg-gray-700/50 rounded-xl border-2 border-yellow-500">
                 <p className="text-amber-300 text-lg mb-4">No warriors available to upgrade</p>
-                <p className="text-amber-400 text-sm">Game Masters must create cards first!</p>
+                <p className="text-amber-400 text-sm">You don't have any cards in your collection!</p>
                 <button
                   onClick={() => {
                     setShowUpgradePage(false)
@@ -206,7 +208,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                  {allGameCards.map((card: WorldCard) => (
+                  {playerOwnedCards.filter(card => !card.isLeader).map((card: WorldCard) => (
                     <button
                       key={card._id}
                       onClick={() => applyReward(card._id)}
@@ -500,14 +502,14 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                 You earned <span className="font-bold text-yellow-300">+{battleResult.playerReward.bonusAmount} {battleResult.playerReward.bonusType}</span>!
                 Bestow this boon upon one of your warriors:
               </p>
-              {allGameCards.length === 0 ? (
+              {playerOwnedCards.filter(card => !card.isLeader).length === 0 ? (
                 <div className="text-center p-8 bg-gray-700/50 rounded-xl border-2 border-yellow-500">
                   <p className="text-amber-300 text-lg mb-4">No warriors available to upgrade</p>
-                  <p className="text-amber-400 text-sm">Game Masters must create cards first!</p>
+                  <p className="text-amber-400 text-sm">You don't have any cards in your collection!</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-80 overflow-y-auto">
-                  {allGameCards.map((card: WorldCard) => (
+                  {playerOwnedCards.filter(card => !card.isLeader).map((card: WorldCard) => (
                     <button
                       key={card._id}
                       onClick={() => applyReward(card._id)}

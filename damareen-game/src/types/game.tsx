@@ -138,4 +138,5 @@ export interface BattleResponse {
 
 export interface PlayerCollectionsResponse {
   collections: PlayerCollection[]
+  playerCards?: WorldCard[]
 }

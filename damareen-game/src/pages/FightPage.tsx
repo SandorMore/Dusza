@@ -39,6 +39,7 @@ const FightPage: React.FC = () => {
   const [isCreatingDeck, setIsCreatingDeck] = useState<boolean>(false)
   const [allGameCards, setAllGameCards] = useState<WorldCard[]>([])
   const [allGameDungeons, setAllGameDungeons] = useState<Dungeon[]>([])
+  const [playerOwnedCards, setPlayerOwnedCards] = useState<WorldCard[]>([])
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -94,6 +95,25 @@ const FightPage: React.FC = () => {
       setCollections(collectionsRes.collections || [])
       setAllGameCards(allCardsRes.cards || [])
       setAllGameDungeons(allDungeonsRes.dungeons || [])
+      
+      // Get player's own cards from collections (player-specific copies)
+      const playerCards: WorldCard[] = []
+      if (collectionsRes.collections && collectionsRes.collections.length > 0) {
+        collectionsRes.collections.forEach((collection: PlayerCollection) => {
+          if (collection.cards) {
+            playerCards.push(...collection.cards)
+          }
+        })
+      }
+      // Also include playerCards from the response if available
+      if (collectionsRes.playerCards) {
+        playerCards.push(...collectionsRes.playerCards)
+      }
+      // Remove duplicates based on _id
+      const uniquePlayerCards = playerCards.filter((card, index, self) => 
+        index === self.findIndex(c => c._id === card._id)
+      )
+      setPlayerOwnedCards(uniquePlayerCards)
 
       // Get all base cards (non-leader, unupgraded) created by gamemasters
       // Base cards are those where isLeader === false and originalCard is not set
@@ -189,6 +209,27 @@ const FightPage: React.FC = () => {
 
       console.log('✅ Reward API response:', result);
       setMessage('⚜️ ' + result.message);
+
+      // Reload player collections to get updated cards
+      const collectionsRes = await apiService.getPlayerCollections();
+      setCollections(collectionsRes.collections || []);
+      
+      // Update player-owned cards
+      const playerCards: WorldCard[] = []
+      if (collectionsRes.collections && collectionsRes.collections.length > 0) {
+        collectionsRes.collections.forEach((collection: PlayerCollection) => {
+          if (collection.cards) {
+            playerCards.push(...collection.cards)
+          }
+        })
+      }
+      if (collectionsRes.playerCards) {
+        playerCards.push(...collectionsRes.playerCards)
+      }
+      const uniquePlayerCards = playerCards.filter((card, index, self) => 
+        index === self.findIndex(c => c._id === card._id)
+      )
+      setPlayerOwnedCards(uniquePlayerCards)
 
       // Redirect to player dashboard after successful upgrade to prevent multiple upgrades
       setTimeout(() => {
@@ -373,6 +414,7 @@ const FightPage: React.FC = () => {
                 applyReward={applyReward}
                 availableCards={availableCards}
                 allGameCards={allGameCards}
+                playerOwnedCards={playerOwnedCards}
                 setActiveTab={handleTabChange}
                 getTypeColor={getTypeColor}
                 getTypeEmoji={getTypeEmoji}
