@@ -9,21 +9,17 @@ const LandingPage: React.FC = () => {
     <div className="min-h-screen bg-[url('/assets/freepik__the-style-is-rich-with-textured-brushstrokes-deep-__21312.png')] bg-cover bg-center flex flex-col items-center justify-center">
       <div className="text-center max-w-4xl p-5 md:p-10 backdrop-blur-sm bg-white/30 rounded-3xl shadow-2xl">
         <h1 className="text-5xl font-bold text-amber-200 drop-shadow-[0_0_3px_black] md:text-6xl font-bold  font-serif mb-6 tracking-wider">
-           Welcome to Damareen
+           Damareen
         </h1>
-        <p className="text-5xl font-bold text-amber-200 drop-shadow-[0_0_3px_black] md:text-3xl font-serif mb-12">
-          A realm of fantasy card battles and legendary warriors
-        </p>
-        
         {isAuthenticated() ? (
           <div className="bg-gradient-to-br from-amber-800 to-amber-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
-            <p className="text-2xl text-amber-100 font-serif mb-6">Welcome, {user?.username}!</p>
+            <p className="text-2xl text-amber-100 font-serif mb-6">Üdvözöllek, {user?.username}!</p>
             <div className="space-x-4">
               <a 
                 href={user?.role === 'gameMaster' ? '/game-master' : '/player'}
                 className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-amber-100 px-8 py-4 rounded-xl transition-all border-2 border-amber-500 font-bold text-lg shadow-lg hover:shadow-amber-700/50"
               >
-                🏰 Enter Your Keep
+                Lépj be
               </a>
               <a 
                 href="/login" 
@@ -35,25 +31,25 @@ const LandingPage: React.FC = () => {
                   window.location.href = '/'
                 }}
               >
-                ⚔️ Leave Realm
+                Kilépés
               </a>
             </div>
           </div>
         ) : (
           <div className="bg-black/25 rounded-2xl shadow-2xl p-8">
-            <p className="text-xl text-amber-200 font-serif mb-8">Begin your legendary journey!</p>
+            <p className="text-xl text-amber-200 font-serif mb-8">Játék elkezdése</p>
             <div className="space-x-4">
               <a 
                 href="/login" 
                 className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-amber-100 px-8 py-4 rounded-xl transition-all   font-bold text-lg shadow-lg hover:shadow-amber-700/50"
               >
-                🏰 Enter Castle
+                Belépés
               </a>
               <a 
                 href="/register" 
                 className="bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 text-amber-100 px-8 py-4 rounded-xl transition-all  font-bold text-lg shadow-lg hover:shadow-blue-800/50"
               >
-                ⚜️ Join the Realm
+                Csatlakozás
               </a>
             </div>
           </div>

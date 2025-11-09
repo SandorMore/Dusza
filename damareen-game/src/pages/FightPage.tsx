@@ -291,9 +291,9 @@ const FightPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[url('/assets/paper-1074131_1280.png')] bg-cover bg-center">
+    <div className="min-h-screen bg-[url('/assets/2304.w026.n002.3380B.p1.3380.jpg')] bg-fixed bg-center">
       {/* Medieval Header */}
-      <header className="bg-gradient-to-r from-amber-800 to-amber-900 shadow-2xl border-b-4 border-amber-600">
+      <header className="bg-gradient-to-r from-gray-600 to-gray-800 shadow-2xl">
         <div className="max-w-1xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="text-center">
@@ -332,7 +332,7 @@ const FightPage: React.FC = () => {
       </header>
 
       
-      <div className="bg-gradient-to-r from-amber-700 to-amber-800">
+      <div className="backdrop-blur-sm bg-black/30">
         <div className="max-w-1xl mx-auto">
           <nav className="flex justify-center space-x-6">
             {[
@@ -346,8 +346,8 @@ const FightPage: React.FC = () => {
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
                 className={`py-5 px-3 border-b-4 font-bold text-lg font-serif transition-all ${activeTab === tab.id
-                    ? 'border-amber-300 text-amber-100 bg-amber-900/50'
-                    : 'border-transparent text-amber-200 hover:text-amber-100 hover:border-amber-400'
+                    ? 'border-amber-300 text-gray-100 bg-amber-900/50'
+                    : 'border-transparent text-white hover:text-amber-100 hover:border-amber-400'
                   }`}
               >
                 <span className="flex items-center space-x-3">

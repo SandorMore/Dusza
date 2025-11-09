@@ -8,8 +8,8 @@ const Navbar = () => {
             <h1 className='text-2xl font-bold hover:'>Damareen</h1>
         </div>
         <ul className='flex space-x-4'>
-            <Link to="/login"><li className='p-2 bg-white shadow-black-500/50'>Login</li></Link>
-            <Link to="/register"><li className='p-2 bg-white shadow-black-500/50'>Register</li></Link>
+            <Link to="/login"><li className='p-2 bg-white shadow-black-500/50'>Bejelentkezés</li></Link>
+            <Link to="/register"><li className='p-2 bg-white shadow-black-500/50'>Regisztráció</li></Link>
         </ul>
     </div>
   )

@@ -30,21 +30,13 @@ const Register: React.FC = () => {
     try {
       console.log('Sending registration request...')
       const response: AuthResponse = await apiService.register(formData)
-      console.log('Full API response:', response)
       
-      // MEGVÁLTOZOTT: tokens.accessToken használata
       if (response.tokens?.accessToken) {
         localStorage.setItem('token', response.tokens.accessToken)
-        console.log('AccessToken saved:', response.tokens.accessToken)
-      } else {
-        console.log('No accessToken in response!')
       }
       
       if (response.user) {
         localStorage.setItem('user', JSON.stringify(response.user))
-        console.log('User saved:', response.user)
-      } else {
-        console.log('No user in response!')
       }
       
       if (response.tokens?.accessToken && response.user) {
@@ -58,7 +50,6 @@ const Register: React.FC = () => {
         setMessage('Registration completed but missing tokens or user')
       }
     } catch (error: unknown) {
-      console.error('Registration error:', error)
       setMessage('Registration failed')
     } finally {
       setLoading(false)
@@ -70,8 +61,8 @@ const Register: React.FC = () => {
     <div className="min-h-screen bg-[url('/public/assets/freepik__the-style-is-rich-with-textured-brushstrokes-deep-__21311.png')] bg-cover bg-center flex justify-center items-center py-12 px-4">
       <div className='backdrop-blur-sm bg-white/30 rounded-3xl shadow-2xl p-8 md:p-12 w-full max-w-md'>
         <form onSubmit={handleSubmit} className='flex flex-col w-full'>
-          <h1 className='text-4xl font-bold text-amber-100 font-serif mb-2 text-center tracking-wider'>⚜️ <br /> Join the Realm</h1>
-          <p className='text-amber-200 text-center mb-8 font-serif'>Forge your legend today!</p>
+          <h1 className='text-4xl font-bold text-amber-100 font-serif mb-6 text-center tracking-wider'>Csatlakozás</h1>
+
 
           {message && (
             <div className={`p-4 mb-6 rounded-xl border-2 font-bold text-center ${
@@ -84,11 +75,11 @@ const Register: React.FC = () => {
           )}
 
           <div className='flex flex-col w-full mb-6'>
-            <label className='text-lg font-bold text-amber-100 font-serif mb-2' htmlFor="username">👤 Felhasználónév</label>
+            <label className='text-lg font-bold text-amber-100 font-serif mb-2' htmlFor="username">Felhasználónév</label>
             <input 
               id='username' 
               type="text" 
-              placeholder='Enter your username' 
+              placeholder='Felhasználónév' 
               className=' bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500' 
               value={formData.username}
               onChange={handleChange}
@@ -97,11 +88,11 @@ const Register: React.FC = () => {
           </div>
 
           <div className='flex flex-col w-full mb-6'>
-            <label className='text-lg font-bold text-amber-100 font-serif mb-2' htmlFor="email">📧 Email</label>
+            <label className='text-lg font-bold text-amber-100 font-serif mb-2' htmlFor="email">Email</label>
             <input 
               id='email' 
               type="email" 
-              placeholder='Enter your email' 
+              placeholder='Email címed' 
               className=' bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500' 
               value={formData.email}
               onChange={handleChange}
@@ -110,11 +101,11 @@ const Register: React.FC = () => {
           </div>
 
           <div className='flex flex-col w-full mb-6'>
-            <label className='text-lg font-bold text-amber-100 font-serif mb-2' htmlFor="password">🔐 Jelszó</label>
+            <label className='text-lg font-bold text-amber-100 font-serif mb-2' htmlFor="password">Jelszó</label>
             <input 
               id='password' 
               type="password" 
-              placeholder='Enter your password (min 6 chars)' 
+              placeholder='Jelszó (min 6 karakter)' 
               className=' bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500' 
               value={formData.password}
               onChange={handleChange}
@@ -124,15 +115,15 @@ const Register: React.FC = () => {
           </div>
 
           <div className='flex flex-col w-full mb-8'>
-            <label className='text-lg font-bold text-amber-100 font-serif mb-2' htmlFor="role">👑 Szerepkör</label>
+            <label className='text-lg font-bold text-amber-100 font-serif mb-2' htmlFor="role">Szerepkör</label>
             <select 
               id="role"
               className=' bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500 font-bold'
               value={formData.role}
               onChange={handleChange}
             >
-              <option value="player">⚔️ Játékos</option>
-              <option value="gameMaster">👑 Game Master</option>
+              <option value="player">Játékos</option>
+              <option value="gameMaster">Játékmester</option>
             </select>
           </div>
 
@@ -141,13 +132,13 @@ const Register: React.FC = () => {
             type="submit"
             disabled={loading}
           >
-            {loading ? '🔄 Forging...' : '⚜️ Join the Realm'}
+            {loading ? 'Loading...' : 'Csatlakozás'}
           </button>
 
           <p className='mt-6 text-center text-amber-200 font-serif'>
-            Already have an account?{' '}
+            Már van fiókod?{' '}
             <a href="/login" className='text-amber-100 hover:text-yellow-300 underline font-bold'>
-              Enter the castle
+              Belépés
             </a>
           </p>
         </form>

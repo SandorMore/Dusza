@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react'
 import type { BattleResult, BattleRound, WorldCard } from '../types/game'
 import { apiService } from '../services/api'
@@ -205,11 +206,11 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
                 )}
                 <div className="card-stats-display">
                   <div className="stat-line">
-                    <span className="stat-label">Damage</span>
+                    <span className="stat-label">Sebzés</span>
                     <span className="stat-value">{card.damage}</span>
                   </div>
                   <div className="stat-line">
-                    <span className="stat-label">Health</span>
+                    <span className="stat-label">Életerő</span>
                     <span className={`stat-value health ${isDefeated ? 'zero' : ''}`}>
                       {health}
                     </span>
@@ -292,7 +293,7 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
           {/* Round Result Display */}
           {!showAttack && currentRoundData  && displayAbleResult && (
             <div className={`round-result ${currentRoundData.playerWins ? 'player-win' : 'dungeon-win'}`}>
-              {currentRoundData.playerWins ? '✅ Victory' : '❌ Defeat'}
+              {currentRoundData.playerWins ? 'Győzelem' : 'Vereség'}
             </div>
           )}
         </div>
@@ -314,11 +315,11 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
                 )}
                 <div className="card-stats-display">
                   <div className="stat-line">
-                    <span className="stat-label">Damage</span>
+                    <span className="stat-label">Sebzés</span>
                     <span className="stat-value">{card.damage}</span>
                   </div>
                   <div className="stat-line">
-                    <span className="stat-label">Health</span>
+                    <span className="stat-label">Életerő</span>
                     <span className={`stat-value health ${isDefeated ? 'zero' : ''}`}>
                       {health}
                     </span>
@@ -343,20 +344,22 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
         {finalBattleResult ? (
           <div className="battle-complete">
             <div className={`final-result ${finalBattleResult.playerWins ? 'victory' : 'defeat'}`}>
-              {finalBattleResult.playerWins ? '🎉 GLORIOUS VICTORY! 🎉' : '💀 VALIANT DEFEAT! 💀'}
+              {finalBattleResult.playerWins ? 'Győzelem!' : 'Vereség!'}
             </div>
             <div className="control-buttons">
-              <button onClick={handleViewRewards} className="btn-continue">
-                {finalBattleResult.playerWins ? '🏆 View Rewards' : '📊 View Results'}
-              </button>
+              {finalBattleResult.playerWins && (
+                <button onClick={handleViewRewards} className="btn-continue">
+                  Jutalom megtekintése
+                </button>
+              )}
               <button onClick={onExit} className="btn-exit">
-                ⚔️ Exit Battle
+                Kilépés
               </button>
             </div>
           </div>
         ) : isCalculatingFinal ? (
           <div className="round-status">
-            ⏳ Calculating final result...
+            ⏳ Végeredmény kiszámítása...
           </div>
         ) : (
           <div className="round-info">
@@ -367,11 +370,11 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
                 className="btn-start-round"
                 disabled={isAnimating}
               >
-                ⚔️ Start Round {currentRound + 1}
+                Kör indítása {currentRound + 1}
               </button>
             ) : isAnimating || showAttack ? (
               <div className="round-status">
-                ⚔️ Battle in progress...
+                A harc lefolytatás...
               </div>
             ) : roundCompleted ? (
               <div className="round-controls">
@@ -385,7 +388,7 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
                   </button>
                 ) : (
                   <div className="round-status">
-                    ⏳ Finalizing battle...
+                    Harc véglegesítése...
                   </div>
                 )}
               </div>
