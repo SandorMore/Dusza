@@ -11,7 +11,7 @@ interface Props {
 const DungeonCreator: React.FC<Props> = ({ worldCards, onDungeonCreated }) => {
   const [formData, setFormData] = useState<DungeonData>({
     name: '',
-    type: 'Egyszerű találkozás',
+    type: 'Egyszerű',
     cardIds: []
   })
   const [loading, setLoading] = useState(false)
@@ -55,7 +55,7 @@ const DungeonCreator: React.FC<Props> = ({ worldCards, onDungeonCreated }) => {
       await apiService.createDungeon(submissionData)
       
       setMessage('Dungeon created successfully!')
-      setFormData({ name: '', type: 'Egyszerű találkozás', cardIds: [] })
+      setFormData({ name: '', type: 'Egyszerű', cardIds: [] })
       onDungeonCreated()
     } catch (error: unknown) {
       console.error('❌ Dungeon creation error:', error)
@@ -71,7 +71,7 @@ const DungeonCreator: React.FC<Props> = ({ worldCards, onDungeonCreated }) => {
 
   const getRequiredCardCount = () => {
     switch (formData.type) {
-      case 'Egyszerű találkozás': return 1
+      case 'Egyszerű': return 1
       case 'Kis kazamata': return 4
       case 'Nagy kazamata': return 6
       default: return 0
