@@ -104,7 +104,10 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
   const handleApplyReward = async (cardId: string) => {
     try {
       await applyReward(cardId)
-      setShowUpgradePage(false)
+      setTimeout(() => {
+        setShowUpgradePage(false)
+        setBattleResult(null)
+      }, 500)
     } catch (error) {
     }
   }
@@ -138,9 +141,8 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
     }
   }
 
-  // Show animated battle when battleResult is first set
   useEffect(() => {
-    if (battleResult && !showAnimatedBattle && !showUpgradePage) {
+    if (battleResult && !showAnimatedBattle && !showUpgradePage && !(battleResult.playerWins && battleResult.playerReward)) {
       setShowAnimatedBattle(true)
     }
   }, [battleResult, showAnimatedBattle, showUpgradePage])
@@ -452,7 +454,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                     <div className="font-bold text-blue-300 text-lg">{round.playerCard.name}</div>
                     <div className="mt-3 space-y-2">
                       <div>⚔️ Erő: {round.playerCard.damage}</div>
-                      <div>❤️ Állóképesség: {round.playerCard.health}</div>
+                      <div>❤️ Élet: {round.playerCard.health}</div>
                       <div className={`px-3 py-1 rounded-lg font-bold inline-block ${getTypeColor(round.playerCard.type)}`}>
                         {getTypeEmoji(round.playerCard.type)} {round.playerCard.type}
                       </div>
@@ -473,7 +475,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                     <div className="font-bold text-red-300 text-lg">{round.dungeonCard.name}</div>
                     <div className="mt-3 space-y-2">
                       <div>⚔️ Erő: {round.dungeonCard.damage}</div>
-                      <div>❤️ Állóképesség: {round.dungeonCard.health}</div>
+                      <div>❤️ Élet: {round.dungeonCard.health}</div>
                       <div className={`px-3 py-1 rounded-lg font-bold inline-block ${getTypeColor(round.dungeonCard.type)}`}>
                         {getTypeEmoji(round.dungeonCard.type)} {round.dungeonCard.type}
                       </div>

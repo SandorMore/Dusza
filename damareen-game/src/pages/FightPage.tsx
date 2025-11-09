@@ -164,7 +164,19 @@ const FightPage: React.FC = () => {
       );
 
       setMessage('⚜️ ' + result.message);
-      await loadData();
+      
+      const [collectionsRes, allCardsRes] = await Promise.all([
+        apiService.getPlayerCollections(),
+        apiService.getAllCards()
+      ])
+      
+      setCollections(collectionsRes.collections || [])
+      setAllGameCards(allCardsRes.cards || [])
+      
+      const baseCards: WorldCard[] = (allCardsRes.cards || []).filter(card => 
+        !card.isLeader && !card.originalCard
+      )
+      setAvailableCards(baseCards)
 
     } catch (error: any) {
       setMessage('❌ Hiba a jutalom odaítélésénél: ' + (error.response?.data?.message || error.message));

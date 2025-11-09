@@ -74,14 +74,14 @@ const RoyalArchivesTab: React.FC<RoyalArchivesTabProps> = ({
                   <span className="font-bold text-amber-100">{card.damage}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-green-300 font-bold">❤️ Állóképesség</span>
+                  <span className="text-green-300 font-bold">❤️ Élet</span>
                   <span className="font-bold text-amber-100">{card.health}</span>
                 </div>
                 
                 {card.boostType && (
                   <div className="bg-purple-700 border border-purple-500 rounded-xl p-3 mt-3">
                     <div className="text-xs text-purple-200 font-bold">
-                      ⚡ {card.boostType === 'damage' ? '2× Erő' : '2× Állóképesség'}
+                      ⚡ {card.boostType === 'damage' ? '2× Erő' : '2× Élet'}
                     </div>
                   </div>
                 )}
