@@ -20,7 +20,7 @@ const KingdomLoreTab: React.FC<KingdomLoreTabProps> = ({
   getCardRarityColor
 }) => {
   return (
-    <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4 border-amber-600">
+    <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-8 border-4">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-2xl font-bold text-amber-100 font-serif">🏰 Kingdom Lore ({allGameCards.length})</h2>
         <div className="text-amber-200 font-bold">
@@ -85,7 +85,7 @@ const KingdomLoreTab: React.FC<KingdomLoreTabProps> = ({
               <div key={card._id} className={`border-2 rounded-2xl p-5 transition-all transform hover:scale-105 ${
                 card.isLeader 
                   ? 'bg-gradient-to-br from-yellow-600 to-amber-700 border-yellow-500' 
-                  : 'bg-gradient-to-br from-gray-700 to-gray-800 border-amber-500'
+                  : 'bg-gradient-to-br from-gray-700 to-gray-800 '
               } hover:shadow-2xl`}>
                 <div className="flex justify-between items-start mb-4">
                   <h4 className="font-bold text-amber-100 text-lg">{card.name}</h4>

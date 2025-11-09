@@ -346,7 +346,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
 
           {/* Battle Preview */}
           {selectedDeck && selectedDungeon && (
-            <div className="mt-8 p-8 bg-gradient-to-r from-blue-900/50 to-purple-900/50 rounded-2xl border-4 border-blue-600">
+            <div className=" mt-8 p-8 rounded-2xl border-4 border-">
               <h3 className="font-bold text-2xl text-amber-100 font-serif mb-6 text-center">🎯 Battle Preview</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
