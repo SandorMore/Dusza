@@ -231,7 +231,7 @@ router.post('/battle', auth, async (req, res) => {
     
     const battleResult = simulateBattle(orderedPlayerCards, dungeon.cards, dungeon.type);
     
-    res.json({ message: 'Battle completed', result: battleResult });
+    res.json({ result: battleResult });
   } catch (error) {
     console.error('Error starting battle:', error);
     res.status(500).json({ message: error.message });

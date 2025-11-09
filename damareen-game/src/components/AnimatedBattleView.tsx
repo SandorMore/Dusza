@@ -34,6 +34,7 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
   const [battleRounds, setBattleRounds] = useState<BattleRound[]>(battleResult.rounds)
   const [totalRounds, setTotalRounds] = useState(battleResult.totalRounds || battleResult.rounds.length)
   const [isFetchingRound, setIsFetchingRound] = useState(false)
+  const [displayWhy, setDisplayWhy] = useState(false)
   const [displayAbleResult, setDisplayAbleResult] = useState(false)
   const [finalBattleResult, setFinalBattleResult] = useState<BattleResult | null>(null)
   const [isCalculatingFinal, setIsCalculatingFinal] = useState(false)
@@ -51,6 +52,7 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
     setRoundCompleted(false)
     setIsAnimating(false)
     setShowAttack(false)
+    setDisplayWhy(false)
   }, [currentRound])
 
   const handleNextRound = async () => {
@@ -98,7 +100,7 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
       
       setShowAttack(false)
       setDisplayAbleResult(true)
-      
+      setDisplayWhy(true)
       // Wait longer before allowing next round
       setTimeout(() => {
         setIsAnimating(false)
@@ -181,7 +183,7 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
       {/* Top Banner with Round Number */}
       <div className="battle-banner">
         <div className="round-indicator">
-          {currentRound + 1}-{totalRounds}
+          {currentRound + 1}/{totalRounds}
         </div>
       </div>
 
@@ -358,7 +360,7 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
           </div>
         ) : (
           <div className="round-info">
-            <div className="round-reason">{currentRoundData?.reason}</div>
+            {displayWhy && <div className="round-reason">{currentRoundData?.reason}</div>}
             {!roundStarted ? (
               <button
                 onClick={handleStartRound}
