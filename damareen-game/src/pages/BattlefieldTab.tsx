@@ -107,7 +107,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
       setTimeout(() => {
         setShowUpgradePage(false)
         setBattleResult(null)
-      }, 500)
+      }, 1000)
     } catch (error) {
     }
   }
@@ -142,7 +142,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
   }
 
   useEffect(() => {
-    if (battleResult && !showAnimatedBattle && !showUpgradePage && !(battleResult.playerWins && battleResult.playerReward)) {
+    if (battleResult && !showAnimatedBattle && !showUpgradePage) {
       setShowAnimatedBattle(true)
     }
   }, [battleResult, showAnimatedBattle, showUpgradePage])
@@ -199,10 +199,10 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
               Válassz egy harcost, akire ezt az áldást ruházod:
             </p>
             
-            {allGameCards.length === 0 ? (
+            {availableCards.filter(card => !card.isLeader).length === 0 ? (
               <div className="text-center p-8 bg-gray-700/50 rounded-xl border-2 border-yellow-500">
                 <p className="text-amber-300 text-lg mb-4">Nincs elérhető harcos a fejlesztéshez</p>
-                <p className="text-amber-400 text-sm">A Game Master-eknek először kártyákat kell létrehozniuk!</p>
+                <p className="text-amber-400 text-sm">Nincs kártyád a gyűjteményedben!</p>
                 <button
                   onClick={() => {
                     setShowUpgradePage(false)
@@ -216,7 +216,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                  {allGameCards.map((card: WorldCard) => (
+                  {availableCards.filter(card => !card.isLeader).map((card: WorldCard) => (
                     <button
                       key={card._id}
                       onClick={() => handleApplyReward(card._id)}
@@ -501,14 +501,14 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                 Kerestél <span className="font-bold text-yellow-300">+{battleResult.playerReward.bonusAmount} {battleResult.playerReward.bonusType === 'damage' ? 'sebzés' : 'életerő'}</span>!
                 Ruházd ezt az áldást egy harcosodra:
               </p>
-              {allGameCards.length === 0 ? (
+              {availableCards.filter(card => !card.isLeader).length === 0 ? (
                 <div className="text-center p-8 bg-gray-700/50 rounded-xl border-2 border-yellow-500">
                   <p className="text-amber-300 text-lg mb-4">Nincs elérhető harcos a fejlesztéshez</p>
-                  <p className="text-amber-400 text-sm">A Game Master-eknek először kártyákat kell létrehozniuk!</p>
+                  <p className="text-amber-400 text-sm">Nincs kártyád a gyűjteményedben!</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-80 overflow-y-auto">
-                  {allGameCards.map((card: WorldCard) => (
+                  {availableCards.filter(card => !card.isLeader).map((card: WorldCard) => (
                     <button
                       key={card._id}
                       onClick={() => handleApplyReward(card._id)}

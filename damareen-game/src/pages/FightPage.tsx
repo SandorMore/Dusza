@@ -165,14 +165,10 @@ const FightPage: React.FC = () => {
 
       setMessage('⚜️ ' + result.message);
       
-      const [collectionsRes, allCardsRes] = await Promise.all([
-        apiService.getPlayerCollections(),
-        apiService.getAllCards()
-      ])
-      
+      const collectionsRes = await apiService.getPlayerCollections()
       setCollections(collectionsRes.collections || [])
-      setAllGameCards(allCardsRes.cards || [])
       
+      const allCardsRes = await apiService.getAllCards()
       const baseCards: WorldCard[] = (allCardsRes.cards || []).filter(card => 
         !card.isLeader && !card.originalCard
       )
