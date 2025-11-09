@@ -1,4 +1,3 @@
-// src/services/api.ts - UPDATED VERSION
 import axios from 'axios'
 import type { AxiosInstance, AxiosResponse } from 'axios'
 import type { 
@@ -25,7 +24,6 @@ import type {
   BattleRound
 } from '../types/game'
 
-// Response típusok
 interface CreateWorldCardResponse {
   message: string
   card: WorldCard
@@ -61,7 +59,6 @@ class ApiService {
     this.api.interceptors.request.use(
       (config) => {
         const token = localStorage.getItem('token')
-        console.log('🔍 API Request - URL:', config.url, 'Token:', !!token)
         if (token) {
           config.headers.Authorization = `Bearer ${token}`
         }
@@ -73,7 +70,6 @@ class ApiService {
     this.api.interceptors.response.use(
       (response) => response,
       (error) => {
-        console.error('❌ API Error:', error.response?.status, error.response?.data)
         if (error.response?.status === 401) {
           localStorage.removeItem('token')
           localStorage.removeItem('user')
@@ -91,16 +87,13 @@ class ApiService {
     });
     return response.data;
   }
-  // Auth methods
   async register(userData: RegisterFormData): Promise<AuthResponse> {
     const response: AxiosResponse<AuthResponse> = await this.api.post('/auth/register', userData)
-    console.log('🔍 Register API válasz:', response.data)
     return response.data
   }
 
   async login(credentials: LoginFormData): Promise<AuthResponse> {
     const response: AxiosResponse<AuthResponse> = await this.api.post('/auth/login', credentials)
-    console.log('🔍 Login API válasz:', response.data)
     return response.data
   }
 
@@ -109,22 +102,14 @@ class ApiService {
     return response.data
   }
 
-  // Game Master methods
   async getWorldCards(): Promise<WorldCardsResponse> {
     const response: AxiosResponse<WorldCardsResponse> = await this.api.get('/game-master/world-cards')
     return response.data
   }
 
   async createWorldCard(cardData: WorldCardData): Promise<CreateWorldCardResponse> {
-    try {
-      console.log('🔍 Sending card data:', cardData);
-      const response: AxiosResponse<CreateWorldCardResponse> = await this.api.post('/game-master/world-cards', cardData);
-      console.log('✅ Card created successfully:', response.data);
-      return response.data;
-    } catch (error: any) {
-      console.error('❌ Error creating world card:', error.response?.data || error.message);
-      throw error;
-    }
+    const response: AxiosResponse<CreateWorldCardResponse> = await this.api.post('/game-master/world-cards', cardData);
+    return response.data;
   }
 
   async createLeaderCard(leaderData: LeaderCardData): Promise<CreateLeaderCardResponse> {
@@ -165,7 +150,6 @@ class ApiService {
     return response.data
   }
 
-  // Player methods
   async createPlayerDeck(deckData: PlayerDeckData): Promise<CreatePlayerDeckResponse> {
     const response: AxiosResponse<CreatePlayerDeckResponse> = await this.api.post('/player/decks', deckData)
     return response.data
@@ -218,7 +202,6 @@ class ApiService {
     return response.data
   }
 
-  // NEW: Player methods for accessing game data
   async getPlayerDungeons(): Promise<DungeonsResponse> {
     const response: AxiosResponse<DungeonsResponse> = await this.api.get('/player/dungeons')
     return response.data

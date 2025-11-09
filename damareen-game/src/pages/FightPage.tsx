@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// src/pages/FightPage.tsx - REFACTORED WITH COMPONENTS
 import React, { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { apiService } from '../services/api'
@@ -55,13 +54,11 @@ const FightPage: React.FC = () => {
         setUser(userData)
         loadData()
       } catch (error) {
-        console.error('Error parsing user data:', error)
         window.location.href = '/login'
       }
     }
   }, [])
 
-  // Update active tab when URL parameter changes
   useEffect(() => {
     const tabParam = searchParams.get('tab') as 'decks' | 'battle' | 'collection' | 'allcards' | null
     if (tabParam && ['decks', 'battle', 'collection', 'allcards'].includes(tabParam)) {
@@ -69,7 +66,6 @@ const FightPage: React.FC = () => {
     }
   }, [searchParams])
 
-  // Update URL when active tab changes (but only if it's a valid tab)
   const handleTabChange = (tab: 'decks' | 'battle' | 'collection' | 'allcards'| 'about') => {
     setActiveTab(tab)
     setSearchParams({ tab })
@@ -79,8 +75,6 @@ const FightPage: React.FC = () => {
     setLoading(true)
     setMessage('')
     try {
-      console.log('🔄 Loading fight page data...')
-
       const [decksRes, collectionsRes, dungeonsRes, allCardsRes, allDungeonsRes] = await Promise.all([
         apiService.getPlayerDecks(),
         apiService.getPlayerCollections(),
@@ -95,29 +89,14 @@ const FightPage: React.FC = () => {
       setAllGameCards(allCardsRes.cards || [])
       setAllGameDungeons(allDungeonsRes.dungeons || [])
 
-      // Get all base cards (non-leader, unupgraded) created by gamemasters
-      // Base cards are those where isLeader === false and originalCard is not set
-      // This ensures all players can use all base cards in war formations (unupgraded)
       const baseCards: WorldCard[] = (allCardsRes.cards || []).filter(card => 
         !card.isLeader && !card.originalCard
       )
-      console.log('🃏 Base cards available for war formations:', baseCards.length);
-      console.log('🃏 Total cards from gamemasters:', allCardsRes.cards?.length || 0);
 
       setAvailableCards(baseCards)
 
-      console.log('✅ Loaded:', {
-        decks: decksRes.decks?.length || 0,
-        dungeons: dungeonsRes.dungeons?.length || 0,
-        collections: collectionsRes.collections?.length || 0,
-        availableCards: baseCards.length,
-        allGameCards: allCardsRes.cards?.length || 0,
-        allGameDungeons: allDungeonsRes.dungeons?.length || 0
-      })
-
     } catch (error: any) {
-      console.error('❌ Error loading data:', error)
-      setMessage('Failed to load game data: ' + (error.response?.data?.message || error.message))
+      setMessage('Nem sikerült betölteni a játékadatokat: ' + (error.response?.data?.message || error.message))
     } finally {
       setLoading(false)
     }
@@ -125,7 +104,7 @@ const FightPage: React.FC = () => {
 
   const createDeck = async (): Promise<void> => {
     if (!newDeckName.trim() || selectedCardsForDeck.length === 0) {
-      setMessage('Please enter a deck name and select cards')
+      setMessage('Kérlek add meg a formáció nevét és válassz kártyákat')
       return
     }
 
@@ -135,28 +114,27 @@ const FightPage: React.FC = () => {
         name: newDeckName,
         cardIds: selectedCardsForDeck
       })
-      setMessage('🎉 Deck forged successfully!')
+      setMessage('🎉 Formáció sikeresen kovácsolva!')
       setNewDeckName('')
       setSelectedCardsForDeck([])
       await loadData()
       setIsCreatingDeck(false)
       handleTabChange('battle')
     } catch (error: any) {
-      setMessage('❌ Error forging deck: ' + (error.response?.data?.message || error.message))
+      setMessage('❌ Hiba a formáció kovácsolásakor: ' + (error.response?.data?.message || error.message))
       setIsCreatingDeck(false)
     }
   }
 
   const startBattle = async (cardOrder?: string[]): Promise<void> => {
     if (!selectedDeck || !selectedDungeon) {
-      setMessage('Please select both a war formation and a dungeon')
+      setMessage('Kérlek válassz egy harci formációt és egy kazamatát')
       return
     }
 
-    // Strict validation: must be 1-1, 4-4, or 6-6
     const validCounts = [1, 4, 6]
     if (!validCounts.includes(selectedDeck.cards.length) || selectedDeck.cards.length !== selectedDungeon.cards.length) {
-      setMessage(`❌ War formation and dungeon must both have exactly 1, 4, or 6 warriors. Current: ${selectedDeck.cards.length} vs ${selectedDungeon.cards.length}`)
+      setMessage(`❌ A harci formációnak és a kazamatának pontosan 1, 4 vagy 6 harcost kell tartalmaznia. Jelenleg: ${selectedDeck.cards.length} vs ${selectedDungeon.cards.length}`)
       return
     }
 
@@ -166,9 +144,8 @@ const FightPage: React.FC = () => {
       setBattleResult(battleRes.result)
       setMessage(battleRes.message)
       handleTabChange('battle')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      setMessage('❌ Error commencing battle: ' + (error.response?.data?.message || error.message))
+      setMessage('❌ Hiba a csata kezdésekor: ' + (error.response?.data?.message || error.message))
     } finally {
       setLoading(false)
     }
@@ -179,7 +156,6 @@ const FightPage: React.FC = () => {
 
     try {
       setLoading(true);
-      console.log('🔄 Applying reward to card:', cardId);
 
       const result = await apiService.applyReward(
         cardId,
@@ -187,22 +163,18 @@ const FightPage: React.FC = () => {
         battleResult.playerReward.bonusAmount
       );
 
-      console.log('✅ Reward API response:', result);
       setMessage('⚜️ ' + result.message);
 
-      // Redirect to player dashboard after successful upgrade to prevent multiple upgrades
       setTimeout(() => {
         window.location.href = '/player';
-      }, 1000); // Small delay to show the success message
+      }, 1000);
 
     } catch (error: any) {
-      console.error('❌ Error applying reward:', error);
-      setMessage('❌ Error bestowing reward: ' + (error.response?.data?.message || error.message));
+      setMessage('❌ Hiba a jutalom odaítélésénél: ' + (error.response?.data?.message || error.message));
       setLoading(false);
     }
   }
 
-  // Helper functions
   const getTypeColor = (type: string): string => {
     switch (type) {
       case 'tűz': return 'bg-red-800 text-amber-100 border-red-600'
@@ -243,7 +215,7 @@ const FightPage: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-amber-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-600 mx-auto mb-4"></div>
-          <p className="text-amber-800 font-serif text-lg">Preparing the battlefield...</p>
+          <p className="text-amber-800 font-serif text-lg">Csatamező előkészítése...</p>
         </div>
       </div>
     )
@@ -251,14 +223,13 @@ const FightPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[url('/assets/paper-1074131_1280.png')] bg-cover bg-center">
-      {/* Medieval Header */}
       <header className="bg-gradient-to-r from-amber-800 to-amber-900 shadow-2xl border-b-4 border-amber-600">
         <div className="max-w-1xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-amber-100 font-serif tracking-wider">⚔️ Grand Battle Arena</h1>
+              <h1 className="text-3xl font-bold text-amber-100 font-serif tracking-wider">⚔️ Nagy Csatamező</h1>
               <p className="text-amber-200 font-medium mt-2">
-                Hail, {user.username}! Warriors: {allGameCards.length} | Dungeons: {allGameDungeons.length}
+                Üdvözöllek, {user.username}! Harcosok: {allGameCards.length} | Kazamaták: {allGameDungeons.length}
               </p>
             </div>
             <div className="flex space-x-3">
@@ -266,7 +237,7 @@ const FightPage: React.FC = () => {
                 onClick={() => window.location.href = '/player'}
                 className="bg-blue-700 hover:bg-blue-800 text-amber-100 px-6 py-3 rounded-xl transition-all border-2 border-blue-600 font-bold shadow-lg"
               >
-                🏰 Return to Keep
+                🏰 Vissza a Várba
               </button>
               {collections.length === 0 && (
                 <button
@@ -275,14 +246,13 @@ const FightPage: React.FC = () => {
                       const result = await apiService.initializeStarterData();
                       setMessage(result.message);
                       await loadData();
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     } catch (error: any) {
-                      setMessage('❌ Royal Decree Error: ' + (error.response?.data?.message || error.message));
+                      setMessage('❌ Királyi Rendelkezés Hiba: ' + (error.response?.data?.message || error.message));
                     }
                   }}
                   className="bg-orange-700 hover:bg-orange-800 text-amber-100 px-6 py-3 rounded-xl transition-all border-2 border-orange-600 font-bold shadow-lg"
                 >
-                  ⚜️ Summon Starter Warriors
+                  ⚜️ Kezdő Harcosok Idézése
                 </button>
               )}
             </div>
@@ -295,11 +265,11 @@ const FightPage: React.FC = () => {
         <div className="max-w-1xl mx-auto">
           <nav className="flex justify-center space-x-6">
             {[
-              { id: 'decks' as const, label: ` War Formations (${playerDecks.length})`, icon: '🛡️' },
-              { id: 'battle' as const, label: ' Battlefield', icon: '⚔️' },
-              { id: 'collection' as const, label: ` Royal Archives (${availableCards.length})`, icon: '📜' },
-              { id: 'allcards' as const, label: ` Kingdom Lore (${allGameCards.length})`, icon: '🏰' },
-              { id: 'about' as const, label: ' About', icon: '📖' }
+              { id: 'decks' as const, label: ` Harci Formációk (${playerDecks.length})`, icon: '🛡️' },
+              { id: 'battle' as const, label: ' Csatamező', icon: '⚔️' },
+              { id: 'collection' as const, label: ` Királyi Archívum (${availableCards.length})`, icon: '📜' },
+              { id: 'allcards' as const, label: ` Királyság Története (${allGameCards.length})`, icon: '🏰' },
+              { id: 'about' as const, label: ' Névjegy', icon: '📖' }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -319,7 +289,6 @@ const FightPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
         {message && (
           <div className={`mb-6 p-4 rounded-xl border-2 font-bold text-center ${message.includes('❌')
@@ -335,11 +304,10 @@ const FightPage: React.FC = () => {
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-600"></div>
-            <span className="ml-4 text-amber-800 font-serif text-lg">Consulting the war council...</span>
+            <span className="ml-4 text-amber-800 font-serif text-lg">Háborús tanács konzultálása...</span>
           </div>
         ) : (
           <>
-            {/* War Formations Tab */}
             {activeTab === 'decks' && (
               <Asd
                 playerDecks={playerDecks}
@@ -358,7 +326,6 @@ const FightPage: React.FC = () => {
               />
             )}
 
-            {/* Battlefield Tab */}
             {activeTab === 'battle' && (
               <BattlefieldTab
                 playerDecks={playerDecks}
@@ -381,7 +348,6 @@ const FightPage: React.FC = () => {
               />
             )}
 
-            {/* Royal Archives Tab */}
             {activeTab === 'collection' && (
               <RoyalArchivesTab
                 availableCards={availableCards}
@@ -389,11 +355,10 @@ const FightPage: React.FC = () => {
                 getTypeColor={getTypeColor}
                 getTypeEmoji={getTypeEmoji}
                 getCardRarityColor={getCardRarityColor}
-                setMessage={setMessage}  // Add this line
+                setMessage={setMessage}
               />
             )}
 
-            {/* Kingdom Lore Tab */}
             {activeTab === 'allcards' && (
               <KingdomLoreTab
                 allGameCards={allGameCards}
@@ -412,15 +377,6 @@ const FightPage: React.FC = () => {
         )}
       </main>
 
-      {/* Medieval Footer */}
-      {/* <footer className="bg-gradient-to-r from-amber-900 to-amber-800 border-t-4 border-amber-700 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-amber-200">
-            <p className="font-serif text-lg">© 2024 Royal Card Battle Arena - All rights reserved by royal decree</p>
-            <p className="text-amber-300 mt-2 font-bold">May your sword stay sharp and your formations stay mighty!</p>
-          </div>
-        </div>
-      </footer> */}
     </div>
   )
 }

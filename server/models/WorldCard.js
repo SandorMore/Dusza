@@ -1,4 +1,3 @@
-// models/WorldCard.js
 const mongoose = require('mongoose');
 
 const worldCardSchema = new mongoose.Schema({

@@ -1,4 +1,3 @@
-// src/pages/Login.tsx - Javított verzió
 import React, { useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { apiService } from '../services/api'
@@ -26,41 +25,29 @@ const Login: React.FC = () => {
     setMessage('')
 
     try {
-      console.log('🔍 Login küldés...', formData)
       const response: AuthResponse = await apiService.login(formData)
-      console.log('✅ Backend válasz:', response)
       
-      // MEGVÁLTOZOTT: tokens.accessToken használata
       if (response.tokens?.accessToken) {
         localStorage.setItem('token', response.tokens.accessToken)
-        console.log('💾 AccessToken elmentve:', response.tokens.accessToken)
         
-        // Refresh token is elmenthető
         if (response.tokens.refreshToken) {
           localStorage.setItem('refreshToken', response.tokens.refreshToken)
         }
-      } else {
-        console.log('❌ Nincs accessToken a válaszban!')
       }
       
       if (response.user) {
         localStorage.setItem('user', JSON.stringify(response.user))
-        console.log('💾 User elmentve:', response.user)
-      } else {
-        console.log('❌ Nincs user a válaszban!')
       }
       
       if (response.tokens?.accessToken && response.user) {
         setMessage('Sikeres bejelentkezés! Átirányítás...')
         setTimeout(() => {
-          console.log('🚀 Átirányítás a /game-master-re...')
           window.location.href = '/game-master'
         }, 1000)
       } else {
         setMessage('Bejelentkezés sikeres, de hiányzó adatok')
       }
     } catch (error: unknown) {
-      console.error('❌ Login hiba:', error)
       setMessage('Bejelentkezés sikertelen')
     } finally {
       setLoading(false)
@@ -71,8 +58,8 @@ const Login: React.FC = () => {
     <div className="min-h-screen bg-[url('/assets/freepik__the-style-is-rich-with-textured-brushstrokes-deep-__21314.png')] bg-cover bg-center flex justify-center items-center py-12 px-4">
       <div className='backdrop-blur-sm bg-white/30 rounded-3xl shadow-2xl p-8 md:p-12 w-full max-w-md'>
         <form onSubmit={handleSubmit} className='flex flex-col w-full'>
-          <h1 className='text-4xl font-bold text-amber-200 drop-shadow-[0_0_3px_black] font-serif mb-2 text-center tracking-wider'>🏰 <br /> Castle Gates</h1>
-          <p className='text-amber-200 text-center mb-8 font-serif'>Enter the realm, brave soul!</p>
+          <h1 className='text-4xl font-bold text-amber-200 drop-shadow-[0_0_3px_black] font-serif mb-2 text-center tracking-wider'>🏰 <br /> Várkapuk</h1>
+          <p className='text-amber-200 text-center mb-8 font-serif'>Lépj be a birodalomba, bátor lélek!</p>
 
           {message && (
             <div className={`p-4 mb-6 rounded-xl border-2 font-bold text-center ${
@@ -89,7 +76,7 @@ const Login: React.FC = () => {
             <input 
               id='email' 
               type="email" 
-              placeholder='Enter your email' 
+              placeholder='Add meg az email címed' 
               className=' bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500' 
               value={formData.email}
               onChange={handleChange}
@@ -102,7 +89,7 @@ const Login: React.FC = () => {
             <input 
               id='password' 
               type="password" 
-              placeholder='Enter your password' 
+              placeholder='Add meg a jelszavad' 
               className=' bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500' 
               value={formData.password}
               onChange={handleChange}
@@ -115,13 +102,13 @@ const Login: React.FC = () => {
             type="submit"
             disabled={loading}
           >
-            {loading ? '🔄 Entering...' : '⚔️ Enter Castle'}
+            {loading ? '🔄 Belépés...' : '⚔️ Belépés a Várba'}
           </button>
 
           <p className='mt-6 text-center text-1xl font-bold text-amber-200 drop-shadow-[0_0_3px_black]'>
-            No account yet?{' '}
+            Még nincs fiókod?{' '}
             <a href="/register" className='text-amber-100 hover:text-yellow-300 underline font-bold'>
-              Join the realm
+              Csatlakozz a birodalomhoz
             </a>
           </p>
         </form>

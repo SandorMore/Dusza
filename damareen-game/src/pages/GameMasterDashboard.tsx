@@ -18,12 +18,10 @@ const GameMasterDashboard: React.FC = () => {
   const [error, setError] = useState<string>('')
 
   useEffect(() => {
-    // Check if user is authenticated and is a Game Master
     const token = localStorage.getItem('token')
     const userStr = localStorage.getItem('user')
     
     if (!token) {
-      console.log('No token found, redirecting to login...')
       window.location.href = '/login'
       return
     }
@@ -34,15 +32,12 @@ const GameMasterDashboard: React.FC = () => {
         setUser(userData)
         
         if (userData.role !== 'gameMaster') {
-          console.log('User is not Game Master, redirecting...')
           window.location.href = '/player'
           return
         }
         
-        // Load data after user is confirmed to be Game Master
         loadData()
       } catch (error) {
-        console.error('Error parsing user data:', error)
         window.location.href = '/login'
         return
       }
@@ -53,26 +48,17 @@ const GameMasterDashboard: React.FC = () => {
     setLoading(true)
     setError('')
     try {
-      console.log('🔄 Loading all game data...')
-      
       const [cardsRes, dungeonsRes, environmentsRes] = await Promise.all([
         apiService.getWorldCards(),
         apiService.getDungeons(),
         apiService.getGameEnvironments()
       ])
       
-      console.log('📦 Cards response:', cardsRes)
-      console.log('🏰 Dungeons response:', dungeonsRes)
-      console.log('🌍 Environments response:', environmentsRes)
-      
       setWorldCards(cardsRes.cards || [])
       setDungeons(dungeonsRes.dungeons || [])
       setEnvironments(environmentsRes.environments || [])
       
-      console.log(`✅ Loaded: ${cardsRes.cards?.length || 0} cards, ${dungeonsRes.dungeons?.length || 0} dungeons, ${environmentsRes.environments?.length || 0} environments`)
-      
     } catch (error) {
-      console.error('❌ Error loading data:', error)
       setError('Failed to load game data. Please check your connection and try again.')
     } finally {
       setLoading(false)
@@ -80,17 +66,14 @@ const GameMasterDashboard: React.FC = () => {
   }
 
   const handleCardCreated = () => {
-    console.log('🔄 Refreshing cards after creation...')
     loadData()
   }
 
   const handleDungeonCreated = () => {
-    console.log('🔄 Refreshing dungeons after creation...')
     loadData()
   }
 
   const handleEnvironmentCreated = () => {
-    console.log('🔄 Refreshing environments after creation...')
     loadData()
   }
 
@@ -101,13 +84,12 @@ const GameMasterDashboard: React.FC = () => {
     window.location.href = '/login'
   }
 
-  // Show loading while checking authentication
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-amber-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-600 mx-auto mb-4"></div>
-          <p className="text-amber-800 font-serif text-lg">Consulting the royal archives...</p>
+          <p className="text-amber-800 font-serif text-lg">Királyi archívumok konzultálása...</p>
         </div>
       </div>
     )

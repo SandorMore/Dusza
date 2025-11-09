@@ -1,4 +1,3 @@
-// models/PlayerCollection.js
 const mongoose = require('mongoose')
 
 const playerCollectionSchema = new mongoose.Schema({

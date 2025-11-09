@@ -1,4 +1,3 @@
-// src/pages/Register.tsx - Javított verzió
 import React, { useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { apiService } from '../services/api'
@@ -28,38 +27,27 @@ const Register: React.FC = () => {
     setMessage('')
 
     try {
-      console.log('Sending registration request...')
       const response: AuthResponse = await apiService.register(formData)
-      console.log('Full API response:', response)
       
-      // MEGVÁLTOZOTT: tokens.accessToken használata
       if (response.tokens?.accessToken) {
         localStorage.setItem('token', response.tokens.accessToken)
-        console.log('AccessToken saved:', response.tokens.accessToken)
-      } else {
-        console.log('No accessToken in response!')
       }
       
       if (response.user) {
         localStorage.setItem('user', JSON.stringify(response.user))
-        console.log('User saved:', response.user)
-      } else {
-        console.log('No user in response!')
       }
       
       if (response.tokens?.accessToken && response.user) {
         setMessage('Sikeres regisztráció! Átirányítás...')
         setTimeout(() => {
           const redirectTo = response.user?.role === 'gameMaster' ? '/game-master' : '/player'
-          console.log('Redirecting to:', redirectTo)
           window.location.href = redirectTo
         }, 1500)
       } else {
-        setMessage('Registration completed but missing tokens or user')
+        setMessage('Regisztráció befejezve, de hiányoznak a tokenek vagy a felhasználó')
       }
     } catch (error: unknown) {
-      console.error('Registration error:', error)
-      setMessage('Registration failed')
+      setMessage('Regisztráció sikertelen')
     } finally {
       setLoading(false)
     }
@@ -70,8 +58,8 @@ const Register: React.FC = () => {
     <div className="min-h-screen bg-[url('/public/assets/freepik__the-style-is-rich-with-textured-brushstrokes-deep-__21311.png')] bg-cover bg-center flex justify-center items-center py-12 px-4">
       <div className='backdrop-blur-sm bg-white/30 rounded-3xl shadow-2xl p-8 md:p-12 w-full max-w-md'>
         <form onSubmit={handleSubmit} className='flex flex-col w-full'>
-          <h1 className='text-4xl font-bold text-amber-100 font-serif mb-2 text-center tracking-wider'>⚜️ <br /> Join the Realm</h1>
-          <p className='text-amber-200 text-center mb-8 font-serif'>Forge your legend today!</p>
+          <h1 className='text-4xl font-bold text-amber-100 font-serif mb-2 text-center tracking-wider'>⚜️ <br /> Csatlakozz a Birodalomhoz</h1>
+          <p className='text-amber-200 text-center mb-8 font-serif'>Kovácsold meg a legendádat ma!</p>
 
           {message && (
             <div className={`p-4 mb-6 rounded-xl border-2 font-bold text-center ${
@@ -88,7 +76,7 @@ const Register: React.FC = () => {
             <input 
               id='username' 
               type="text" 
-              placeholder='Enter your username' 
+              placeholder='Add meg a felhasználóneved' 
               className=' bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500' 
               value={formData.username}
               onChange={handleChange}
@@ -101,7 +89,7 @@ const Register: React.FC = () => {
             <input 
               id='email' 
               type="email" 
-              placeholder='Enter your email' 
+              placeholder='Add meg az email címed' 
               className=' bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500' 
               value={formData.email}
               onChange={handleChange}
@@ -114,7 +102,7 @@ const Register: React.FC = () => {
             <input 
               id='password' 
               type="password" 
-              placeholder='Enter your password (min 6 chars)' 
+              placeholder='Add meg a jelszavad (min 6 karakter)' 
               className=' bg-amber-50 p-3 rounded-xl text-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-500' 
               value={formData.password}
               onChange={handleChange}
@@ -141,13 +129,13 @@ const Register: React.FC = () => {
             type="submit"
             disabled={loading}
           >
-            {loading ? '🔄 Forging...' : '⚜️ Join the Realm'}
+            {loading ? '🔄 Kovácsolás...' : '⚜️ Csatlakozás a Birodalomhoz'}
           </button>
 
           <p className='mt-6 text-center text-amber-200 font-serif'>
-            Already have an account?{' '}
+            Már van fiókod?{' '}
             <a href="/login" className='text-amber-100 hover:text-yellow-300 underline font-bold'>
-              Enter the castle
+              Belépés a várba
             </a>
           </p>
         </form>

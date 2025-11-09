@@ -40,12 +40,10 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
   const [isCalculatingFinal, setIsCalculatingFinal] = useState(false)
 
   useEffect(() => {
-    // Initialize health arrays
     setPlayerHealth(playerCards.map(card => card.health))
     setDungeonHealth(dungeonCards.map(card => card.health))
   }, [playerCards, dungeonCards])
 
-  // Reset round state when round changes
   useEffect(() => {
     setDisplayAbleResult(false)
     setRoundStarted(false)
@@ -63,8 +61,6 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
         setBattleRounds(prev => [...prev, nextRoundData.round])
         setCurrentRound(nextRoundData.roundIndex)
       } catch (error: any) {
-        console.error('Error fetching next round:', error)
-        // Still advance to next round even if fetch fails
         setCurrentRound(prev => prev + 1)
       } finally {
         setIsFetchingRound(false)
@@ -80,11 +76,9 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
     
     setRoundStarted(true)
     
-    // Start attack animation
     setIsAnimating(true)
     setShowAttack(true)
 
-    // After slower attack animation, update health
     const timer = setTimeout(() => {
       setPlayerHealth(prev => {
         const newHealth = [...prev]
@@ -101,19 +95,17 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
       setShowAttack(false)
       setDisplayAbleResult(true)
       setDisplayWhy(true)
-      // Wait longer before allowing next round
       setTimeout(() => {
         setIsAnimating(false)
         setRoundCompleted(true)
         
-        // If this is the final round, start calculating final result after a delay
         if (currentRound >= totalRounds - 1) {
           setTimeout(() => {
             calculateFinalResult()
-          }, 1000) // Additional delay before calculating final result
+          }, 1000)
         }
-      }, 1500) // Slower animation completion
-    }, 2000) // Slower attack animation
+      }, 1500)
+    }, 2000)
 
     return () => clearTimeout(timer)
   }
@@ -126,8 +118,6 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
       const finalResult = await apiService.completeBattle(deckId, dungeonId, cardOrder, battleRounds)
       setFinalBattleResult(finalResult.result)
     } catch (error: any) {
-      console.error('Error completing battle:', error)
-      // Calculate locally if API fails
       const playerWinsCount = battleRounds.filter(r => r.playerWins).length
       const playerWins = playerWinsCount >= Math.ceil(battleRounds.length / 2)
       const localResult: BattleResult = {
@@ -170,7 +160,6 @@ const AnimatedBattleView: React.FC<AnimatedBattleViewProps> = ({
   const currentRoundData = battleRounds[currentRound]
   const isBattleComplete = currentRound >= totalRounds - 1 && !isAnimating && roundCompleted
   
-  // Calculate final result when battle is complete (fallback)
   useEffect(() => {
     if (isBattleComplete && battleResult.playerWins === null && battleRounds.length === totalRounds && !finalBattleResult && !isCalculatingFinal) {
       calculateFinalResult()

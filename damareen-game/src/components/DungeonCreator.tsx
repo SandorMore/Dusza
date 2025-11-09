@@ -23,34 +23,21 @@ const DungeonCreator: React.FC<Props> = ({ worldCards, onDungeonCreated }) => {
     setMessage('')
 
     try {
-      console.log('🔄 Starting dungeon creation...')
-      console.log('Original card order:', formData.cardIds)
-      
-      // Ensure leader is last before submitting
       const selectedCards = getSelectedCardsInOrder()
       const leaderIndex = selectedCards.findIndex(card => card.isLeader)
       
       let finalCardIds = formData.cardIds
       
-      console.log('Selected cards:', selectedCards.map(c => ({ name: c.name, isLeader: c.isLeader })))
-      console.log('Leader index:', leaderIndex)
-      
       if (leaderIndex !== -1 && leaderIndex !== selectedCards.length - 1) {
-        // Reorder the cardIds to put leader last
         const leaderCardId = formData.cardIds[leaderIndex]
         const nonLeaderCards = formData.cardIds.filter(id => id !== leaderCardId)
         finalCardIds = [...nonLeaderCards, leaderCardId]
-        console.log('Reordered cards - leader moved to end')
       }
-      
-      console.log('Final card order for submission:', finalCardIds)
       
       const submissionData = {
         ...formData,
         cardIds: finalCardIds
       }
-      
-      console.log('Submitting dungeon data:', submissionData)
       
       await apiService.createDungeon(submissionData)
       
@@ -58,7 +45,6 @@ const DungeonCreator: React.FC<Props> = ({ worldCards, onDungeonCreated }) => {
       setFormData({ name: '', type: 'Egyszerű', cardIds: [] })
       onDungeonCreated()
     } catch (error: unknown) {
-      console.error('❌ Dungeon creation error:', error)
       if (error instanceof Error) {
         setMessage(`Error: ${error.message}`)
       } else {
