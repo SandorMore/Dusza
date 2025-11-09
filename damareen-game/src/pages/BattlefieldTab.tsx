@@ -17,6 +17,7 @@ import {
   verticalListSortingStrategy
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { useNavigate} from 'react-router-dom'
 
 interface BattlefieldTabProps {
   playerDecks: PlayerDeck[]
@@ -98,6 +99,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
   const [showUpgradePage, setShowUpgradePage] = useState(false)
   const resultsRef = useRef<HTMLDivElement>(null)
   const [previewDeckCards, setPreviewDeckCards] = useState<WorldCard[]>([])
+  const navigate = useNavigate()
 
   // Initialize preview deck cards when selectedDeck changes
   useEffect(() => {
@@ -176,7 +178,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
   // Show dedicated upgrade page if player won
   if (battleResult && showUpgradePage && battleResult.playerWins && battleResult.playerReward) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-amber-100 py-8">
+      <div className="min-h-screen py-8">
         <div className="max-w-6xl mx-auto px-4">
           <div className="bg-gradient-to-br from-yellow-800 to-orange-900 rounded-2xl shadow-2xl p-8 border-4 border-yellow-600">
             <h2 className="text-3xl font-bold text-amber-100 font-serif mb-4 text-center">⚜️ Victory Spoils!</h2>
@@ -208,7 +210,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                     <button
                       key={card._id}
                       onClick={() => applyReward(card._id)}
-                      className="p-6 border-4 border-yellow-500 rounded-xl text-left bg-gradient-to-br from-gray-700 to-gray-800 hover:from-yellow-900/50 hover:to-orange-900/50 transition-all transform hover:scale-105 shadow-lg"
+                      className="p-6 rounded-xl text-left bg-gradient-to-br from-gray-700 to-gray-800 hover:from-yellow-900/50 hover:to-orange-900/50 transition-all transform hover:scale-105 shadow-lg"
                     >
                       <div className="flex items-center justify-between mb-4">
                         <div className="font-bold text-amber-100 text-xl">{card.name}</div>
@@ -244,9 +246,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
                 </div>
                 <div className="text-center">
                   <button
-                    onClick={() => {
-                      setShowUpgradePage(false)
-                    }}
+                    onClick={() => navigate("/player")}
                     className="bg-gray-600 hover:bg-gray-700 text-amber-100 px-8 py-3 rounded-xl transition-all border-2 border-gray-500 font-bold"
                   >
                     Skip Upgrade
