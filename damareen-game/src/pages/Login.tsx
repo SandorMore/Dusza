@@ -50,12 +50,6 @@ const Login: React.FC = () => {
         console.log('❌ Nincs user a válaszban!')
       }
       
-      // Ellenőrizzük, tényleg elmentődött-e
-      const savedToken = localStorage.getItem('token')
-      const savedUser = localStorage.getItem('user')
-      console.log('🔍 Ellenőrzés - Mentett token:', savedToken)
-      console.log('🔍 Ellenőrzés - Mentett user:', savedUser)
-      
       if (response.tokens?.accessToken && response.user) {
         setMessage('Sikeres bejelentkezés! Átirányítás...')
         setTimeout(() => {

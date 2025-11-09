@@ -29,7 +29,7 @@ export interface LeaderCardData {
 export interface Dungeon {
   _id: string
   name: string
-  type: 'Egyszerű találkozás' | 'Kis kazamata' | 'Nagy kazamata'
+  type: 'Egyszerű' | 'Kis kazamata' | 'Nagy kazamata'
   cards: WorldCard[]
   createdBy: string
   createdAt: string
@@ -38,7 +38,7 @@ export interface Dungeon {
 
 export interface DungeonData {
   name: string
-  type: 'Egyszerű találkozás' | 'Kis kazamata' | 'Nagy kazamata'
+  type: 'Egyszerű' | 'Kis kazamata' | 'Nagy kazamata'
   cardIds: string[]
 }
 

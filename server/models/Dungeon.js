@@ -10,7 +10,7 @@ const dungeonSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ['Egyszerű találkozás', 'Kis kazamata', 'Nagy kazamata']
+    enum: ['Egyszerű', 'Kis kazamata', 'Nagy kazamata']
   },
   cards: [{
     type: mongoose.Schema.Types.ObjectId,
@@ -56,17 +56,16 @@ dungeonSchema.pre('save', async function(next) {
     console.log('Last card is leader:', lastCardIsLeader);
 
     // BASIC VALIDATION ONLY - comment out strict rules for now
-    const requiredCount = this.type === 'Egyszerű találkozás' ? 1 : 
+    const requiredCount = this.type === 'Egyszerű' ? 1 : 
                          this.type === 'Kis kazamata' ? 4 : 6;
     
     if (cardCount !== requiredCount) {
       console.log('❌ VALIDATION FAILED: Wrong card count');
       return next(new Error(`${this.type} must have exactly ${requiredCount} cards`));
     }
-    
-    /* COMMENT OUT STRICT VALIDATION FOR NOW
+    /*
     switch(this.type) {
-      case 'Egyszerű találkozás':
+      case 'Egyszerű':
         if (cardCount !== 1) {
           console.log('❌ SIMPLE ENCOUNTER VALIDATION FAILED: Wrong card count');
           return next(new Error('Simple encounter must have exactly 1 card'));
