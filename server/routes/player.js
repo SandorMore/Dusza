@@ -195,7 +195,7 @@ router.post('/decks', auth, async (req, res) => {
 router.post('/battle', auth, async (req, res) => {
   try {
     console.log('🔍 POST /battle - User:', req.user.username);
-    const { deckId, dungeonId } = req.body;
+    const { deckId, dungeonId, cardOrder } = req.body;
     
     const deck = await PlayerDeck.findById(deckId).populate('cards');
     const dungeon = await Dungeon.findById(dungeonId).populate('cards');
@@ -208,7 +208,28 @@ router.post('/battle', auth, async (req, res) => {
       return res.status(400).json({ message: 'Deck size must match dungeon size' });
     }
     
-    const battleResult = simulateBattle(deck.cards, dungeon.cards, dungeon.type);
+    // Reorder deck cards if cardOrder is provided
+    let orderedPlayerCards = deck.cards;
+    if (cardOrder && Array.isArray(cardOrder) && cardOrder.length === deck.cards.length) {
+      // Create a map of card IDs to cards for quick lookup
+      const cardMap = new Map();
+      deck.cards.forEach(card => {
+        cardMap.set(card._id.toString(), card);
+      });
+      
+      // Reorder cards according to cardOrder
+      orderedPlayerCards = cardOrder.map(cardId => {
+        const card = cardMap.get(cardId);
+        if (!card) {
+          throw new Error(`Card with ID ${cardId} not found in deck`);
+        }
+        return card;
+      });
+      
+      console.log('🔄 Cards reordered according to drag-and-drop sequence');
+    }
+    
+    const battleResult = simulateBattle(orderedPlayerCards, dungeon.cards, dungeon.type);
     
     res.json({ message: 'Battle completed', result: battleResult });
   } catch (error) {

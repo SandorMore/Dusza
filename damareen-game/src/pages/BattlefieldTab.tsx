@@ -149,7 +149,7 @@ const BattlefieldTab: React.FC<BattlefieldTabProps> = ({
     return (
       <AnimatedBattleView
         battleResult={battleResult}
-        playerCards={selectedDeck.cards}
+        playerCards={previewDeckCards}
         dungeonCards={selectedDungeon.cards}
         deckId={selectedDeck._id}
         dungeonId={selectedDungeon._id}
